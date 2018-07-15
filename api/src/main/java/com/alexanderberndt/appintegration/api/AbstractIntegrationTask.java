@@ -38,7 +38,7 @@ public abstract class AbstractIntegrationTask<IN, OUT> implements IntegrationTas
     }
 
     @Override
-    public final void setup(final IntegrationTaskDef taskDef) {
+    public final void setupTask(final IntegrationTaskDef taskDef) {
 
         this.taskDef = taskDef;
         if (taskDef == null) {
@@ -49,8 +49,8 @@ public abstract class AbstractIntegrationTask<IN, OUT> implements IntegrationTas
         if ((requiredProperties != null) && (requiredProperties.length != 0)) {
 
             if (taskDef.getProperties() == null) {
-                LOGGER.error("Missing setup-properties: {}", Arrays.asList(requiredProperties));
-                throw new IntegrationException("Missing setup-properties: " + Arrays.asList(requiredProperties));
+                LOGGER.error("Missing setupTask-properties: {}", Arrays.asList(requiredProperties));
+                throw new IntegrationException("Missing setupTask-properties: " + Arrays.asList(requiredProperties));
             }
 
             final List<String> missingRequirements = new ArrayList<>();
@@ -61,8 +61,8 @@ public abstract class AbstractIntegrationTask<IN, OUT> implements IntegrationTas
             }
 
             if (missingRequirements.size() > 0) {
-                LOGGER.error("Missing setup-properties: {}", missingRequirements);
-                throw new IntegrationException("Missing setup-properties: " + missingRequirements);
+                LOGGER.error("Missing setupTask-properties: {}", missingRequirements);
+                throw new IntegrationException("Missing setupTask-properties: " + missingRequirements);
             }
         }
 

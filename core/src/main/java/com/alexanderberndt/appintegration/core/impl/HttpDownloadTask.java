@@ -44,7 +44,7 @@ public class HttpDownloadTask extends AbstractIntegrationTask<Object, byte[]> {
     }
 
     @Override
-    public byte[] filter(Object data, IntegrationContext context) {
+    public byte[] execute(Object data, IntegrationContext context) {
 
         try {
             final URL url = new URI("http://spiegel.de").toURL();

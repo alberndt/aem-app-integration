@@ -40,6 +40,7 @@ public class RegexValidator extends AbstractIntegrationValidator<String> {
         final Matcher m = pattern.matcher(data);
         if (m.find()) {
             LOGGER.info("Found pattern");
+            context.addWarning("Found pattern {}", pattern.pattern(), "alex");
         }
     }
 }

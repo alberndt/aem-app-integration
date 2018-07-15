@@ -12,9 +12,9 @@ public class HttpDownloadTaskTest {
     public void filter() {
 
         HttpDownloadTask httpDownloadTask = new HttpDownloadTask();
-//        httpDownloadTask.setup(null);
+//        httpDownloadTask.setupTask(null);
 //
-//        byte[] content = httpDownloadTask.filter(null, null);
+//        byte[] content = httpDownloadTask.execute(null, null);
     }
 
 }

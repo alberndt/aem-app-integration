@@ -7,7 +7,7 @@ public abstract class AbstractIntegrationValidator<T> extends AbstractIntegratio
     }
 
     @Override
-    public final T filter(T data, IntegrationContext context) {
+    public final T execute(T data, IntegrationContext context) {
         this.validate(data, context);
         return data;
     }
