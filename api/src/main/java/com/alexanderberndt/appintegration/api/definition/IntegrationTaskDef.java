@@ -12,6 +12,15 @@ public class IntegrationTaskDef {
 
     private List<IntegrationTaskDef> subtasks;
 
+    public IntegrationTaskDef() {
+    }
+
+    public IntegrationTaskDef(String task, Properties properties, List<IntegrationTaskDef> subtasks) {
+        this.task = task;
+        this.properties = properties;
+        this.subtasks = subtasks;
+    }
+
     public String getTask() {
         return task;
     }
