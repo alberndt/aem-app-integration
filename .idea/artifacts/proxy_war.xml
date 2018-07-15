@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
   <artifact type="war" name="proxy:war">
-    <output-path>$PROJECT_DIR$/proxy/target</output-path>
+    <output-path>$PROJECT_DIR$/server/jetty/target</output-path>
     <root id="archive" name="testapps.war">
       <element id="artifact" artifact-name="proxy:war exploded" />
     </root>

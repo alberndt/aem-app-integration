@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
   <artifact type="exploded-war" name="proxy:war exploded">
-    <output-path>$PROJECT_DIR$/proxy/target/testapps</output-path>
+    <output-path>$PROJECT_DIR$/server/jetty/target/testapps</output-path>
     <root id="root">
       <element id="directory" name="WEB-INF">
         <element id="directory" name="classes">
@@ -18,7 +18,7 @@
         </element>
       </element>
       <element id="directory" name="META-INF">
-        <element id="file-copy" path="$PROJECT_DIR$/proxy/target/testapps/META-INF/MANIFEST.MF" />
+        <element id="file-copy" path="$PROJECT_DIR$/server/jetty/target/testapps/META-INF/MANIFEST.MF" />
       </element>
       <element id="javaee-facet-resources" facet="proxy/web/Web" />
     </root>

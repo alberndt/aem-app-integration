@@ -1,0 +1,15 @@
+<component name="libraryTable">
+  <library name="Maven: com.alexanderberndt.aem-app-integration:testapps:war:0.0.1-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/alexanderberndt/aem-app-integration/testapps/0.0.1-SNAPSHOT/testapps-0.0.1-SNAPSHOT.war!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/sample-apps/testapps-0.0.1-SNAPSHOT-javadoc.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/alexanderberndt/aem-app-integration/testapps/0.0.1-SNAPSHOT/testapps-0.0.1-SNAPSHOT-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/sample-apps/testapps-0.0.1-SNAPSHOT-sources.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/alexanderberndt/aem-app-integration/testapps/0.0.1-SNAPSHOT/testapps-0.0.1-SNAPSHOT-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

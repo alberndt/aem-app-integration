@@ -1,5 +1,5 @@
 <component name="ArtifactManager">
-  <artifact type="exploded-war" name="testapps:war exploded">
+  <artifact type="exploded-war" name="sample-apps:war exploded">
     <output-path>$PROJECT_DIR$/sample-apps/target/testapps</output-path>
     <root id="root">
       <element id="directory" name="WEB-INF">

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/aem-app-integration.iml" filepath="$PROJECT_DIR$/.idea/aem-app-integration.iml" />
+      <module fileurl="file://$PROJECT_DIR$/api/api.iml" filepath="$PROJECT_DIR$/api/api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/core.iml" filepath="$PROJECT_DIR$/core/core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/server/jetty/proxy.iml" filepath="$PROJECT_DIR$/server/jetty/proxy.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sample-apps/testapps.iml" filepath="$PROJECT_DIR$/sample-apps/testapps.iml" />
+    </modules>
+  </component>
+</project>
