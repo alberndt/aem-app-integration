@@ -1,40 +1,42 @@
 package com.alexanderberndt.appintegration.core.impl;
 
-import com.alexanderberndt.appintegration.api.IntegrationContext;
-import com.alexanderberndt.appintegration.api.definition.IntegrationTaskDef;
+import com.alexanderberndt.appintegration.api.IntegrationJob;
+import com.alexanderberndt.appintegration.api.IntegrationResource;
+import com.alexanderberndt.appintegration.api.IntegrationResourceType;
+import com.alexanderberndt.appintegration.core.IntegrationResourceImpl;
+import com.alexanderberndt.appintegration.core.tasks.RegexValidator;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
-import static org.mockito.Mockito.*;
 import org.mockito.MockitoAnnotations;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.mockito.Mockito.*;
 
 public class RegexValidatorTest {
 
-    private static final String JSON1 = "{\"regex\":\"hello world\"}";
-
     @Mock
-    private IntegrationContext context;
+    private IntegrationJob job;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
     }
 
     @Test
     public void filter() {
-
-        IntegrationTaskDef taskDef = IntegrationTaskTestUtil
-                .buildTaskDef(RegexValidator.TASK_NAME)
-                .property(RegexValidator.REGEX_PARAM, "hello")
-                .build();
+        Map<String, Object> properties = new HashMap<>();
+        properties.put(RegexValidator.REGEX_PARAM, "hello world");
 
         RegexValidator regexValidator = new RegexValidator();
-        regexValidator.setupTask(taskDef);
-        regexValidator.execute("Here is my hello world!", context);
 
-        verify(context, times(1)).addWarning(anyString(), anyVararg());
+        regexValidator.setupTask(properties);
+        IntegrationResource resource = IntegrationResourceImpl.create(IntegrationResourceType.PLAIN_TEXT, "Here is my hello world!");
+        regexValidator.execute(resource, job);
 
+        verify(job, times(1)).addWarning(anyString(), ArgumentMatchers.<Object>any());
     }
-
-
 }

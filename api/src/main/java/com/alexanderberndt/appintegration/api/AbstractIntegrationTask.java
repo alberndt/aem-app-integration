@@ -1,66 +1,51 @@
 package com.alexanderberndt.appintegration.api;
 
-import com.alexanderberndt.appintegration.api.definition.IntegrationTaskDef;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
-public abstract class AbstractIntegrationTask<IN, OUT> implements IntegrationTask<IN, OUT> {
+public abstract class AbstractIntegrationTask implements IntegrationTask {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractIntegrationTask.class);
 
-    private final Class<IN> inputClass;
-
-    private final Class<OUT> outputClass;
-
     private final String[] requiredProperties;
 
-    private IntegrationTaskDef taskDef;
+    private Map<String, Object> properties;
 
-    public AbstractIntegrationTask(Class<IN> inputClass, Class<OUT> outputClass, String... requiredProperties) {
-        this.inputClass = inputClass;
-        this.outputClass = outputClass;
+    private List<IntegrationResourceType> applicableResourceTypes;
+
+    public AbstractIntegrationTask(String... requiredProperties) {
         this.requiredProperties = requiredProperties;
     }
 
     @Override
-    public final Class<IN> getInputClass() {
-        return inputClass;
+    public void setApplicableResourceTypes(List<IntegrationResourceType> applicableResourceTypes) {
+        this.applicableResourceTypes = applicableResourceTypes;
     }
 
     @Override
-    public final Class<OUT> getOutputClass() {
-        return outputClass;
+    public final List<IntegrationResourceType> getApplicableResourceTypes() {
+        return this.applicableResourceTypes;
     }
 
     @Override
-    public final void setupTask(final IntegrationTaskDef taskDef) {
+    public final void setupTask(Map<String, Object> properties) {
 
-        this.taskDef = taskDef;
-        if (taskDef == null) {
-            LOGGER.error("Task definition MUST NOT be null!");
-            throw new IntegrationException("Task definition MUST NOT be null!");
-        }
+        this.properties = properties;
 
         if ((requiredProperties != null) && (requiredProperties.length != 0)) {
-
-            if (taskDef.getProperties() == null) {
+            if (this.properties == null) {
                 LOGGER.error("Missing setupTask-properties: {}", Arrays.asList(requiredProperties));
                 throw new IntegrationException("Missing setupTask-properties: " + Arrays.asList(requiredProperties));
             }
-
             final List<String> missingRequirements = new ArrayList<>();
             for (final String reqProp : requiredProperties) {
-                if (!taskDef.getProperties().containsKey(reqProp)) {
+                if (!this.properties.containsKey(reqProp)) {
                     missingRequirements.add(reqProp);
                 }
             }
-
-            if (missingRequirements.size() > 0) {
+            if (!missingRequirements.isEmpty()) {
                 LOGGER.error("Missing setupTask-properties: {}", missingRequirements);
                 throw new IntegrationException("Missing setupTask-properties: " + missingRequirements);
             }
@@ -74,12 +59,12 @@ public abstract class AbstractIntegrationTask<IN, OUT> implements IntegrationTas
     }
 
     @SuppressWarnings("unchecked")
-    protected <T> T getProperty(final String propertyName, Class<T> tClass) {
-        if (this.taskDef.getProperties() != null) {
-            final Object obj = this.taskDef.getProperties().get(propertyName);
+    protected <P> P getProperty(final String propertyName, Class<P> tClass) {
+        if (this.properties != null) {
+            final Object obj = this.properties.get(propertyName);
             if (obj != null) {
                 if (tClass.isInstance(obj)) {
-                    return (T) obj;
+                    return (P) obj;
                 } else {
                     LOGGER.warn("Property {} has not the expected type {}, but has actual type {}.",
                             propertyName, tClass, obj.getClass());

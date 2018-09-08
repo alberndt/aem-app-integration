@@ -1,0 +1,35 @@
+# Test Pipeline 1
+---
+applicationId: "adapt-schedule"
+baseUrl: "https://adapt.to"
+htmlSnippetUrl: "https://adapt.to/${year}/en/schedule.html"
+htmlSnippetQuery: "section[id=id-day-3] table tbody"
+
+tasks:
+
+- task: "validate-regex"
+  resourceTypes: ["html-snippet"]
+  properties:
+    regex: "Alexander Berndt"
+    warn: "contains abc!"
+
+- task: "extract-static-resources"
+  resourceTypes: ["html"]
+  properties:
+    query: "script[type=text/javascript][data-webapp=export][src]"
+    expectedType: "javascript"
+    attribute: "src"
+
+- task: "extract-static-resources"
+  resourceTypes: ["html"]
+  properties:
+    query: "link[rel=stylesheet][data-webapp=export][href]"
+    expectedType: "css"
+    attribute: "href"
+
+- task: "extract-static-resources"
+  resourceTypes: ["html"]
+  properties:
+    query: "html[manifest]"
+    expectedType: "cache-manifest"
+    attribute: "manifest"

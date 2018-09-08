@@ -1,21 +1,16 @@
 package com.alexanderberndt.appintegration.api;
 
-import com.alexanderberndt.appintegration.api.definition.IntegrationTaskDef;
+import java.util.List;
+import java.util.Map;
 
-public interface IntegrationTask<IN, OUT> {
+public interface IntegrationTask {
 
-    OUT execute(IN data, IntegrationContext context);
+    void setApplicableResourceTypes(List<IntegrationResourceType> applicableResourceTypes);
 
-    void setupTask(final IntegrationTaskDef taskDef);
+    List<IntegrationResourceType> getApplicableResourceTypes();
 
-    void tearDownTask();
+    void setupTask(final Map<String, Object> properties);
 
-    void beforeImportStarts();
-
-    void afterImportFinished();
-
-    Class<IN> getInputClass();
-
-    Class<OUT> getOutputClass();
+    void execute(IntegrationResource resource, IntegrationJob job);
 
 }

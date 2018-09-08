@@ -2,6 +2,13 @@
 <project version="4">
   <component name="FrameworkDetectionExcludesConfiguration">
     <file url="file://$PROJECT_DIR$/testapps/overlays" />
+    <file type="Osmorc" url="file://$PROJECT_DIR$/asdsadf/core" />
+    <file type="Osmorc" url="file://$PROJECT_DIR$/asdsadf/it.tests" />
+    <file type="Osmorc" url="file://$PROJECT_DIR$/server/aem-server/core" />
+    <file type="Osmorc" url="file://$PROJECT_DIR$/server/aem-server/it.tests" />
+    <file type="Osmorc" url="file://$PROJECT_DIR$/server/aem/bundle" />
+    <file type="Osmorc" url="file://$PROJECT_DIR$/server/aem/core" />
+    <file type="Osmorc" url="file://$PROJECT_DIR$/server/aem/it.tests" />
     <file type="web" url="file://$PROJECT_DIR$/proxy" />
     <file type="web" url="file://$PROJECT_DIR$/sample-apps" />
     <file type="web" url="file://$PROJECT_DIR$/server/jetty" />
@@ -15,6 +22,11 @@
       <list>
         <option value="$PROJECT_DIR$/pom.xml" />
       </list>
+    </option>
+    <option name="ignoredFiles">
+      <set>
+        <option value="$PROJECT_DIR$/asdsadf/pom.xml" />
+      </set>
     </option>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_9" default="false" project-jdk-name="1.8" project-jdk-type="JavaSDK" />

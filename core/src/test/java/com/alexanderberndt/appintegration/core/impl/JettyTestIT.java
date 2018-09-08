@@ -1,5 +1,6 @@
 package com.alexanderberndt.appintegration.core.impl;
 
+import com.alexanderberndt.appintegration.core.utils.HttpDownloadUtil;
 import org.junit.Test;
 
 public class JettyTestIT {
@@ -13,10 +14,10 @@ public class JettyTestIT {
 //
 //        server.start();
 //
-        HttpDownloadTask task = new HttpDownloadTask();
+        //HttpDownloadUtil task = new HttpDownloadUtil();
         //task.execute();
 
-        Thread.sleep(8000);
+        //Thread.sleep(8000);
 //
 //
 //
