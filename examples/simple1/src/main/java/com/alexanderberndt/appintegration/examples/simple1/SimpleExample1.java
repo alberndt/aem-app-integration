@@ -47,8 +47,6 @@ public class SimpleExample1 {
 
     private void run() {
         LOGGER.info("run");
-
-
         this.job.executeImport();
     }
 
