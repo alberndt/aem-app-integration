@@ -1,7 +1,6 @@
 package com.alexanderberndt.appintegration.core.tasks;
 
 import com.alexanderberndt.appintegration.api.AbstractIntegrationTask;
-import com.alexanderberndt.appintegration.api.IntegrationContext;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

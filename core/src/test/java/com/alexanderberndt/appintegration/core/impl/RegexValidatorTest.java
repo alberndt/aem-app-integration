@@ -5,8 +5,8 @@ import com.alexanderberndt.appintegration.api.IntegrationResource;
 import com.alexanderberndt.appintegration.api.IntegrationResourceType;
 import com.alexanderberndt.appintegration.core.IntegrationResourceImpl;
 import com.alexanderberndt.appintegration.core.tasks.RegexValidator;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -21,7 +21,7 @@ public class RegexValidatorTest {
     @Mock
     private IntegrationJob job;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
     }

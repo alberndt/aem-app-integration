@@ -82,23 +82,6 @@ public class IntegrationJobImpl implements IntegrationJob {
     @Override
     public void addWarning(String messagePattern, Object... objects) {
 
-        final FormattingTuple formattingTuple;
-        if ((objects != null) && (objects.length > 0) && (objects[objects.length - 1] instanceof Throwable)) {
-            // format message, if it contains a throwable
-            final Throwable t = (Throwable) objects[objects.length - 1];
-            final Object[] otherObjects;
-            if (objects.length > 1) {
-                otherObjects = Arrays.copyOfRange(objects, 0, objects.length - 1);
-            } else {
-                otherObjects = null;
-            }
-            formattingTuple = MessageFormatter.arrayFormat(messagePattern, otherObjects, t);
-        } else {
-            formattingTuple = MessageFormatter.arrayFormat(messagePattern, objects);
-        }
-
-        LOGGER.warn(messagePattern, objects);
-        System.out.println(formattingTuple.getMessage());
 
     }
 

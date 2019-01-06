@@ -1,10 +1,5 @@
 package com.alexanderberndt.appintegration.core.impl;
 
-import com.alexanderberndt.appintegration.api.IntegrationContext;
-import com.alexanderberndt.appintegration.core.tasks.SystemResourceLoadTask;
-import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 public class SystemResourceLoadTaskTest {
 

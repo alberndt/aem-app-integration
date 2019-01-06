@@ -50,7 +50,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="aem-appintegration-server.aem-server" options="-Xlint" />
+      <module name="aem-appintegration-server.aem-server" options="" />
       <module name="aem-appintegration-server.aem-server.core" options="-Xlint" />
       <module name="aem-appintegration-server.aem-server.it.launcher" options="-Xlint" />
       <module name="aem-appintegration-server.aem-server.it.tests" options="-Xlint" />

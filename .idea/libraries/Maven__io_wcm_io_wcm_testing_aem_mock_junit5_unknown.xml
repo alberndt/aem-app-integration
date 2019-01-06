@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: io.wcm:io.wcm.testing.aem-mock.junit5:unknown">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/io/wcm/io.wcm.testing.aem-mock.junit5/unknown/io.wcm.testing.aem-mock.junit5-unknown.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/io/wcm/io.wcm.testing.aem-mock.junit5/unknown/io.wcm.testing.aem-mock.junit5-unknown-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/io/wcm/io.wcm.testing.aem-mock.junit5/unknown/io.wcm.testing.aem-mock.junit5-unknown-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
