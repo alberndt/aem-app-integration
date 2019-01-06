@@ -1,4 +1,4 @@
-package com.alexanderberndt.appintegration.core.parser;
+package com.alexanderberndt.appintegration.parser;
 
 import java.util.List;
 

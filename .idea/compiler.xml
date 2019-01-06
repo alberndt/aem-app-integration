@@ -11,7 +11,6 @@
         <module name="aem-appintegration-server.aem-server.it.tests" />
         <module name="aem-appintegration-server.aem-server.ui.apps" />
         <module name="aem-appintegration-server.aem-server.ui.content" />
-        <module name="api" />
         <module name="core" />
         <module name="proxy" />
         <module name="sample-apps" />

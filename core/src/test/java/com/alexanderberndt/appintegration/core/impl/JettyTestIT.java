@@ -1,6 +1,5 @@
 package com.alexanderberndt.appintegration.core.impl;
 
-import com.alexanderberndt.appintegration.core.utils.HttpDownloadUtil;
 import org.junit.jupiter.api.Test;
 
 public class JettyTestIT {

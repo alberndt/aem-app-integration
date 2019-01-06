@@ -1,8 +1,8 @@
-package com.alexanderberndt.appintegration.core.html;
+package com.alexanderberndt.appintegration.html;
 
 import com.alexanderberndt.appintegration.api.IntegrationStep;
 import com.alexanderberndt.appintegration.api.IntegrationStepResult;
-import com.alexanderberndt.appintegration.core.utils.ConfigValidator;
+import com.alexanderberndt.appintegration.utils.ConfigValidator;
 import org.apache.commons.configuration2.ImmutableConfiguration;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Selector;

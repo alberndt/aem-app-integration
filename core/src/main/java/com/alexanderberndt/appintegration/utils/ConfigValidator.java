@@ -1,4 +1,4 @@
-package com.alexanderberndt.appintegration.core.utils;
+package com.alexanderberndt.appintegration.utils;
 
 import com.alexanderberndt.appintegration.api.IntegrationStepResult;
 import org.apache.commons.configuration2.ImmutableConfiguration;

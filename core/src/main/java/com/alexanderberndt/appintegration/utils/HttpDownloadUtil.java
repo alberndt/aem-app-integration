@@ -1,10 +1,10 @@
-package com.alexanderberndt.appintegration.core.utils;
+package com.alexanderberndt.appintegration.utils;
 
 
 import com.alexanderberndt.appintegration.api.IntegrationException;
 import com.alexanderberndt.appintegration.api.IntegrationResource;
 import com.alexanderberndt.appintegration.api.IntegrationResourceType;
-import com.alexanderberndt.appintegration.core.IntegrationResourceImpl;
+import com.alexanderberndt.appintegration.IntegrationResourceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

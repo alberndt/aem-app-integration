@@ -1,4 +1,4 @@
-package com.alexanderberndt.appintegration.core.tasks;
+package com.alexanderberndt.appintegration.tasks;
 
 
 import com.alexanderberndt.appintegration.api.AbstractIntegrationTask;

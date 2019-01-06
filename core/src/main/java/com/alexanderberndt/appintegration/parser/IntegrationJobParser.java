@@ -1,10 +1,10 @@
-package com.alexanderberndt.appintegration.core.parser;
+package com.alexanderberndt.appintegration.parser;
 
 import com.alexanderberndt.appintegration.api.IntegrationException;
 import com.alexanderberndt.appintegration.api.IntegrationResourceType;
 import com.alexanderberndt.appintegration.api.IntegrationTask;
 import com.alexanderberndt.appintegration.api.IntegrationTaskFactory;
-import com.alexanderberndt.appintegration.core.IntegrationJobImpl;
+import com.alexanderberndt.appintegration.IntegrationJobImpl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;

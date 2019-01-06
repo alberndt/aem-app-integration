@@ -1,4 +1,4 @@
-package com.alexanderberndt.appintegration.core;
+package com.alexanderberndt.appintegration;
 
 import com.alexanderberndt.appintegration.api.IntegrationResource;
 import com.alexanderberndt.appintegration.api.IntegrationResourceType;

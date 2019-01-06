@@ -11,7 +11,6 @@
       <module fileurl="file://$PROJECT_DIR$/server/aem-server/it.tests/aem-appintegration-server.aem-server.it.tests.iml" filepath="$PROJECT_DIR$/server/aem-server/it.tests/aem-appintegration-server.aem-server.it.tests.iml" group="aem-appintegration-server and modules/aem-appintegration-server.aem-server and modules" />
       <module fileurl="file://$PROJECT_DIR$/server/aem-server/ui.apps/aem-appintegration-server.aem-server.ui.apps.iml" filepath="$PROJECT_DIR$/server/aem-server/ui.apps/aem-appintegration-server.aem-server.ui.apps.iml" group="aem-appintegration-server and modules/aem-appintegration-server.aem-server and modules" />
       <module fileurl="file://$PROJECT_DIR$/server/aem-server/ui.content/aem-appintegration-server.aem-server.ui.content.iml" filepath="$PROJECT_DIR$/server/aem-server/ui.content/aem-appintegration-server.aem-server.ui.content.iml" group="aem-appintegration-server and modules/aem-appintegration-server.aem-server and modules" />
-      <module fileurl="file://$PROJECT_DIR$/api/api.iml" filepath="$PROJECT_DIR$/api/api.iml" />
       <module fileurl="file://$PROJECT_DIR$/core/core.iml" filepath="$PROJECT_DIR$/core/core.iml" />
       <module fileurl="file://$PROJECT_DIR$/server/jetty/proxy.iml" filepath="$PROJECT_DIR$/server/jetty/proxy.iml" group="aem-appintegration-server and modules" />
       <module fileurl="file://$PROJECT_DIR$/examples/simple1/simple1.iml" filepath="$PROJECT_DIR$/examples/simple1/simple1.iml" group="aem-appintegration-examples and modules" />

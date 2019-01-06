@@ -20,7 +20,6 @@
 
     <modules>
         <module>sample-apps</module>
-        <module>api</module>
         <module>core</module>
         <module>server</module>
         <module>examples</module>

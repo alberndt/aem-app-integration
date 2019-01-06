@@ -1,9 +1,9 @@
 package com.alexanderberndt.appintegration.examples.simple1;
 
 import com.alexanderberndt.appintegration.api.IntegrationException;
-import com.alexanderberndt.appintegration.core.CoreIntegrationTaskFactory;
-import com.alexanderberndt.appintegration.core.IntegrationJobImpl;
-import com.alexanderberndt.appintegration.core.parser.IntegrationJobParser;
+import com.alexanderberndt.appintegration.CoreIntegrationTaskFactory;
+import com.alexanderberndt.appintegration.IntegrationJobImpl;
+import com.alexanderberndt.appintegration.parser.IntegrationJobParser;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

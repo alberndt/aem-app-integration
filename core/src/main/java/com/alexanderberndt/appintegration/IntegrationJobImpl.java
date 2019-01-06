@@ -1,23 +1,20 @@
-package com.alexanderberndt.appintegration.core;
+package com.alexanderberndt.appintegration;
 
 import com.alexanderberndt.appintegration.api.IntegrationJob;
 import com.alexanderberndt.appintegration.api.IntegrationResource;
 import com.alexanderberndt.appintegration.api.IntegrationResourceType;
 import com.alexanderberndt.appintegration.api.IntegrationTask;
-import com.alexanderberndt.appintegration.core.utils.HttpDownloadUtil;
+import com.alexanderberndt.appintegration.utils.HttpDownloadUtil;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.helpers.FormattingTuple;
-import org.slf4j.helpers.MessageFormatter;
 
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 

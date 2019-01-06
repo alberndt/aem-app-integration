@@ -1,13 +1,4 @@
-package com.alexanderberndt.appintegration.core.tasks;
-
-import com.alexanderberndt.appintegration.api.AbstractIntegrationTask;
-import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+package com.alexanderberndt.appintegration.tasks;
 
 public class SystemResourceLoadTask /*extends AbstractIntegrationTask<Object, byte[]>*/ {
 

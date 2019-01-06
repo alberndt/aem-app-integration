@@ -1,4 +1,4 @@
-package com.alexanderberndt.appintegration.core.html;
+package com.alexanderberndt.appintegration.html;
 
 import com.alexanderberndt.appintegration.api.IntegrationMessage;
 import com.alexanderberndt.appintegration.api.IntegrationStepResult;
