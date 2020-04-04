@@ -1,9 +1,9 @@
 package com.alexanderberndt.appintegration.parser;
 
-import com.alexanderberndt.appintegration.api.IntegrationException;
-import com.alexanderberndt.appintegration.api.IntegrationResourceType;
-import com.alexanderberndt.appintegration.api.IntegrationTask;
-import com.alexanderberndt.appintegration.api.IntegrationTaskFactory;
+import com.alexanderberndt.appintegration.api.AppIntegrationException;
+import com.alexanderberndt.appintegration.engine.processors.html.api.IntegrationResourceType;
+import com.alexanderberndt.appintegration.engine.processors.html.api.IntegrationTask;
+import com.alexanderberndt.appintegration.engine.processors.html.api.IntegrationTaskFactory;
 import com.alexanderberndt.appintegration.IntegrationJobImpl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -51,14 +51,14 @@ public class IntegrationJobParser {
                             .collect(Collectors.toList());
                     task.setApplicableResourceTypes(expectedResourceTypes);
                 } catch (IllegalArgumentException e) {
-                    throw new IntegrationException("Cannot parse expected resource types " + taskDef.getResourceTypes(), e);
+                    throw new AppIntegrationException("Cannot parse expected resource types " + taskDef.getResourceTypes(), e);
                 }
                 task.setupTask(taskDef.getProperties());
                 job.addIntegrationTask(task);
             }
             return job;
         } catch (Exception e) {
-            throw new IntegrationException("Failed to create job", e);
+            throw new AppIntegrationException("Failed to create job", e);
         }
     }
 }

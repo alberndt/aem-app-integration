@@ -1,6 +1,6 @@
 package com.alexanderberndt.appintegration;
 
-import com.alexanderberndt.appintegration.api.IntegrationJob;
+import com.alexanderberndt.appintegration.engine.processors.html.api.IntegrationJob;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

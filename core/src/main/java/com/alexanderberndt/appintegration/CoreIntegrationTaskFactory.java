@@ -1,8 +1,8 @@
 package com.alexanderberndt.appintegration;
 
-import com.alexanderberndt.appintegration.api.IntegrationException;
-import com.alexanderberndt.appintegration.api.IntegrationTask;
-import com.alexanderberndt.appintegration.api.IntegrationTaskFactory;
+import com.alexanderberndt.appintegration.api.AppIntegrationException;
+import com.alexanderberndt.appintegration.engine.processors.html.api.IntegrationTask;
+import com.alexanderberndt.appintegration.engine.processors.html.api.IntegrationTaskFactory;
 import com.alexanderberndt.appintegration.tasks.ExtractStaticResourcesTask;
 import com.alexanderberndt.appintegration.tasks.RegexValidator;
 
@@ -19,7 +19,7 @@ public class CoreIntegrationTaskFactory implements IntegrationTaskFactory {
                 return new ExtractStaticResourcesTask();
 
             default:
-                throw new IntegrationException("Task " + taskName + " is undefined");
+                throw new AppIntegrationException("Task " + taskName + " is undefined");
         }
     }
 }

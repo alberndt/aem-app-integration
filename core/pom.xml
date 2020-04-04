@@ -13,6 +13,7 @@
         <artifactId>aem-appintegration-reactor</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
+
     <build>
         <plugins>
             <plugin>
@@ -23,6 +24,14 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                </configuration>
             </plugin>
             <!--
                         <plugin>
@@ -103,12 +112,7 @@
     </build>
 
 
-
     <dependencies>
-        <dependency>
-            <groupId>com.alexanderberndt.appintegration</groupId>
-            <artifactId>aem-appintegration-api</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -147,6 +151,12 @@
         </dependency>
 
         <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>jsr305</artifactId>
+            <version>3.0.2</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
             <scope>test</scope>
@@ -159,11 +169,6 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.wcm</groupId>
-            <artifactId>io.wcm.testing.aem-mock.junit5</artifactId>
             <scope>test</scope>
         </dependency>
 
@@ -181,13 +186,6 @@
         </dependency>
 
 
-        <dependency>
-            <groupId>com.alexanderberndt.appintegration</groupId>
-            <artifactId>aem-appintegration-sample-apps</artifactId>
-            <scope>test</scope>
-            <type>war</type>
-        </dependency>
-
         <!-- https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-server -->
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
@@ -195,7 +193,6 @@
             <version>9.4.11.v20180605</version>
             <scope>test</scope>
         </dependency>
-
 
 
     </dependencies>

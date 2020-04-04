@@ -1,7 +1,7 @@
 package com.alexanderberndt.appintegration.html;
 
-import com.alexanderberndt.appintegration.api.IntegrationStep;
-import com.alexanderberndt.appintegration.api.IntegrationStepResult;
+import com.alexanderberndt.appintegration.engine.processors.html.api.IntegrationStep;
+import com.alexanderberndt.appintegration.engine.processors.html.api.IntegrationStepResult;
 import com.alexanderberndt.appintegration.utils.ConfigValidator;
 import org.apache.commons.configuration2.ImmutableConfiguration;
 import org.jsoup.nodes.Document;

@@ -1,6 +1,7 @@
 package com.alexanderberndt.appintegration.tasks;
 
-import com.alexanderberndt.appintegration.api.*;
+import com.alexanderberndt.appintegration.api.AppIntegrationException;
+import com.alexanderberndt.appintegration.engine.processors.html.api.*;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -29,7 +30,7 @@ public class ExtractStaticResourcesTask extends AbstractIntegrationTask {
         try {
             this.expectedResourceType = IntegrationResourceType.parse(expected);
         } catch (IllegalArgumentException e) {
-            throw new IntegrationException("Illegal " + EXPECTED_TYPE_PARAM + ": " + expected);
+            throw new AppIntegrationException("Illegal " + EXPECTED_TYPE_PARAM + ": " + expected);
         }
     }
 

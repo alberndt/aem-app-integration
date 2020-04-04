@@ -45,14 +45,19 @@ public class ProxyServlet extends HttpServlet {
             connection.setReadTimeout(READ_TIMEOUT);
             connection.connect();
 
+            out.println("Status: " + connection.getResponseCode());
 
-            resp.setStatus(connection.getResponseCode());
-            resp.setContentType(connection.getContentType());
+            out.println("Content Type: " + connection.getContentType());
+            out.flush();
 
+
+
+//            resp.setStatus(connection.getResponseCode());
+//            resp.setContentType(connection.getContentType());
+//
             IOUtils.copy(connection.getInputStream(), resp.getOutputStream());
 
             LOGGER.info("done with url {}", url);
-
 
         } catch (Exception e) {
             LOGGER.error("Failed to proxy {}", req.getRequestURI());

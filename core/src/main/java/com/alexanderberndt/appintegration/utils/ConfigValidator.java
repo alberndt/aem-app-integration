@@ -1,6 +1,6 @@
 package com.alexanderberndt.appintegration.utils;
 
-import com.alexanderberndt.appintegration.api.IntegrationStepResult;
+import com.alexanderberndt.appintegration.engine.processors.html.api.IntegrationStepResult;
 import org.apache.commons.configuration2.ImmutableConfiguration;
 import org.apache.commons.configuration2.ex.ConversionException;
 import org.apache.commons.lang3.StringUtils;

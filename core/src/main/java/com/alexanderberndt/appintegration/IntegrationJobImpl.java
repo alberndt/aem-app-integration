@@ -1,9 +1,9 @@
 package com.alexanderberndt.appintegration;
 
-import com.alexanderberndt.appintegration.api.IntegrationJob;
-import com.alexanderberndt.appintegration.api.IntegrationResource;
-import com.alexanderberndt.appintegration.api.IntegrationResourceType;
-import com.alexanderberndt.appintegration.api.IntegrationTask;
+import com.alexanderberndt.appintegration.engine.processors.html.api.IntegrationJob;
+import com.alexanderberndt.appintegration.engine.processors.html.api.IntegrationResource;
+import com.alexanderberndt.appintegration.engine.processors.html.api.IntegrationResourceType;
+import com.alexanderberndt.appintegration.engine.processors.html.api.IntegrationTask;
 import com.alexanderberndt.appintegration.utils.HttpDownloadUtil;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.jsoup.select.Elements;

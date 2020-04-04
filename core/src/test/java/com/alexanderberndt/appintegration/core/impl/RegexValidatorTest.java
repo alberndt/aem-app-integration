@@ -1,8 +1,8 @@
 package com.alexanderberndt.appintegration.core.impl;
 
-import com.alexanderberndt.appintegration.api.IntegrationJob;
-import com.alexanderberndt.appintegration.api.IntegrationResource;
-import com.alexanderberndt.appintegration.api.IntegrationResourceType;
+import com.alexanderberndt.appintegration.engine.processors.html.api.IntegrationJob;
+import com.alexanderberndt.appintegration.engine.processors.html.api.IntegrationResource;
+import com.alexanderberndt.appintegration.engine.processors.html.api.IntegrationResourceType;
 import com.alexanderberndt.appintegration.IntegrationResourceImpl;
 import com.alexanderberndt.appintegration.tasks.RegexValidator;
 import org.junit.jupiter.api.BeforeEach;

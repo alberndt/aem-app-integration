@@ -1,9 +1,9 @@
 package com.alexanderberndt.appintegration.utils;
 
 
-import com.alexanderberndt.appintegration.api.IntegrationException;
-import com.alexanderberndt.appintegration.api.IntegrationResource;
-import com.alexanderberndt.appintegration.api.IntegrationResourceType;
+import com.alexanderberndt.appintegration.api.AppIntegrationException;
+import com.alexanderberndt.appintegration.engine.processors.html.api.IntegrationResource;
+import com.alexanderberndt.appintegration.engine.processors.html.api.IntegrationResourceType;
 import com.alexanderberndt.appintegration.IntegrationResourceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,13 +49,13 @@ public class HttpDownloadUtil {
                 return resource;
 
             } else {
-                throw new IntegrationException("Failed to load resource " + ref
+                throw new AppIntegrationException("Failed to load resource " + ref
                         + " - status: " + connection.getResponseCode()
                         + " - message: " + connection.getResponseMessage());
             }
         } catch (Exception e) {
             LOGGER.error("Error establish connection due to {}", e.getMessage());
-            throw new IntegrationException("Failed to load resource " + ref, e);
+            throw new AppIntegrationException("Failed to load resource " + ref, e);
         }
     }
 

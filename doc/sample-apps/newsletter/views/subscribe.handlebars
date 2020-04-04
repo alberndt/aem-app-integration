@@ -1,0 +1,11 @@
+<h1>{{translation.WELCOME}} in {{lang}}</h1>
+<p>Plain old html code. {{alex}} with {{no}}.</p>
+
+<h2>Subscribe: {{newsletter.name}}</h2>
+
+<form method="POST" action="{{config.app.contextRoot}}/api/subscribe">
+    <label>E-Mail: </label>
+    <input type="text" name="email" />
+    <input type="submit">
+</form>
+<script type="text/javascript" src="{{config.app.contextRoot}}/js/subscribe.js"></script>

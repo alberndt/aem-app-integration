@@ -1,7 +1,7 @@
 package com.alexanderberndt.appintegration;
 
-import com.alexanderberndt.appintegration.api.IntegrationResource;
-import com.alexanderberndt.appintegration.api.IntegrationResourceType;
+import com.alexanderberndt.appintegration.engine.processors.html.api.IntegrationResource;
+import com.alexanderberndt.appintegration.engine.processors.html.api.IntegrationResourceType;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

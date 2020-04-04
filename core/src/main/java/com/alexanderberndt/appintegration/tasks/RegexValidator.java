@@ -1,10 +1,10 @@
 package com.alexanderberndt.appintegration.tasks;
 
 
-import com.alexanderberndt.appintegration.api.AbstractIntegrationTask;
-import com.alexanderberndt.appintegration.api.IntegrationException;
-import com.alexanderberndt.appintegration.api.IntegrationJob;
-import com.alexanderberndt.appintegration.api.IntegrationResource;
+import com.alexanderberndt.appintegration.engine.processors.html.api.AbstractIntegrationTask;
+import com.alexanderberndt.appintegration.api.AppIntegrationException;
+import com.alexanderberndt.appintegration.engine.processors.html.api.IntegrationJob;
+import com.alexanderberndt.appintegration.engine.processors.html.api.IntegrationResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +32,7 @@ public class RegexValidator extends AbstractIntegrationTask {
         try {
             this.pattern = Pattern.compile(regexString);
         } catch (PatternSyntaxException e) {
-            throw new IntegrationException("Non-parsable regex " + regexString, e);
+            throw new AppIntegrationException("Non-parsable regex " + regexString, e);
         }
     }
 

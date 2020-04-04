@@ -1,0 +1,15 @@
+{
+  "name": "Newsletter",
+  "version": "1.0.0",
+  "components": {
+    "subscribe": {
+      "name": "Subscribe Newsletter",
+      "url": "/subscribe.${newsletterId}.${language}.html",
+      "dialog": "/subscribe-dialog.json"
+    },
+    "confirm": {
+      "name": "Confirm Subscription",
+      "url": "/confirm-subscription.html"
+    }
+  }
+}

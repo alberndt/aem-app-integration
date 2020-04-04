@@ -1,0 +1,18 @@
+package com.alexanderberndt.appintegration.standalone;
+
+import com.alexanderberndt.appintegration.engine.AppIntegrationEngine;
+import com.alexanderberndt.appintegration.engine.loader.impl.HttpResourceLoader;
+import com.alexanderberndt.appintegration.engine.loader.impl.SystemResourceLoader;
+import com.alexanderberndt.appintegration.standalone.context.PropertiesContextProvider;
+import com.alexanderberndt.appintegration.standalone.context.TestContextProvider;
+
+public class StandaloneAppIntegrationEngine extends AppIntegrationEngine<String> {
+
+    public StandaloneAppIntegrationEngine() {
+        this.registerContextProvider("properties", new PropertiesContextProvider());
+        this.registerContextProvider("test", new TestContextProvider());
+
+        this.registerResourceLoader("classloader", new SystemResourceLoader());
+        this.registerResourceLoader("http", new HttpResourceLoader());
+    }
+}
