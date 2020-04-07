@@ -4,12 +4,12 @@
   "components": {
     "subscribe": {
       "name": "Subscribe Newsletter",
-      "url": "/subscribe.${newsletterId}.${language}.html",
-      "dialog": "/subscribe-dialog.json"
+      "url": "subscribe.${newsletterId}.${language}.html",
+      "dialog": "subscribe-dialog.json"
     },
     "confirm": {
       "name": "Confirm Subscription",
-      "url": "/confirm-subscription.html"
+      "url": "confirm.${language}.html"
     }
   }
 }

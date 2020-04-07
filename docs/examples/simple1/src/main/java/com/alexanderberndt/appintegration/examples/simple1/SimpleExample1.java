@@ -1,6 +1,6 @@
 package com.alexanderberndt.appintegration.examples.simple1;
 
-import com.alexanderberndt.appintegration.engine.processors.html.api.IntegrationException;
+import com.alexanderberndt.appintegration.engine.pipeline.api.IntegrationException;
 import com.alexanderberndt.appintegration.CoreIntegrationTaskFactory;
 import com.alexanderberndt.appintegration.IntegrationJobImpl;
 import com.alexanderberndt.appintegration.parser.IntegrationJobParser;

@@ -1,4 +1,4 @@
-package com.alexanderberndt.appintegration.engine.processors.html.api;
+package com.alexanderberndt.appintegration.engine.pipeline.api;
 
 import org.slf4j.helpers.FormattingTuple;
 import org.slf4j.helpers.MessageFormatter;

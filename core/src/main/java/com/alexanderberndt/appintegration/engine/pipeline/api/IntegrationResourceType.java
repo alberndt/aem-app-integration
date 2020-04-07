@@ -1,4 +1,4 @@
-package com.alexanderberndt.appintegration.engine.processors.html.api;
+package com.alexanderberndt.appintegration.engine.pipeline.api;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;

@@ -1,0 +1,24 @@
+{
+  "steps": [
+    {
+      "name": "min-file-size",
+      "filter": "file-size-validator",
+      "fileTypes": "html",
+      "configuration": {
+        "min-size": 100,
+        "error-level": "warn",
+        "message": "File is too small for a valid html file"
+      }
+    },
+    {
+      "name": "stacktrace-search",
+      "filter": "text-snippet-extractor",
+      "fileTypes": "html",
+      "configuration": {
+        "regex": "Exception: ",
+        "level": "${stacktrace-in-html.error-level}",
+        "level-default": "warn"
+      }
+    }
+  ]
+}

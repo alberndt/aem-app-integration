@@ -1,10 +1,10 @@
-package com.alexanderberndt.appintegration.engine.processors.html.api;
+package com.alexanderberndt.appintegration.engine.pipeline.api;
 
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class IntegrationResourceTypeTest {
+public class ProcessingItemTypeTest {
 
     @Test
     public void testParse() {

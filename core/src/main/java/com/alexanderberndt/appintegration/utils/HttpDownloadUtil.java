@@ -2,9 +2,9 @@ package com.alexanderberndt.appintegration.utils;
 
 
 import com.alexanderberndt.appintegration.api.AppIntegrationException;
-import com.alexanderberndt.appintegration.engine.processors.html.api.IntegrationResource;
-import com.alexanderberndt.appintegration.engine.processors.html.api.IntegrationResourceType;
-import com.alexanderberndt.appintegration.IntegrationResourceImpl;
+import com.alexanderberndt.appintegration.engine.pipeline.api.ProcessingItem;
+import com.alexanderberndt.appintegration.engine.pipeline.api.IntegrationResourceType;
+import com.alexanderberndt.appintegration.ProcessingItemImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +29,7 @@ public class HttpDownloadUtil {
     private HttpDownloadUtil() {
     }
 
-    public static IntegrationResource download(URI baseUri, String ref, IntegrationResourceType expectedType) {
+    public static ProcessingItem download(URI baseUri, String ref, IntegrationResourceType expectedType) {
 
         try {
             final URL url = baseUri.resolve(ref).toURL();
@@ -44,8 +44,8 @@ public class HttpDownloadUtil {
 
                 // ToDo: verify mime type, get charset
                 //final String mimeType = StringUtils.defaultIfBlank(connection.getHeaderField("Content-Type"));
-                final IntegrationResource resource = IntegrationResourceImpl.create(expectedType, data, expectedType.getDefaultCharset(), expectedType.isHtmlDocument());
-                LOGGER.info("fetched from content with {} characters and md5-hash={}", resource.getData().length, resource.getMd5Hex());
+                final ProcessingItem resource = ProcessingItemImpl.create(expectedType, data, expectedType.getDefaultCharset(), expectedType.isHtmlDocument());
+//                LOGGER.info("fetched from content with {} characters and md5-hash={}", resource.getData().length, resource.getMd5Hex());
                 return resource;
 
             } else {

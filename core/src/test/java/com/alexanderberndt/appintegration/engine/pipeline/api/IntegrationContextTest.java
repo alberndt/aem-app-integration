@@ -1,4 +1,4 @@
-package com.alexanderberndt.appintegration.engine.processors.html.api;
+package com.alexanderberndt.appintegration.engine.pipeline.api;
 
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;

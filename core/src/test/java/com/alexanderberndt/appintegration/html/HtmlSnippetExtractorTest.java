@@ -1,7 +1,5 @@
 package com.alexanderberndt.appintegration.html;
 
-import org.apache.commons.configuration2.BaseConfiguration;
-import org.apache.commons.configuration2.Configuration;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,10 +23,10 @@ class HtmlSnippetExtractorTest {
 
     @Test
     void validateValidConfiguration() {
-        Configuration configuration = new BaseConfiguration();
-        configuration.addProperty("query", "div.myClass[attr]");
-
-        HtmlSnippetExtractor extractor = new HtmlSnippetExtractor();
+//        Configuration configuration = new BaseConfiguration();
+//        configuration.addProperty("query", "div.myClass[attr]");
+//
+//        HtmlSnippetExtractor extractor = new HtmlSnippetExtractor();
 
 //        IntegrationStepResult<String> result = extractor.validateConfiguration(configuration);
 //        assertNotNull(result);
@@ -52,10 +50,10 @@ class HtmlSnippetExtractorTest {
 
     @Test
     void validateInvalidConfiguration2() {
-        Configuration configuration = new BaseConfiguration();
-        configuration.addProperty("query", "//alex");
-
-        HtmlSnippetExtractor extractor = new HtmlSnippetExtractor();
+//        Configuration configuration = new BaseConfiguration();
+//        configuration.addProperty("query", "//alex");
+//
+//        HtmlSnippetExtractor extractor = new HtmlSnippetExtractor();
 
 //        IntegrationStepResult<String> result = extractor.validateConfiguration(configuration);
 //        assertNotNull(result);
