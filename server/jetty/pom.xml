@@ -3,16 +3,15 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-    <parent>
-        <artifactId>parent</artifactId>
-        <groupId>com.alexanderberndt.aem-app-integration</groupId>
-        <version>0.0.1-SNAPSHOT</version>
-        <relativePath>../parent/pom.xml</relativePath>
-    </parent>
     <modelVersion>4.0.0</modelVersion>
-
     <artifactId>proxy</artifactId>
     <packaging>war</packaging>
+
+    <parent>
+        <groupId>com.alexanderberndt.appintegration</groupId>
+        <artifactId>aem-appintegration-server</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
 
     <name>testapps Maven Webapp</name>
 
@@ -81,8 +80,6 @@
 
     <build>
         <finalName>testapps</finalName>
-
-        <sourceDirectory>src/main/java</sourceDirectory>
 
         <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
             <plugins>

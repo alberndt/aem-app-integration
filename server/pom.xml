@@ -16,7 +16,6 @@
 
     <modules>
         <module>jetty</module>
-        <module>aem-server</module>
     </modules>
 
 </project>
