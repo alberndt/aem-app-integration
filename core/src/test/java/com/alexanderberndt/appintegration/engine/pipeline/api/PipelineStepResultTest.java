@@ -1,5 +1,7 @@
 package com.alexanderberndt.appintegration.engine.pipeline.api;
 
+import com.alexanderberndt.appintegration.pipeline.old.IntegrationMessage;
+import com.alexanderberndt.appintegration.pipeline.old.IntegrationStepResult;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

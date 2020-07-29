@@ -16,6 +16,7 @@
 
     <modules>
         <module>jetty</module>
+        <module>standalone</module>
     </modules>
 
 </project>

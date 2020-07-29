@@ -1,22 +1,5 @@
 package com.alexanderberndt.appintegration;
 
-import com.alexanderberndt.appintegration.engine.pipeline.api.IntegrationJob;
-import com.alexanderberndt.appintegration.engine.pipeline.api.ProcessingItem;
-import com.alexanderberndt.appintegration.engine.pipeline.api.IntegrationResourceType;
-import com.alexanderberndt.appintegration.utils.HttpDownloadUtil;
-import org.apache.commons.lang3.text.StrSubstitutor;
-import org.jsoup.select.Elements;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 public class IntegrationJobImpl /*implements IntegrationJob*/ {
 
 //    private static Logger LOGGER = LoggerFactory.getLogger(IntegrationJobImpl.class);

@@ -1,17 +1,5 @@
 package com.alexanderberndt.appintegration.parser;
 
-import com.alexanderberndt.appintegration.api.AppIntegrationException;
-import com.alexanderberndt.appintegration.engine.pipeline.api.IntegrationResourceType;
-import com.alexanderberndt.appintegration.IntegrationJobImpl;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.stream.Collectors;
-
 public class IntegrationJobParser {
 
 //    private static final Logger LOGGER = LoggerFactory.getLogger(IntegrationJobParser.class);

@@ -1,13 +1,12 @@
 package com.alexanderberndt.appintegration;
 
-import com.alexanderberndt.appintegration.engine.pipeline.api.ProcessingItem;
-import com.alexanderberndt.appintegration.engine.pipeline.api.IntegrationResourceType;
+import com.alexanderberndt.appintegration.pipeline.old.ProcessingItem;
+import com.alexanderberndt.appintegration.pipeline.old.IntegrationResourceType;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 
 public class ProcessingItemImpl  {
 

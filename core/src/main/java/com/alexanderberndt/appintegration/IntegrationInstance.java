@@ -1,10 +1,6 @@
 package com.alexanderberndt.appintegration;
 
-import com.alexanderberndt.appintegration.engine.pipeline.api.IntegrationJob;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
-
+@Deprecated
 public class IntegrationInstance {
 
 //    private final IntegrationJob integrationJob;

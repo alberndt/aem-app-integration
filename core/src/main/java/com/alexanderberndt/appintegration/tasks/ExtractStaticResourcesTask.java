@@ -1,13 +1,10 @@
 package com.alexanderberndt.appintegration.tasks;
 
-import com.alexanderberndt.appintegration.api.AppIntegrationException;
-import com.alexanderberndt.appintegration.engine.pipeline.api.*;
-import org.apache.commons.lang3.StringUtils;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
+import com.alexanderberndt.appintegration.pipeline.old.IntegrationResourceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+// ToDo: Implemented
 public class ExtractStaticResourcesTask  {
 
     public static final String TASK_NAME = "extract-static-resources";

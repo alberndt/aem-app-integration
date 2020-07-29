@@ -1,0 +1,19 @@
+- task: properties
+  base-url: "http://www.spiegel.de"
+  verbose: true
+
+- task: lookup-cache
+
+- task: load-resource
+  
+- task: check-max-size
+  if-resource-type: html
+  warn-size: "1mb"
+  error-size": "10mb"
+
+- task: validate-regex
+  if-resource-types: [text,html]
+  if-resource-path-pattern: ^/css/.*$
+  if-expression: size>10mb
+  regex: "abc"
+  warning: "contains abc!"

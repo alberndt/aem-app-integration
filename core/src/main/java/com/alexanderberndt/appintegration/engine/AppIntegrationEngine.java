@@ -1,20 +1,19 @@
 package com.alexanderberndt.appintegration.engine;
 
-import com.alexanderberndt.appintegration.api.AppIntegrationException;
-import com.alexanderberndt.appintegration.api.Application;
-import com.alexanderberndt.appintegration.api.ApplicationInfo;
-import com.alexanderberndt.appintegration.api.ContextProvider;
-import com.alexanderberndt.appintegration.engine.loader.ResourceLoader;
-import com.alexanderberndt.appintegration.engine.processors.info.ApplicationInfoLoader;
+import com.alexanderberndt.appintegration.api.*;
+import com.alexanderberndt.appintegration.engine.resources.loader.ResourceLoader;
+import com.alexanderberndt.appintegration.tasks.processors.info.ApplicationInfoLoader;
+import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class AppIntegrationEngine<I> {
+public class AppIntegrationEngine<I extends ApplicationInstance> {
 
     // applications
     private Map<String, ApplicationRecord> applicationRecordMap = new LinkedHashMap<>();
@@ -25,6 +24,33 @@ public class AppIntegrationEngine<I> {
 
     // services
     private ApplicationInfoLoader applicationInfoLoader = new ApplicationInfoLoader();
+
+
+    public void registerApplication(@Nonnull String id, @Nonnull Application application) {
+        applicationRecordMap.put(id, new ApplicationRecord(id, application));
+    }
+
+    public void unregisterApplication(@Nonnull String id) {
+        applicationRecordMap.remove(id);
+    }
+
+    protected void prefetch(List<I> instanceList) throws IOException {
+
+    }
+
+    public String getHtmlSnippet(I instance) throws IOException {
+        return loadHtmlSnippet(instance.getApplicationId(), instance.getComponentId(), instance);
+    }
+
+    public InputStream getStaticResource(String path) {
+        // ToDo: Support caching headers
+        return null;
+    }
+
+    public List<String> getDynamicPaths() {
+        return null;
+    }
+
 
 
     public String loadHtmlSnippet(String applicationId, String componentId, I instance) throws IOException {
@@ -40,7 +66,7 @@ public class AppIntegrationEngine<I> {
         final String resolvedAbsoluteComponentUrl = app.resolveRelativeUrl(resolvedRelativeComponentUrl);
 
 
-        String htmlSnippet = app.getResourceLoader().load(resolvedAbsoluteComponentUrl, String.class);
+        String htmlSnippet = null;//app.getResourceLoader().load(resolvedAbsoluteComponentUrl, String.class);
         if (StringUtils.isBlank(htmlSnippet)) {
             throw new AppIntegrationException("Cannot load html-snippet " + resolvedAbsoluteComponentUrl);
         }
@@ -56,13 +82,7 @@ public class AppIntegrationEngine<I> {
         return StringSubstitutor.replace(url, context);
     }
 
-    public void registerApplication(@Nonnull String id, @Nonnull Application application) {
-        applicationRecordMap.put(id, new ApplicationRecord(id, application));
-    }
 
-    public void unregisterApplication(@Nonnull String id) {
-        applicationRecordMap.remove(id);
-    }
 
     @Nonnull
     private ApplicationRecord getApplicationRecord(@Nonnull String applicationId) {
@@ -126,7 +146,8 @@ public class AppIntegrationEngine<I> {
         }
 
         public String resolveRelativeUrl(String relativeUrl) {
-            return this.getResourceLoader().resolveRelativeUrl(application.getApplicationInfoUrl(), relativeUrl);
+            return null;
+            //return this.getResourceLoader().resolveRelativeUrl(application.getApplicationInfoUrl(), relativeUrl);
         }
 
         public void clearContextProvider(String contextProviderId) {

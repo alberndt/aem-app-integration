@@ -116,6 +116,7 @@
 
     <dependencyManagement>
         <dependencies>
+
             <dependency>
                 <groupId>com.alexanderberndt.appintegration</groupId>
                 <artifactId>aem-appintegration-api</artifactId>

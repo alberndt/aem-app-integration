@@ -1,11 +1,5 @@
 package com.alexanderberndt.appintegration.html;
 
-import com.alexanderberndt.appintegration.engine.pipeline.api.PipelineFilter;
-import com.alexanderberndt.appintegration.engine.pipeline.api.IntegrationStepResult;
-import com.alexanderberndt.appintegration.utils.ConfigValidator;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Selector;
-
 public class HtmlSnippetExtractor  {
 
     private static final String QUERY_PARAM = "query";
