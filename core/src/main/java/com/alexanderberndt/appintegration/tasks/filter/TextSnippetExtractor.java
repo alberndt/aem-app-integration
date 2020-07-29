@@ -2,7 +2,7 @@ package com.alexanderberndt.appintegration.tasks.filter;
 
 import com.alexanderberndt.appintegration.api.task.ProcessingTask;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
-import com.alexanderberndt.appintegration.pipeline.ProcessingContext;
+import com.alexanderberndt.appintegration.pipeline.TaskContext;
 import com.alexanderberndt.appintegration.tasks.utils.LineFilterReader;
 
 import java.io.IOException;
@@ -16,7 +16,7 @@ public class TextSnippetExtractor implements ProcessingTask {
     }
 
     @Override
-    public void process(ProcessingContext context, ExternalResource resource) {
+    public void process(TaskContext context, ExternalResource resource) {
         try {
             resource.setReader(new TextSnippetExtractingReader(resource.getReader()));
         } catch (IOException e) {

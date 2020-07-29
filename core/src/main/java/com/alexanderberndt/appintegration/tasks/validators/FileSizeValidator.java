@@ -2,7 +2,7 @@ package com.alexanderberndt.appintegration.tasks.validators;
 
 import com.alexanderberndt.appintegration.api.task.ProcessingTask;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
-import com.alexanderberndt.appintegration.pipeline.ProcessingContext;
+import com.alexanderberndt.appintegration.pipeline.TaskContext;
 
 import javax.annotation.Nonnull;
 import java.io.FilterInputStream;
@@ -18,12 +18,12 @@ public class FileSizeValidator implements ProcessingTask {
     }
 
     @Override
-    public void process(ProcessingContext context, ExternalResource resource) {
+    public void process(TaskContext context, ExternalResource resource) {
         resource.setInputStream(new ByteCountingInputStream(resource.getInputStream()));
     }
 
 
-    private class ByteCountingInputStream extends FilterInputStream {
+    private static class ByteCountingInputStream extends FilterInputStream {
 
         private long byteCount;
 

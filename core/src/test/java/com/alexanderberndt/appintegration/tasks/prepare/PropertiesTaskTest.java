@@ -1,13 +1,12 @@
 package com.alexanderberndt.appintegration.tasks.prepare;
 
 import com.alexanderberndt.appintegration.api.task.PreparationTask;
+import com.alexanderberndt.appintegration.core.CoreGlobalContext;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
-import com.alexanderberndt.appintegration.pipeline.ProcessingContext;
+import com.alexanderberndt.appintegration.pipeline.TaskContext;
 import com.alexanderberndt.appintegration.utils.ValueMap;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,13 +27,15 @@ class PropertiesTaskTest {
         Map<String, Object> globalProperties = new HashMap<>();
         globalProperties.put("global", "do NOT copy!!!");
         globalProperties.put("properties.predefined", "this SHOULD work!");
-        ValueMap globalValueMap = new ValueMap(globalProperties, false);
+        ValueMap globalParams = new ValueMap(globalProperties, false);
+        CoreGlobalContext globalContext = new CoreGlobalContext(globalParams);
 
         // task properties
         Map<String, Object> taskProperties = new HashMap<>();
         taskProperties.put("hello", "Hello World!");
         taskProperties.put("the-number", 42);
-        ProcessingContext context = new ProcessingContext(new ValueMap(globalValueMap, "properties", taskProperties, false));
+        ValueMap taskParams = new ValueMap(globalParams, "properties", taskProperties, false);
+        TaskContext context = globalContext.createChildContext("properties", "properties task", taskParams);
         ExternalResourceRef resourceRef = new ExternalResourceRef();
 
         assertTrue(resourceRef.getProperties().isEmpty());

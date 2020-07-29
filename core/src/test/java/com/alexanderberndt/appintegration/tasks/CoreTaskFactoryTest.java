@@ -1,11 +1,13 @@
 package com.alexanderberndt.appintegration.tasks;
 
 import com.alexanderberndt.appintegration.api.task.GenericTask;
+import com.alexanderberndt.appintegration.core.CoreTaskFactory;
 import com.alexanderberndt.appintegration.pipeline.TaskFactory;
 import com.alexanderberndt.appintegration.tasks.prepare.PropertiesTask;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CoreTaskFactoryTest {
 

@@ -1,44 +1,38 @@
 package com.alexanderberndt.appintegration.pipeline;
 
+import com.alexanderberndt.appintegration.engine.resources.loader.ResourceLoaderFactory;
 import com.alexanderberndt.appintegration.utils.ValueMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import java.lang.invoke.MethodHandles;
 
-public class ProcessingContext {
+public abstract class TaskContext {
 
     private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private final ProcessingContext parentCtx;
+    private final GlobalContext globalContext;
 
     private final String contextId;
 
     private final String contextName;
 
-    private final ValueMap parametersMap;
+    private final ValueMap taskParams;
 
     private final String messagePrefix;
 
-    public ProcessingContext(ValueMap parametersMap) {
-        this(null, null, null, parametersMap);
-    }
-
-    public ProcessingContext(ProcessingContext parentCtx, String contextId, String contextName, ValueMap parametersMap) {
-        this.parentCtx = parentCtx;
+    protected TaskContext(@Nonnull GlobalContext globalContext, String contextId, String contextName, ValueMap taskParams) {
+        this.globalContext = globalContext;
         this.contextId = contextId;
         this.contextName = contextName;
         // ToDo: Connect with parent-context
-        this.parametersMap = parametersMap;
+        this.taskParams = taskParams;
         this.messagePrefix = String.format("%s (%s): ", contextName, contextId);
     }
 
-    public ProcessingContext createChildContext(String contextId, String contextName, ValueMap parametersMap) {
-        return new ProcessingContext(this, contextId, contextName, parametersMap);
-    }
-
-    public ValueMap getParametersMap() {
-        return parametersMap;
+    public ValueMap getTaskParams() {
+        return taskParams;
     }
 
     public void addWarning(String message) {
@@ -47,6 +41,11 @@ public class ProcessingContext {
 
     public void addError(String message) {
         LOG.error("{}{}", messagePrefix, message);
+    }
+
+    @Nonnull
+    public ResourceLoaderFactory getResourceLoaderFactory() {
+        return globalContext.getResourceLoaderFactory();
     }
 
 }

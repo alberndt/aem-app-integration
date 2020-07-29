@@ -1,13 +1,8 @@
-package com.alexanderberndt.appintegration.tasks.processors.info;
+package com.alexanderberndt.appintegration.tasks.process.info;
 
-import com.alexanderberndt.appintegration.api.ApplicationInfo;
-import com.alexanderberndt.appintegration.engine.resources.loader.ResourceLoader;
-import com.alexanderberndt.appintegration.engine.resources.loader.impl.SystemResourceLoader;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class ApplicationInfoLoaderTest {
 

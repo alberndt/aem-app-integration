@@ -70,12 +70,6 @@ public class ValueMap implements Map<String, Object> {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public <T> T get(@Nonnull String name, @Nonnull T defaultValue) {
-        T value = (T) get(name, defaultValue.getClass());
-        return (value != null) ? value : defaultValue;
-    }
-
     public <T> T require(String name, Class<T> type) {
         final T value = get(name, type);
         if (value != null) {
@@ -85,13 +79,10 @@ public class ValueMap implements Map<String, Object> {
         }
     }
 
-    public <T> T require(String name, T defaultValue) {
-        final T value = get(name, defaultValue);
-        if (value != null) {
-            return value;
-        } else {
-            throw new AppIntegrationException(String.format("missing required parameter %s!", name));
-        }
+    @SuppressWarnings("unchecked")
+    public <T> T get(@Nonnull String name, @Nonnull T defaultValue) {
+        T value = (T) get(name, defaultValue.getClass());
+        return (value != null) ? value : defaultValue;
     }
 
     @Override

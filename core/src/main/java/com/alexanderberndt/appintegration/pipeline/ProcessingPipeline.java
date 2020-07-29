@@ -10,10 +10,11 @@ import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
 import com.alexanderberndt.appintegration.utils.ValueMap;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ProcessingPipeline implements LoadingTask {
+public class ProcessingPipeline {
 
     private final TaskFactory taskFactory;
 
@@ -29,6 +30,24 @@ public class ProcessingPipeline implements LoadingTask {
     public ProcessingPipeline(TaskFactory taskFactory, Map<String, Object> globalProperties) {
         this.taskFactory = taskFactory;
         this.globalValueMap = new ValueMap(globalProperties, false);
+    }
+
+    public void addTask(String taskName, Object... properties) {
+        if (properties.length % 2 == 0) {
+            Map<String, Object> taskProperties = new HashMap<>();
+            for (int i = 0; i < properties.length; i = i + 2) {
+                if (properties[i] instanceof String) {
+                    taskProperties.put((String) properties[i], properties[i + 1]);
+                } else {
+                    throw new IllegalArgumentException("Properties must be provided of pairs of String/Objects");
+                }
+            }
+
+            addTask(taskName, taskProperties);
+
+        } else {
+            throw new IllegalArgumentException("Properties must be provided of pairs of String/Objects - so an even number of properties is expected");
+        }
     }
 
     public void addTask(String taskName, Map<String, Object> taskProperties) {
@@ -72,14 +91,7 @@ public class ProcessingPipeline implements LoadingTask {
         }
     }
 
-
-    @Override
-    public String getName() {
-        return "processing-pipeline";
-    }
-
-    @Override
-    public ExternalResource load(ProcessingContext context, ExternalResourceRef resourceRef) {
+    public ExternalResource load(GlobalContext context, ExternalResourceRef resourceRef) {
 
         if (loadingTask == null) {
             throw new AppIntegrationException("A LoadingTask must be added to the Pipeline before!");
@@ -95,27 +107,27 @@ public class ProcessingPipeline implements LoadingTask {
         return resource;
     }
 
-    private void prepareInternal(ProcessingContext context, ExternalResourceRef resourceRef) {
+    private void prepareInternal(GlobalContext context, ExternalResourceRef resourceRef) {
         for (TaskDefinition<PreparationTask> taskDef : preparationTasks) {
             PreparationTask task = taskDef.getTask();
-            ProcessingContext taskContext = taskDef.createChildContext(context);
+            TaskContext taskContext = taskDef.createChildContext(context);
             task.prepare(taskContext, resourceRef);
         }
     }
 
-    private ExternalResource loadInternal(ProcessingContext context, ExternalResourceRef resourceRef) {
+    private ExternalResource loadInternal(GlobalContext context, ExternalResourceRef resourceRef) {
         ExternalResource resource;
         LoadingTask task = loadingTask.getTask();
-        ProcessingContext taskContext = loadingTask.createChildContext(context);
+        TaskContext taskContext = loadingTask.createChildContext(context);
 
         resource = task.load(taskContext, resourceRef);
         return resource;
     }
 
-    private void processInternal(ProcessingContext context, ExternalResource resource) {
+    private void processInternal(GlobalContext context, ExternalResource resource) {
         for (TaskDefinition<ProcessingTask> taskDef : processingTasks) {
             ProcessingTask task = taskDef.getTask();
-            ProcessingContext taskContext = taskDef.createChildContext(context);
+            TaskContext taskContext = taskDef.createChildContext(context);
 
             task.process(taskContext, resource);
         }
@@ -148,8 +160,8 @@ public class ProcessingPipeline implements LoadingTask {
             return taskProperties;
         }
 
-        public ProcessingContext createChildContext(ProcessingContext parentContext) {
-            return parentContext.createChildContext(taskName, "Task " + taskName, taskProperties);
+        public TaskContext createChildContext(GlobalContext globalCtx) {
+            return globalCtx.createChildContext(taskName, "Task " + taskName, taskProperties);
         }
 
     }

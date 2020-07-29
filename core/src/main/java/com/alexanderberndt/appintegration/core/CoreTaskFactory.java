@@ -1,7 +1,8 @@
-package com.alexanderberndt.appintegration.tasks;
+package com.alexanderberndt.appintegration.core;
 
 import com.alexanderberndt.appintegration.api.task.GenericTask;
 import com.alexanderberndt.appintegration.pipeline.TaskFactory;
+import com.alexanderberndt.appintegration.tasks.load.DownloadTask;
 import com.alexanderberndt.appintegration.tasks.prepare.PropertiesTask;
 
 import java.util.HashMap;
@@ -21,6 +22,7 @@ public class CoreTaskFactory implements TaskFactory {
 
     static {
         registerTask(new PropertiesTask());
+        registerTask(new DownloadTask());
     }
 
     @Override

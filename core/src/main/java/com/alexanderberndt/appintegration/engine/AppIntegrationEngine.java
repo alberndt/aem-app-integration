@@ -1,9 +1,12 @@
 package com.alexanderberndt.appintegration.engine;
 
-import com.alexanderberndt.appintegration.api.*;
+import com.alexanderberndt.appintegration.api.Application;
+import com.alexanderberndt.appintegration.api.ApplicationInfo;
+import com.alexanderberndt.appintegration.api.ApplicationInstance;
+import com.alexanderberndt.appintegration.api.ContextProvider;
 import com.alexanderberndt.appintegration.engine.resources.loader.ResourceLoader;
-import com.alexanderberndt.appintegration.tasks.processors.info.ApplicationInfoLoader;
 import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
+import com.alexanderberndt.appintegration.tasks.process.info.ApplicationInfoLoader;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 

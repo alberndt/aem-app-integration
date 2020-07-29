@@ -1,8 +1,10 @@
 package com.alexanderberndt.appintegration.engine.resources.loader;
 
-public class ResourceLoaderFactory {
+import javax.annotation.Nullable;
 
-    // ToDo: Implement ResourceLoaderFactory
+public interface ResourceLoaderFactory {
 
+    @Nullable
+    ResourceLoader getResourceLoader(String name);
 
 }

@@ -1,8 +1,8 @@
 package com.alexanderberndt.appintegration.api.task;
 
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
-import com.alexanderberndt.appintegration.pipeline.ProcessingContext;
 import com.alexanderberndt.appintegration.pipeline.ProcessingPipeline;
+import com.alexanderberndt.appintegration.pipeline.TaskContext;
 
 /**
  * <p>Filter for a {@link ProcessingPipeline}, which is applied for all applicable resources of an
@@ -17,7 +17,7 @@ import com.alexanderberndt.appintegration.pipeline.ProcessingPipeline;
  */
 public interface ProcessingTask extends GenericTask {
 
-    void process(ProcessingContext context, ExternalResource resource);
+    void process(TaskContext context, ExternalResource resource);
 
 
 

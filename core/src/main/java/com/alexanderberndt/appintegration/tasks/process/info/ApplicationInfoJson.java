@@ -1,4 +1,4 @@
-package com.alexanderberndt.appintegration.tasks.processors.info;
+package com.alexanderberndt.appintegration.tasks.process.info;
 
 import com.alexanderberndt.appintegration.api.ApplicationInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;

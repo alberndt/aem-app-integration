@@ -2,11 +2,11 @@ package com.alexanderberndt.appintegration.api.task;
 
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
-import com.alexanderberndt.appintegration.pipeline.ProcessingContext;
+import com.alexanderberndt.appintegration.pipeline.TaskContext;
 
 public interface LoadingTask extends GenericTask {
 
 
-    ExternalResource load(ProcessingContext context, ExternalResourceRef resourceRef);
+    ExternalResource load(TaskContext context, ExternalResourceRef resourceRef);
 
 }

@@ -1,8 +1,8 @@
-package com.alexanderberndt.appintegration.tasks.processors.info;
+package com.alexanderberndt.appintegration.tasks.process.info;
 
-import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
 import com.alexanderberndt.appintegration.api.ApplicationInfo;
 import com.alexanderberndt.appintegration.engine.resources.loader.ResourceLoader;
+import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;

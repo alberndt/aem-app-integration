@@ -1,13 +1,5 @@
 package com.alexanderberndt.appintegration.tasks.converter;
 
-import com.alexanderberndt.appintegration.api.task.ProcessingTask;
-import com.alexanderberndt.appintegration.pipeline.ProcessingContext;
-import org.apache.commons.io.input.ReaderInputStream;
-
-import java.io.InputStream;
-import java.io.Reader;
-import java.nio.charset.Charset;
-
 @Deprecated
 public class ReaderToStreamConverter {
 
@@ -27,7 +19,7 @@ public class ReaderToStreamConverter {
 //    }
 //
 //    @Override
-//    public InputStream filter(ProcessingContext context, Reader input) {
+//    public InputStream filter(TaskContext context, Reader input) {
 //        return new ReaderInputStream(input, Charset.defaultCharset());
 //    }
 

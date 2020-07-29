@@ -2,13 +2,12 @@ package com.alexanderberndt.appintegration.tasks.filter;
 
 import com.alexanderberndt.appintegration.api.task.ProcessingTask;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
-import com.alexanderberndt.appintegration.pipeline.ProcessingContext;
+import com.alexanderberndt.appintegration.pipeline.TaskContext;
 import com.alexanderberndt.appintegration.tasks.utils.LineFilterReader;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.Map;
 
 public class RegexReplaceFilter implements ProcessingTask {
 
@@ -18,9 +17,9 @@ public class RegexReplaceFilter implements ProcessingTask {
     }
 
     @Override
-    public void process(ProcessingContext context, ExternalResource resource) {
-        final String regex = context.getParametersMap().require("regex", String.class);
-        final String replacement = context.getParametersMap().require("replacement", String.class);
+    public void process(TaskContext context, ExternalResource resource) {
+        final String regex = context.getTaskParams().require("regex", String.class);
+        final String replacement = context.getTaskParams().require("replacement", String.class);
 
         if (StringUtils.isNotBlank(regex) && (replacement != null)) {
             try {

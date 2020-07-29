@@ -1,18 +1,14 @@
 package com.alexanderberndt.appintegration.pipeline;
 
-import com.alexanderberndt.appintegration.tasks.CoreTaskFactory;
-import com.alexanderberndt.appintegration.tasks.converter.StreamToReaderConverter;
-import com.alexanderberndt.appintegration.tasks.filter.TextSnippetExtractor;
+import com.alexanderberndt.appintegration.core.CoreGlobalContext;
+import com.alexanderberndt.appintegration.core.CoreTaskFactory;
+import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
+import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
+import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
 import com.alexanderberndt.appintegration.utils.ValueMap;
-import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.util.Collections;
-
-import static org.junit.jupiter.api.Assertions.*;
+import java.io.IOException;
 
 class ProcessingPipelineTest {
 
@@ -22,16 +18,21 @@ class ProcessingPipelineTest {
     }
 
     @Test
-    void simpleProcessingPipeline() {
+    void simpleProcessingPipeline() throws IOException {
 
         ValueMap emptyProperties = new ValueMap(false);
-        ProcessingContext context = new ProcessingContext(emptyProperties);
+        CoreGlobalContext context = new CoreGlobalContext(emptyProperties);
         ProcessingPipeline pipeline = new ProcessingPipeline(new CoreTaskFactory(), emptyProperties);
 
-        pipeline.addTask("properties", Collections.singletonMap("random-input.length", 2000));
+        pipeline.addTask("properties", "random-input.length", 2000);
+        pipeline.addTask("download", "loader", "http");
+
+        ExternalResourceRef resourceRef = new ExternalResourceRef("http://www.alexanderberndt.com", ExternalResourceType.HTML);
+        ExternalResource resource = pipeline.load(context, resourceRef);
 
 
-fail("Implete");
+        System.out.println(resource.getString());
+
 
 //                InputStream input1 = ClassLoader.getSystemResourceAsStream("simple-app1/server/resources/to-be-filtered1.txt");
 //
