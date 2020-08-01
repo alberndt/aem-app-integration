@@ -1,8 +1,8 @@
 package com.alexanderberndt.appintegration.tasks.filter;
 
-import com.alexanderberndt.appintegration.api.task.ProcessingTask;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
-import com.alexanderberndt.appintegration.pipeline.TaskContext;
+import com.alexanderberndt.appintegration.pipeline.context.TaskContext;
+import com.alexanderberndt.appintegration.pipeline.task.ProcessingTask;
 import com.alexanderberndt.appintegration.tasks.utils.LineFilterReader;
 import org.apache.commons.lang3.StringUtils;
 
@@ -18,8 +18,8 @@ public class RegexReplaceFilter implements ProcessingTask {
 
     @Override
     public void process(TaskContext context, ExternalResource resource) {
-        final String regex = context.getTaskParams().require("regex", String.class);
-        final String replacement = context.getTaskParams().require("replacement", String.class);
+        final String regex = context.getTaskParams().getValue("regex", String.class);
+        final String replacement = context.getTaskParams().getValue("replacement", String.class);
 
         if (StringUtils.isNotBlank(regex) && (replacement != null)) {
             try {

@@ -1,14 +1,15 @@
-package com.alexanderberndt.appintegration.pipeline;
+package com.alexanderberndt.appintegration.pipeline.context;
 
 import com.alexanderberndt.appintegration.engine.resources.loader.ResourceLoaderFactory;
-import com.alexanderberndt.appintegration.utils.ValueMap;
+import com.alexanderberndt.appintegration.pipeline.valuemap.ScopedValueMapFacade;
+import com.alexanderberndt.appintegration.pipeline.valuemap.ValueMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import java.lang.invoke.MethodHandles;
 
-public abstract class TaskContext {
+public abstract class TaskContext implements Context {
 
     private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -31,8 +32,8 @@ public abstract class TaskContext {
         this.messagePrefix = String.format("%s (%s): ", contextName, contextId);
     }
 
-    public ValueMap getTaskParams() {
-        return taskParams;
+    public ScopedValueMapFacade getTaskParams() {
+        return new ScopedValueMapFacade(this, taskParams);
     }
 
     public void addWarning(String message) {
@@ -45,7 +46,8 @@ public abstract class TaskContext {
 
     @Nonnull
     public ResourceLoaderFactory getResourceLoaderFactory() {
-        return globalContext.getResourceLoaderFactory();
+        throw new UnsupportedOperationException("Not yet implemented!");
+        //return globalContext.getResourceLoaderFactory();
     }
 
 }

@@ -1,17 +1,13 @@
 package com.alexanderberndt.appintegration.core;
 
-import com.alexanderberndt.appintegration.engine.resources.loader.ResourceLoaderFactory;
-import com.alexanderberndt.appintegration.pipeline.GlobalContext;
-import com.alexanderberndt.appintegration.utils.ValueMap;
-
-import javax.annotation.Nonnull;
+import com.alexanderberndt.appintegration.engine.resources.loader.ResourceLoader;
+import com.alexanderberndt.appintegration.pipeline.context.GlobalContext;
+import com.alexanderberndt.appintegration.pipeline.valuemap.ValueMap;
 
 public class CoreGlobalContext extends GlobalContext {
 
-    private final ResourceLoaderFactory resourceLoaderFactory = new CoreResourceLoaderFactory();
-
-    public CoreGlobalContext(ValueMap globalParams) {
-        super(globalParams);
+    public CoreGlobalContext(ResourceLoader resourceLoader, ValueMap globalParams) {
+        super(resourceLoader, globalParams);
     }
 
     @Override
@@ -19,9 +15,24 @@ public class CoreGlobalContext extends GlobalContext {
         return new CoreTaskContext(this, contextId, contextName, parametersMap);
     }
 
+
     @Override
-    @Nonnull
-    public ResourceLoaderFactory getResourceLoaderFactory() {
-        return resourceLoaderFactory;
+    public String getNamespace() {
+        return null;
+    }
+
+    @Override
+    public Ranking getRank() {
+        return null;
+    }
+
+    @Override
+    public void addWarning(String message) {
+
+    }
+
+    @Override
+    public void addError(String message) {
+
     }
 }

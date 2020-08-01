@@ -1,8 +1,8 @@
 package com.alexanderberndt.appintegration.tasks.validators;
 
-import com.alexanderberndt.appintegration.api.task.ProcessingTask;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
-import com.alexanderberndt.appintegration.pipeline.TaskContext;
+import com.alexanderberndt.appintegration.pipeline.context.TaskContext;
+import com.alexanderberndt.appintegration.pipeline.task.ProcessingTask;
 
 import javax.annotation.Nonnull;
 import java.io.FilterInputStream;

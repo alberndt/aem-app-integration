@@ -1,27 +1,16 @@
 package com.alexanderberndt.appintegration.engine.resources;
 
-import com.alexanderberndt.appintegration.tasks.filter.RegexReplaceFilter;
-
 import javax.annotation.Nonnull;
 import java.io.*;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Function;
 
 public class ExternalResource {
 
-    @Deprecated
-    public ExternalResource() {
-    }
+    private String url;
 
-    public ExternalResource(ExternalResourceRef resourceRef) {
-        this.relativeUrl = resourceRef.getRelativeUrl();
-        this.type = resourceRef.getExpectedType();
-    }
-
-    private String relativeUrl;
+    private Function<String, String> relativeUrlResolver;
 
     private ExternalResourceType type;
 
@@ -30,6 +19,13 @@ public class ExternalResource {
     private Charset charset;
 
     private final Map<String, String> propertiesMap = new HashMap<>();
+
+    private final List<ExternalResourceRef> referencedResources = new ArrayList<>();
+
+    public ExternalResource(ExternalResourceRef resourceRef) {
+        this.url = resourceRef.getRelativeUrl();
+        this.type = resourceRef.getExpectedType();
+    }
 
     public void setProperty(String name, String value) {
         propertiesMap.put(name, value);
@@ -57,7 +53,7 @@ public class ExternalResource {
         if (cs != null) {
             return new InputStreamReader(inputStream, cs);
         } else {
-            throw new UnsupportedEncodingException("Unknown character encoding for external resource " + relativeUrl);
+            throw new UnsupportedEncodingException("Unknown character encoding for external resource " + url);
         }
     }
 
@@ -67,8 +63,16 @@ public class ExternalResource {
             final byte[] byteArray = readFully(inputStream);
             return new String(byteArray, cs);
         } else {
-            throw new UnsupportedEncodingException("Unknown character encoding for external resource " + relativeUrl);
+            throw new UnsupportedEncodingException("Unknown character encoding for external resource " + url);
         }
+    }
+
+    public void addReference(String relativeUrl, ExternalResourceType expectedType) {
+        referencedResources.add(new ExternalResourceRef(relativeUrl, expectedType));
+    }
+
+    public List<ExternalResourceRef> getReferencedResources() {
+        return Collections.unmodifiableList(referencedResources);
     }
 
     public static byte[] readFully(InputStream inputStream) throws IOException {
@@ -99,12 +103,16 @@ public class ExternalResource {
         return byteArray;
     }
 
-    public String getRelativeUrl() {
-        return relativeUrl;
+    public String getUrl() {
+        return url;
     }
 
-    public void setRelativeUrl(String relativeUrl) {
-        this.relativeUrl = relativeUrl;
+    public void setRelativeUrlResolver(Function<String, String> relativeUrlResolver) {
+        this.relativeUrlResolver = relativeUrlResolver;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public ExternalResourceType getType() {

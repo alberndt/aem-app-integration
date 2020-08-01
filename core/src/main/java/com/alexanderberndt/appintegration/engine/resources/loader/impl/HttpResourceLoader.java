@@ -1,16 +1,18 @@
 package com.alexanderberndt.appintegration.engine.resources.loader.impl;
 
-import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
 import com.alexanderberndt.appintegration.engine.resources.loader.ResourceLoader;
+import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-import java.net.*;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URL;
 
 public class HttpResourceLoader implements ResourceLoader {
 
@@ -56,7 +58,7 @@ public class HttpResourceLoader implements ResourceLoader {
                 // ToDo: verify mime type, get charset
                 final String mimeType = connection.getHeaderField("Content-Type");
                 System.out.println(mimeType);
-                LOG.info("Fetching content for {}", resource.getRelativeUrl());
+                LOG.info("Fetching content for {}", resource.getUrl());
 
                 return resource;
 

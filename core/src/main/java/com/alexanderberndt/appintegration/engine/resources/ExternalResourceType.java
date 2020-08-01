@@ -12,6 +12,7 @@ public enum ExternalResourceType {
     CSS(StandardCharsets.UTF_8, false, 2),
     CACHE_MANIFEST(StandardCharsets.UTF_8, false, 2),
     PLAIN_TEXT(StandardCharsets.UTF_8, false, 1),
+    BINARY(null, false, 0),
     UNKNOWN(null, false, 0);
 
     private final Charset defaultCharset;

@@ -1,10 +1,10 @@
 package com.alexanderberndt.appintegration.tasks;
 
 
-import com.alexanderberndt.appintegration.api.task.ProcessingTask;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
-import com.alexanderberndt.appintegration.pipeline.TaskContext;
+import com.alexanderberndt.appintegration.pipeline.context.TaskContext;
+import com.alexanderberndt.appintegration.pipeline.task.ProcessingTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +25,8 @@ public class RegexValidator implements ProcessingTask {
 
     @Override
     public void process(TaskContext context, ExternalResource resource) {
-        final String regexString = context.getTaskParams().require(REGEX_PARAM, String.class);
+        //final String regexString = context.getTaskParams().require(REGEX_PARAM, String.class);
+        final String regexString = "hell";
         final Pattern pattern;
         try {
             pattern = Pattern.compile(regexString);

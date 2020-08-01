@@ -1,11 +1,11 @@
 package com.alexanderberndt.appintegration.tasks.load;
 
-import com.alexanderberndt.appintegration.api.task.LoadingTask;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
 import com.alexanderberndt.appintegration.engine.resources.loader.ResourceLoader;
 import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
-import com.alexanderberndt.appintegration.pipeline.TaskContext;
+import com.alexanderberndt.appintegration.pipeline.context.TaskContext;
+import com.alexanderberndt.appintegration.pipeline.task.LoadingTask;
 
 import java.io.IOException;
 
@@ -13,7 +13,7 @@ public class DownloadTask implements LoadingTask {
 
     @Override
     public ExternalResource load(TaskContext context, ExternalResourceRef resourceRef) {
-        String loaderName = context.getTaskParams().require("loader", String.class);
+        String loaderName = context.getTaskParams().getValue("loader", String.class);
         ResourceLoader resourceLoader = context.getResourceLoaderFactory().getResourceLoader(loaderName);
 
         if (resourceLoader == null) {

@@ -1,8 +1,8 @@
-package com.alexanderberndt.appintegration.api.task;
+package com.alexanderberndt.appintegration.pipeline.task;
 
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.pipeline.ProcessingPipeline;
-import com.alexanderberndt.appintegration.pipeline.TaskContext;
+import com.alexanderberndt.appintegration.pipeline.context.TaskContext;
 
 /**
  * <p>Filter for a {@link ProcessingPipeline}, which is applied for all applicable resources of an

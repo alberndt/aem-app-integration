@@ -1,7 +1,7 @@
-package com.alexanderberndt.appintegration.api.task;
+package com.alexanderberndt.appintegration.pipeline.task;
 
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
-import com.alexanderberndt.appintegration.pipeline.TaskContext;
+import com.alexanderberndt.appintegration.pipeline.context.TaskContext;
 
 public interface PreparationTask extends GenericTask {
 

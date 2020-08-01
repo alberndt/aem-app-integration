@@ -1,13 +1,12 @@
 package com.alexanderberndt.appintegration.pipeline;
 
-import com.alexanderberndt.appintegration.api.task.GenericTask;
-import com.alexanderberndt.appintegration.api.task.LoadingTask;
-import com.alexanderberndt.appintegration.api.task.PreparationTask;
-import com.alexanderberndt.appintegration.api.task.ProcessingTask;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
 import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
-import com.alexanderberndt.appintegration.utils.ValueMap;
+import com.alexanderberndt.appintegration.pipeline.context.GlobalContext;
+import com.alexanderberndt.appintegration.pipeline.context.TaskContext;
+import com.alexanderberndt.appintegration.pipeline.task.*;
+import com.alexanderberndt.appintegration.pipeline.valuemap.ValueMap;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,9 +26,10 @@ public class ProcessingPipeline {
     private final List<TaskDefinition<ProcessingTask>> processingTasks = new ArrayList<>();
 
 
-    public ProcessingPipeline(TaskFactory taskFactory, Map<String, Object> globalProperties) {
+    public ProcessingPipeline(TaskFactory taskFactory, ValueMap globalProperties) {
         this.taskFactory = taskFactory;
-        this.globalValueMap = new ValueMap(globalProperties, false);
+        // ToDo: Redo valuemap
+        this.globalValueMap = new ValueMap();
     }
 
     public void addTask(String taskName, Object... properties) {
@@ -56,7 +56,8 @@ public class ProcessingPipeline {
             throw new AppIntegrationException(String.format("Task %s is undefined.", taskName));
         }
 
-        final ValueMap taskProps = new ValueMap(globalValueMap, taskName, taskProperties, false);
+        // ToDo: Redo value-map
+        final ValueMap taskProps = null;//new ValueMap(globalValueMap, taskName, taskProperties, false);
         boolean isAdded = false;
 
         if (task instanceof PreparationTask) {

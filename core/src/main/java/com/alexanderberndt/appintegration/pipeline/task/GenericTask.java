@@ -1,4 +1,4 @@
-package com.alexanderberndt.appintegration.api.task;
+package com.alexanderberndt.appintegration.pipeline.task;
 
 public interface GenericTask {
 
