@@ -84,7 +84,7 @@ public class ValueMap {
             existingRecord.setValue(rank, value);
         } else {
             if (!keyCompleteNamespaces.contains(namespace)) {
-                values.put(internalKey, new RankedAndTypedValue(rank, value));
+                values.put(internalKey, RankedAndTypedValue.createByValue(rank, value));
             } else {
                 throw new ValueException(String.format("Variable %s is not allowed (namespace %s is key-complete)!",
                         internalKey, getNamespaceId(namespace)));
@@ -98,7 +98,7 @@ public class ValueMap {
         if (existingRecord != null) {
             existingRecord.setType(rank, type);
         } else {
-            values.put(internalKey, new RankedAndTypedValue(rank, type));
+            values.put(internalKey, RankedAndTypedValue.createByType(rank, type));
         }
     }
 
