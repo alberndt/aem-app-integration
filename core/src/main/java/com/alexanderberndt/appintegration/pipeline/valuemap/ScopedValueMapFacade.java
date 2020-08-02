@@ -3,12 +3,11 @@ package com.alexanderberndt.appintegration.pipeline.valuemap;
 import com.alexanderberndt.appintegration.pipeline.context.Context;
 
 import javax.annotation.Nonnull;
-import java.util.Map;
 import java.util.Set;
 
-import static com.alexanderberndt.appintegration.pipeline.valuemap.ValueMap.NAMESPACE_SEPARATOR;
-
 public class ScopedValueMapFacade {
+
+    public static final String NAMESPACE_SEPARATOR = ":";
 
     private final Context context;
 
@@ -43,13 +42,14 @@ public class ScopedValueMapFacade {
         }
     }
 
+    @Nonnull
     public <T> T getValue(@Nonnull String key, @Nonnull T defaultValue) {
         try {
             final NamespaceKey nk = getNamespaceKey(key);
             return valueMap.getValue(nk.namespace, nk.key, defaultValue);
         } catch (ValueException e) {
             context.addWarning(e.getMessage());
-            return null;
+            return defaultValue;
         }
     }
 
@@ -62,13 +62,28 @@ public class ScopedValueMapFacade {
         }
     }
 
-    public Set<Map.Entry<String, Object>> entrySet() {
-        return valueMap.entrySet(context.getNamespace());
+    public Class<?> getType(@Nonnull String key) {
+        final NamespaceKey nk = getNamespaceKey(key);
+        return valueMap.getType(nk.namespace, nk.key);
+    }
+
+    public void setType(@Nonnull String key, Class<?> type) {
+        final NamespaceKey nk = getNamespaceKey(key);
+        try {
+            valueMap.setType(nk.namespace, nk.key, context.getRank(), type);
+        } catch (ValueException e) {
+            context.addError(e.getMessage());
+        }
+    }
+
+    public Set<String> keySet() {
+        return valueMap.keySet(context.getNamespace());
     }
 
     public void setKeyComplete() {
         valueMap.setKeyComplete(context.getNamespace());
     }
+
 
     static class NamespaceKey {
 

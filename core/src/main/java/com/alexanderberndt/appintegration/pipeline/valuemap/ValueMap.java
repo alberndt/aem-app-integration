@@ -11,11 +11,13 @@ import java.util.stream.Collectors;
 
 public class ValueMap {
 
-    public static final String NAMESPACE_SEPARATOR = ":";
+    private static final String INTERNAL_NAMESPACE_SEPARATOR = "#°#";
 
     private final Map<String, RankedAndTypedValue> values = new HashMap<>();
 
     private final Set<String> keyCompleteNamespaces = new HashSet<>();
+
+    private final EnumSet<Context.Ranking> readOnlyRankSet = EnumSet.noneOf(Context.Ranking.class);
 
     public Object getValue(@Nullable String namespace, @Nonnull String key) {
         return getEntryAndMap(namespace, key, RankedAndTypedValue::getValue);
@@ -23,17 +25,21 @@ public class ValueMap {
 
     @SuppressWarnings("unchecked")
     public <T> T getValue(@Nullable String namespace, @Nonnull String key, @Nonnull Class<T> type) throws ValueException {
-        final Object value = this.getValue(namespace, key);
-        if (value == null) {
+        final RankedAndTypedValue rankedAndTypedValue = getEntryAndMap(namespace, key, Function.identity());
+        if (rankedAndTypedValue == null) {
             return null;
-        } else if (type.isAssignableFrom(value.getClass())) {
-            return (T) value;
         } else {
-            throw new ValueException(String.format("parameter %s is requested as %s, but is %s!",
-                    key, type.getSimpleName(), value.getClass().getSimpleName()));
+            final Class<?> expectedType = rankedAndTypedValue.getType();
+            if ((expectedType == null) || (expectedType == type)) {
+                return (T) rankedAndTypedValue.getValue();
+            } else {
+                throw new ValueException(String.format("parameter %s is requested as %s, but is %s!",
+                        key, type.getSimpleName(), rankedAndTypedValue.getType().getSimpleName()));
+            }
         }
     }
 
+    @Nonnull
     public <T> T requireValue(@Nullable String namespace, String key, Class<T> type) throws ValueException {
         final T value = getValue(namespace, key, type);
         if (value != null) {
@@ -43,6 +49,7 @@ public class ValueMap {
         }
     }
 
+    @Nonnull
     @SuppressWarnings("unchecked")
     public <T> T getValue(@Nullable String namespace, @Nonnull String key, @Nonnull T defaultValue) throws ValueException {
         T value = (T) getValue(namespace, key, defaultValue.getClass());
@@ -58,11 +65,17 @@ public class ValueMap {
         return getEntryAndMap(namespace, key, RankedAndTypedValue::getTypeName);
     }
 
-    public Set<Map.Entry<String, Object>> entrySet(String namespace) {
-        final String prefix = getNamespaceId(namespace) + NAMESPACE_SEPARATOR;
-        return values.entrySet().stream()
-                .filter(entry -> StringUtils.startsWith(entry.getKey(), prefix))
-                .map(entry -> new AbstractMap.SimpleEntry<>(entry.getKey(), entry.getValue().getValue()))
+    public Set<String> namespaceSet() {
+        return values.keySet().stream()
+                .map(key -> StringUtils.substringBefore(key, INTERNAL_NAMESPACE_SEPARATOR))
+                .collect(Collectors.toSet());
+    }
+
+    public Set<String> keySet(String namespace) {
+        final String prefix = getNamespaceId(namespace) + INTERNAL_NAMESPACE_SEPARATOR;
+        return values.keySet().stream()
+                .filter(key -> StringUtils.startsWith(key, prefix))
+                .map(key -> StringUtils.removeStart(key, prefix))
                 .collect(Collectors.toSet());
     }
 
@@ -78,6 +91,10 @@ public class ValueMap {
      * @throws ValueException Thrown, if value was not set
      */
     public void setValue(@Nullable String namespace, @Nonnull String key, @Nonnull Context.Ranking rank, @Nullable Object value) throws ValueException {
+
+        if (readOnlyRankSet.contains(rank))
+            throw new ValueException(String.format("Rank %s is read-only. Cannot set value!", rank));
+
         final String internalKey = getInternalKey(namespace, key);
         final RankedAndTypedValue existingRecord = values.get(internalKey);
         if (existingRecord != null) {
@@ -92,7 +109,11 @@ public class ValueMap {
         }
     }
 
-    public void setType(@Nullable String namespace, @Nonnull String key, @Nonnull Context.Ranking rank, @Nullable Class<?> type) throws ValueException {
+    public void setType(@Nullable String namespace, @Nonnull String key, @Nonnull Context.Ranking rank, @Nonnull Class<?> type) throws ValueException {
+
+        if (readOnlyRankSet.contains(rank))
+            throw new ValueException(String.format("Rank %s is read-only. Cannot set type!", rank));
+
         final String internalKey = getInternalKey(namespace, key);
         final RankedAndTypedValue existingRecord = values.get(internalKey);
         if (existingRecord != null) {
@@ -104,6 +125,14 @@ public class ValueMap {
 
     public void setKeyComplete(String namespace) {
         keyCompleteNamespaces.add(namespace);
+    }
+
+    public void clear(Context.Ranking rank) {
+        this.values.forEach((key, value) -> value.clear(rank));
+    }
+
+    public void setReadOnly(Context.Ranking rank) {
+        readOnlyRankSet.add(rank);
     }
 
     @Nullable
@@ -123,7 +152,7 @@ public class ValueMap {
 
     @Nonnull
     protected String getInternalKey(@Nullable String namespace, @Nonnull String key) {
-        return getNamespaceId(namespace) + NAMESPACE_SEPARATOR + key;
+        return getNamespaceId(namespace) + INTERNAL_NAMESPACE_SEPARATOR + key;
     }
 
 }

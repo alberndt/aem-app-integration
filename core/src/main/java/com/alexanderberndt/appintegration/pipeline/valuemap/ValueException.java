@@ -6,7 +6,4 @@ public class ValueException extends Exception {
         super(message);
     }
 
-    public ValueException(String message, Throwable cause) {
-        super(message, cause);
-    }
 }
