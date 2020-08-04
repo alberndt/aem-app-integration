@@ -17,9 +17,9 @@ public class RegexReplaceFilter implements ProcessingTask {
     }
 
     @Override
-    public void process(TaskContext context, ExternalResource resource) {
-        final String regex = context.getTaskParams().getValue("regex", String.class);
-        final String replacement = context.getTaskParams().getValue("replacement", String.class);
+    public void process(TaskContext<ProcessingTask> context, ExternalResource resource) {
+        final String regex = context.getValue("regex", String.class);
+        final String replacement = context.getValue("replacement", String.class);
 
         if (StringUtils.isNotBlank(regex) && (replacement != null)) {
             try {

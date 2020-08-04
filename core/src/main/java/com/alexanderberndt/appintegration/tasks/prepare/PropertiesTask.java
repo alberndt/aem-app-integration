@@ -12,7 +12,7 @@ public class PropertiesTask implements PreparationTask {
     }
 
     @Override
-    public void prepare(TaskContext context, ExternalResourceRef resourceRef) {
+    public void prepare(TaskContext<PreparationTask> context, ExternalResourceRef resourceRef) {
         throw new UnsupportedOperationException("Need to be fixed!!");
 //        resourceRef.getProperties().putAll(context.getTaskParams().getEntries());
 //        resourceRef.getProperties().putAll(context.getTaskParams());

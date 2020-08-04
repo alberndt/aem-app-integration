@@ -1,6 +1,5 @@
 package com.alexanderberndt.appintegration.pipeline.valuemap;
 
-import com.alexanderberndt.appintegration.pipeline.context.Context;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nonnull;
@@ -9,7 +8,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class ValueMap {
+public class RankedAndTypedValueMap {
 
     private static final String INTERNAL_NAMESPACE_SEPARATOR = "#°#";
 
@@ -17,7 +16,7 @@ public class ValueMap {
 
     private final Set<String> keyCompleteNamespaces = new HashSet<>();
 
-    private final EnumSet<Context.Ranking> readOnlyRankSet = EnumSet.noneOf(Context.Ranking.class);
+    private final EnumSet<Ranking> readOnlyRankSet = EnumSet.noneOf(Ranking.class);
 
     public Object getValue(@Nullable String namespace, @Nonnull String key) {
         return getEntryAndMap(namespace, key, RankedAndTypedValue::getValue);
@@ -90,7 +89,7 @@ public class ValueMap {
      *                  If the type is a Number or Boolean, then the value must-not be null. Otherwise an exception is thrown.
      * @throws ValueException Thrown, if value was not set
      */
-    public void setValue(@Nullable String namespace, @Nonnull String key, @Nonnull Context.Ranking rank, @Nullable Object value) throws ValueException {
+    public void setValue(@Nullable String namespace, @Nonnull String key, @Nonnull Ranking rank, @Nullable Object value) throws ValueException {
 
         if (readOnlyRankSet.contains(rank))
             throw new ValueException(String.format("Rank %s is read-only. Cannot set value!", rank));
@@ -109,7 +108,7 @@ public class ValueMap {
         }
     }
 
-    public void setType(@Nullable String namespace, @Nonnull String key, @Nonnull Context.Ranking rank, @Nonnull Class<?> type) throws ValueException {
+    public void setType(@Nullable String namespace, @Nonnull String key, @Nonnull Ranking rank, @Nonnull Class<?> type) throws ValueException {
 
         if (readOnlyRankSet.contains(rank))
             throw new ValueException(String.format("Rank %s is read-only. Cannot set type!", rank));
@@ -127,11 +126,11 @@ public class ValueMap {
         keyCompleteNamespaces.add(namespace);
     }
 
-    public void clear(Context.Ranking rank) {
+    public void clear(Ranking rank) {
         this.values.forEach((key, value) -> value.clear(rank));
     }
 
-    public void setReadOnly(Context.Ranking rank) {
+    public void setReadOnly(Ranking rank) {
         readOnlyRankSet.add(rank);
     }
 

@@ -11,13 +11,13 @@ import java.util.Map;
 
 public class CoreTaskFactory implements TaskFactory {
 
-    private static final Map<String, GenericTask> taskMap = new HashMap<>();
+    private static final Map<String, GenericTask<?>> taskMap = new HashMap<>();
 
-    protected static void registerTask(GenericTask task) {
+    protected static void registerTask(GenericTask<?> task) {
         registerTask(task.getName(), task);
     }
 
-    protected static void registerTask(String name, GenericTask task) {
+    protected static void registerTask(String name, GenericTask<?> task) {
         taskMap.put(name, task);
     }
 
@@ -28,7 +28,7 @@ public class CoreTaskFactory implements TaskFactory {
     }
 
     @Override
-    public GenericTask getTask(String name) {
+    public GenericTask<?> getTask(String name) {
         return taskMap.get(name);
     }
 }

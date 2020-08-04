@@ -1,6 +1,6 @@
 package com.alexanderberndt.appintegration.engine.resources;
 
-import com.alexanderberndt.appintegration.pipeline.valuemap.ValueMap;
+import com.alexanderberndt.appintegration.pipeline.valuemap.RankedAndTypedValueMap;
 
 public class ExternalResourceRef {
 
@@ -8,7 +8,7 @@ public class ExternalResourceRef {
 
     private ExternalResourceType expectedType;
 
-    private final ValueMap properties = new ValueMap();
+    private final RankedAndTypedValueMap properties = new RankedAndTypedValueMap();
 
     public ExternalResourceRef() {
     }
@@ -38,7 +38,7 @@ public class ExternalResourceRef {
         this.expectedType = expectedType;
     }
 
-    public ValueMap getProperties() {
+    public RankedAndTypedValueMap getProperties() {
         return properties;
     }
 

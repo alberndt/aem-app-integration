@@ -1,24 +1,14 @@
 package com.alexanderberndt.appintegration.core;
 
+import com.alexanderberndt.appintegration.pipeline.context.GlobalContext;
 import com.alexanderberndt.appintegration.pipeline.context.TaskContext;
-import com.alexanderberndt.appintegration.pipeline.valuemap.ValueMap;
+import com.alexanderberndt.appintegration.pipeline.task.GenericTask;
 
-public final class CoreTaskContext extends TaskContext {
+import javax.annotation.Nonnull;
 
-    CoreTaskContext(CoreGlobalContext globalCtx, String contextId, String contextName, ValueMap parametersMap) {
-        super(globalCtx, contextId, contextName, parametersMap);
+public final class CoreTaskContext<T extends GenericTask<T>> extends TaskContext<T> {
+
+    protected CoreTaskContext(@Nonnull GlobalContext globalContext, @Nonnull T task, @Nonnull String taskNamespace, String humanReadableTaskName) {
+        super(globalContext, task, taskNamespace, humanReadableTaskName);
     }
-
-
-    @Override
-    public String getNamespace() {
-        return null;
-    }
-
-    @Override
-    public Ranking getRank() {
-        return null;
-    }
-
-
 }

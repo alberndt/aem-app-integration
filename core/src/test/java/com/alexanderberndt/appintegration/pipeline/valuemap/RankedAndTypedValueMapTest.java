@@ -7,10 +7,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import static com.alexanderberndt.appintegration.pipeline.context.Context.Ranking.*;
+import static com.alexanderberndt.appintegration.pipeline.valuemap.Ranking.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-class ValueMapTest {
+class RankedAndTypedValueMapTest {
 
     private static final String NAMESPACE1 = "value-map-test";
     private static final String NAMESPACE2 = "more-namespace";
@@ -20,11 +20,11 @@ class ValueMapTest {
     public static final String STRING_VAR = "string-variable";
     public static final String UNDEFINED_VAR = "undefined-variable";
 
-    private ValueMap valueMap;
+    private RankedAndTypedValueMap valueMap;
 
     @BeforeEach
     void beforeEach() throws ValueException {
-        valueMap = new ValueMap();
+        valueMap = new RankedAndTypedValueMap();
         valueMap.setValue(NAMESPACE1, INT_VAR, PIPELINE_EXECUTION, 42);
         valueMap.setValue(NAMESPACE1, BOOL_VAR, PIPELINE_EXECUTION, true);
         valueMap.setValue(NAMESPACE1, STRING_VAR, PIPELINE_EXECUTION, "Hello world!");

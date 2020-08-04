@@ -15,14 +15,13 @@ import com.alexanderberndt.appintegration.pipeline.context.TaskContext;
  * </ul>
  *
  */
-public interface ProcessingTask extends GenericTask {
+public interface ProcessingTask extends GenericTask<ProcessingTask> {
 
-    void process(TaskContext context, ExternalResource resource);
 
+    void process(TaskContext<ProcessingTask> context, ExternalResource resource);
 
 
     // ToDo: Input-Combinations or Alternatives
-
 
 
     //    /**

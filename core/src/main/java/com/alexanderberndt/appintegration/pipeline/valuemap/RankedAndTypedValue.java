@@ -1,7 +1,5 @@
 package com.alexanderberndt.appintegration.pipeline.valuemap;
 
-import com.alexanderberndt.appintegration.pipeline.context.Context;
-
 import javax.annotation.Nonnull;
 import java.util.Comparator;
 import java.util.EnumMap;
@@ -11,17 +9,17 @@ import java.util.stream.Stream;
 
 public class RankedAndTypedValue {
 
-    private final EnumSet<Context.Ranking> ranksWithDefinedTypeSet = EnumSet.noneOf(Context.Ranking.class);
+    private final EnumSet<Ranking> ranksWithDefinedTypeSet = EnumSet.noneOf(Ranking.class);
 
-    private final EnumMap<Context.Ranking, Object> valueMap = new EnumMap<>(Context.Ranking.class);
+    private final EnumMap<Ranking, Object> valueMap = new EnumMap<>(Ranking.class);
 
-    private Context.Ranking effectiveRank;
+    private Ranking effectiveRank;
 
     private Class<?> effectiveType;
 
     private boolean isNonNull;
 
-    public static RankedAndTypedValue createByValue(@Nonnull Context.Ranking rank, Object value) {
+    public static RankedAndTypedValue createByValue(@Nonnull Ranking rank, Object value) {
         assertRankNotNull(rank);
         RankedAndTypedValue valueObj = new RankedAndTypedValue();
         valueObj.effectiveRank = rank;
@@ -33,7 +31,7 @@ public class RankedAndTypedValue {
         return valueObj;
     }
 
-    public static RankedAndTypedValue createByType(@Nonnull Context.Ranking rank, @Nonnull Class<?> type) {
+    public static RankedAndTypedValue createByType(@Nonnull Ranking rank, @Nonnull Class<?> type) {
         assertRankNotNull(rank);
         RankedAndTypedValue valueObj = new RankedAndTypedValue();
         valueObj.effectiveRank = rank;
@@ -65,7 +63,7 @@ public class RankedAndTypedValue {
      * @param value Value object, may be null (except for Boolean or Number types)
      * @throws ValueException thrown, if value could not be modified
      */
-    public void setValue(@Nonnull Context.Ranking rank, Object value) throws ValueException {
+    public void setValue(@Nonnull Ranking rank, Object value) throws ValueException {
 
         assertRankNotNull(rank);
 
@@ -104,7 +102,7 @@ public class RankedAndTypedValue {
         }
     }
 
-    public void setType(@Nonnull Context.Ranking rank, @Nonnull Class<?> type) throws ValueException {
+    public void setType(@Nonnull Ranking rank, @Nonnull Class<?> type) throws ValueException {
 
         assertRankNotNull(rank);
 
@@ -127,7 +125,7 @@ public class RankedAndTypedValue {
      *
      * @param rank Rank (must not be null)
      */
-    public void clear(@Nonnull Context.Ranking rank) {
+    public void clear(@Nonnull Ranking rank) {
 
         assertRankNotNull(rank);
 
@@ -137,7 +135,7 @@ public class RankedAndTypedValue {
 
         // search for the highest rank defined (either type of value)
         this.effectiveRank = Stream.concat(this.ranksWithDefinedTypeSet.stream(), this.valueMap.keySet().stream())
-                .min(Comparator.comparing(Context.Ranking::ordinal))
+                .min(Comparator.comparing(Ranking::ordinal))
                 .orElse(null);
 
         // clear effective type, if absolutely nothing is there anymore
@@ -161,7 +159,7 @@ public class RankedAndTypedValue {
 
 
     @SuppressWarnings("java:S2583")
-    private static void assertRankNotNull(@Nonnull Context.Ranking rank) {
+    private static void assertRankNotNull(@Nonnull Ranking rank) {
         //noinspection ConstantConditions
         if (rank == null) {
             throw new IllegalArgumentException("rank must not be null!");

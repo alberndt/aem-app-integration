@@ -7,13 +7,14 @@ import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
 import com.alexanderberndt.appintegration.pipeline.context.TaskContext;
 import com.alexanderberndt.appintegration.pipeline.task.LoadingTask;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 
 public class DownloadTask implements LoadingTask {
 
     @Override
-    public ExternalResource load(TaskContext context, ExternalResourceRef resourceRef) {
-        String loaderName = context.getTaskParams().getValue("loader", String.class);
+    public ExternalResource load(@Nonnull TaskContext<LoadingTask> context, ExternalResourceRef resourceRef) {
+        String loaderName = context.getValue("loader", String.class);
         ResourceLoader resourceLoader = context.getResourceLoaderFactory().getResourceLoader(loaderName);
 
         if (resourceLoader == null) {
@@ -26,4 +27,5 @@ public class DownloadTask implements LoadingTask {
             throw new AppIntegrationException("Failed to load resource " + resourceRef.getRelativeUrl(), e);
         }
     }
+
 }

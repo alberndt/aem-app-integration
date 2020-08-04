@@ -22,14 +22,14 @@ class PropertiesTaskTest {
 //        Map<String, Object> globalProperties = new HashMap<>();
 //        globalProperties.put("global", "do NOT copy!!!");
 //        globalProperties.put("properties.predefined", "this SHOULD work!");
-//        ValueMap globalParams = new ValueMap(globalProperties, false);
+//        RankedAndTypedValueMap globalParams = new RankedAndTypedValueMap(globalProperties, false);
 //        CoreGlobalContext globalContext = new CoreGlobalContext(null, globalParams);
 //
 //        // task properties
 //        Map<String, Object> taskProperties = new HashMap<>();
 //        taskProperties.put("hello", "Hello World!");
 //        taskProperties.put("the-number", 42);
-//        ValueMap taskParams = new ValueMap(globalParams, "properties", taskProperties, false);
+//        RankedAndTypedValueMap taskParams = new RankedAndTypedValueMap(globalParams, "properties", taskProperties, false);
 //        TaskContext context = globalContext.createChildContext("properties", "properties task", taskParams);
 //        ExternalResourceRef resourceRef = new ExternalResourceRef();
 //

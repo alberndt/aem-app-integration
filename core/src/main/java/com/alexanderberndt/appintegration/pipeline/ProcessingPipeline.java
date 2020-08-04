@@ -5,166 +5,60 @@ import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
 import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
 import com.alexanderberndt.appintegration.pipeline.context.GlobalContext;
 import com.alexanderberndt.appintegration.pipeline.context.TaskContext;
-import com.alexanderberndt.appintegration.pipeline.task.*;
-import com.alexanderberndt.appintegration.pipeline.valuemap.ValueMap;
+import com.alexanderberndt.appintegration.pipeline.task.LoadingTask;
+import com.alexanderberndt.appintegration.pipeline.task.PreparationTask;
+import com.alexanderberndt.appintegration.pipeline.task.ProcessingTask;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.lang.invoke.MethodHandles;
 import java.util.List;
-import java.util.Map;
 
+/**
+ * Processing Instance.
+ */
 public class ProcessingPipeline {
 
-    private final TaskFactory taskFactory;
+    private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private final ValueMap globalValueMap;
+    private final GlobalContext context;
 
-    private final List<TaskDefinition<PreparationTask>> preparationTasks = new ArrayList<>();
+    private final List<TaskContext<PreparationTask>> preparationTasks;
 
-    private TaskDefinition<LoadingTask> loadingTask;
+    private final TaskContext<LoadingTask> loadingTask;
 
-    private final List<TaskDefinition<ProcessingTask>> processingTasks = new ArrayList<>();
+    private final List<TaskContext<ProcessingTask>> processingTasks;
 
-
-    public ProcessingPipeline(TaskFactory taskFactory, ValueMap globalProperties) {
-        this.taskFactory = taskFactory;
-        // ToDo: Redo valuemap
-        this.globalValueMap = new ValueMap();
+    protected ProcessingPipeline(GlobalContext context,
+                                 List<TaskContext<PreparationTask>> preparationTasks,
+                                 TaskContext<LoadingTask> loadingTask,
+                                 List<TaskContext<ProcessingTask>> processingTasks) {
+        this.context = context;
+        this.preparationTasks = preparationTasks;
+        this.loadingTask = loadingTask;
+        this.processingTasks = processingTasks;
     }
 
-    public void addTask(String taskName, Object... properties) {
-        if (properties.length % 2 == 0) {
-            Map<String, Object> taskProperties = new HashMap<>();
-            for (int i = 0; i < properties.length; i = i + 2) {
-                if (properties[i] instanceof String) {
-                    taskProperties.put((String) properties[i], properties[i + 1]);
-                } else {
-                    throw new IllegalArgumentException("Properties must be provided of pairs of String/Objects");
-                }
-            }
-
-            addTask(taskName, taskProperties);
-
-        } else {
-            throw new IllegalArgumentException("Properties must be provided of pairs of String/Objects - so an even number of properties is expected");
-        }
-    }
-
-    public void addTask(String taskName, Map<String, Object> taskProperties) {
-        GenericTask task = taskFactory.getTask(taskName);
-        if (task == null) {
-            throw new AppIntegrationException(String.format("Task %s is undefined.", taskName));
-        }
-
-        // ToDo: Redo value-map
-        final ValueMap taskProps = null;//new ValueMap(globalValueMap, taskName, taskProperties, false);
-        boolean isAdded = false;
-
-        if (task instanceof PreparationTask) {
-            if (loadingTask == null) {
-                preparationTasks.add(new TaskDefinition<>(taskName, (PreparationTask) task, taskProps));
-                isAdded = true;
-            } else {
-                throw new AppIntegrationException(String.format("Task %s cannot be added anymore. After adding a LoadingTask, only ProcessingTasks can be added.", taskName));
-            }
-        }
-
-        if (task instanceof LoadingTask) {
-            if (loadingTask == null) {
-                loadingTask = new TaskDefinition<>(taskName, (LoadingTask) task, taskProps);
-                isAdded = true;
-            } else {
-                throw new AppIntegrationException(String.format("Task %s cannot be added anymore. Only one LoadingTask can be added.", taskName));
-            }
-        }
-
-        if (task instanceof ProcessingTask) {
-            if (loadingTask != null) {
-                processingTasks.add(new TaskDefinition<>(taskName, (ProcessingTask) task, taskProps));
-                isAdded = true;
-            } else {
-                throw new AppIntegrationException(String.format("Task %s cannot be added. A LoadingTask must be added before any ProcessingTasks.", taskName));
-            }
-        }
-
-        if (!isAdded) {
-            throw new AppIntegrationException(String.format("Task %s must be either Preparation-, Loading- or Processing-Task!", taskName));
-        }
-    }
-
-    public ExternalResource load(GlobalContext context, ExternalResourceRef resourceRef) {
+    public ExternalResource loadAndProcessResourceRef(GlobalContext context, ExternalResourceRef resourceRef) {
 
         if (loadingTask == null) {
             throw new AppIntegrationException("A LoadingTask must be added to the Pipeline before!");
         }
 
         // preparation tasks
-        prepareInternal(context, resourceRef);
+        for (TaskContext<PreparationTask> taskContext : preparationTasks) {
+            taskContext.getTask().prepare(taskContext, resourceRef);
+        }
+
         // loading task
-        final ExternalResource resource = loadInternal(context, resourceRef);
+        ExternalResource resource = loadingTask.getTask().load(loadingTask, resourceRef);
+
         // processing tasks
-        processInternal(context, resource);
+        for (TaskContext<ProcessingTask> taskContext : processingTasks) {
+            taskContext.getTask().process(taskContext, resource);
+        }
 
         return resource;
-    }
-
-    private void prepareInternal(GlobalContext context, ExternalResourceRef resourceRef) {
-        for (TaskDefinition<PreparationTask> taskDef : preparationTasks) {
-            PreparationTask task = taskDef.getTask();
-            TaskContext taskContext = taskDef.createChildContext(context);
-            task.prepare(taskContext, resourceRef);
-        }
-    }
-
-    private ExternalResource loadInternal(GlobalContext context, ExternalResourceRef resourceRef) {
-        ExternalResource resource;
-        LoadingTask task = loadingTask.getTask();
-        TaskContext taskContext = loadingTask.createChildContext(context);
-
-        resource = task.load(taskContext, resourceRef);
-        return resource;
-    }
-
-    private void processInternal(GlobalContext context, ExternalResource resource) {
-        for (TaskDefinition<ProcessingTask> taskDef : processingTasks) {
-            ProcessingTask task = taskDef.getTask();
-            TaskContext taskContext = taskDef.createChildContext(context);
-
-            task.process(taskContext, resource);
-        }
-    }
-
-
-    private static class TaskDefinition<T> {
-
-        private final String taskName;
-
-        private final T task;
-
-        private final ValueMap taskProperties;
-
-        public TaskDefinition(String taskName, T task, ValueMap taskProperties) {
-            this.taskName = taskName;
-            this.task = task;
-            this.taskProperties = taskProperties;
-        }
-
-        public String getTaskName() {
-            return taskName;
-        }
-
-        public T getTask() {
-            return task;
-        }
-
-        public ValueMap getTaskProperties() {
-            return taskProperties;
-        }
-
-        public TaskContext createChildContext(GlobalContext globalCtx) {
-            return globalCtx.createChildContext(taskName, "Task " + taskName, taskProperties);
-        }
-
     }
 
 }
