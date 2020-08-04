@@ -1,7 +1,7 @@
 package com.alexanderberndt.appintegration.pipeline.context;
 
-import com.alexanderberndt.appintegration.pipeline.task.ProcessingTask;
 import com.alexanderberndt.appintegration.pipeline.valuemap.RankedAndTypedValueMap;
+import com.alexanderberndt.appintegration.pipeline.valuemap.Ranking;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,19 +21,16 @@ class TaskContextTest {
 
     private RankedAndTypedValueMap processingParams;
 
-    private TaskContext<ProcessingTask> taskContext;
+    private TaskContext taskContext;
 
     @Mock
     private GlobalContext globalContextMock;
-
-    @Mock
-    private ProcessingTask task;
 
 
     @BeforeEach
     void beforeEach() {
         this.processingParams = new RankedAndTypedValueMap();
-        this.taskContext = new TaskContext<ProcessingTask>(globalContextMock, task, MY_NAMESPACE, "This is a test task-context") {
+        this.taskContext = new TaskContext(globalContextMock, Ranking.TASK_DEFAULT, MY_NAMESPACE) {
         };
 
         Mockito.lenient().when(globalContextMock.getProcessingParams()).thenReturn(processingParams);
@@ -41,14 +38,14 @@ class TaskContextTest {
 
     @Test
     void getUnqualifiedNamespaceKey() {
-        TaskContext<?>.NamespaceKey nk = taskContext.parseNamespaceKey("any-variable");
+        TaskContext.NamespaceKey nk = taskContext.parseNamespaceKey("any-variable");
         assertEquals("my-namespace", nk.getNamespace());
         assertEquals("any-variable", nk.getKey());
     }
 
     @Test
     void getQualifiedNamespaceKey() {
-        TaskContext<?>.NamespaceKey nk = taskContext.parseNamespaceKey("other:any-other");
+        TaskContext.NamespaceKey nk = taskContext.parseNamespaceKey("other:any-other");
         assertEquals("other", nk.getNamespace());
         assertEquals("any-other", nk.getKey());
     }

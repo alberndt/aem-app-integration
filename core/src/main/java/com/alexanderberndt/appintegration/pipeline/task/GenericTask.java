@@ -2,7 +2,7 @@ package com.alexanderberndt.appintegration.pipeline.task;
 
 import com.alexanderberndt.appintegration.pipeline.context.TaskContext;
 
-public interface GenericTask<T extends GenericTask<T>> {
+public interface GenericTask {
 
     default String getName() {
         return this.getClass().getSimpleName()
@@ -27,7 +27,7 @@ public interface GenericTask<T extends GenericTask<T>> {
      *
      * @param taskContext TaskContext
      */
-    default void declareTaskPropertiesAndDefaults(TaskContext<T> taskContext) {
+    default void declareTaskPropertiesAndDefaults(TaskContext taskContext) {
     }
 
 }

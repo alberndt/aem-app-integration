@@ -55,4 +55,11 @@ public class ExternalResourceRef {
         return relativeUrl != null ? relativeUrl.hashCode() : 0;
     }
 
+    @Override
+    public String toString() {
+        return "ExternalResourceRef{" +
+                "relativeUrl='" + relativeUrl + '\'' +
+                ", expectedType=" + expectedType +
+                '}';
+    }
 }

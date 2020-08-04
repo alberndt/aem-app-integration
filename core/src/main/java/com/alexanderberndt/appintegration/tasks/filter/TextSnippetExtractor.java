@@ -5,7 +5,6 @@ import com.alexanderberndt.appintegration.pipeline.context.TaskContext;
 import com.alexanderberndt.appintegration.pipeline.task.ProcessingTask;
 import com.alexanderberndt.appintegration.tasks.utils.LineFilterReader;
 
-import java.io.IOException;
 import java.io.Reader;
 
 public class TextSnippetExtractor implements ProcessingTask {
@@ -17,13 +16,8 @@ public class TextSnippetExtractor implements ProcessingTask {
 
     @Override
     public void process(TaskContext context, ExternalResource resource) {
-        try {
-            resource.setReader(new TextSnippetExtractingReader(resource.getReader()));
-        } catch (IOException e) {
-            e.printStackTrace();
-            context.addError(e.getMessage());
-            // ToDo: Implement error handling
-        }
+        resource.setContent(new TextSnippetExtractingReader(resource.getContentAsReader()));
+        // ToDo: Implement error handling
     }
 
     private static class TextSnippetExtractingReader extends LineFilterReader {

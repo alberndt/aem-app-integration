@@ -12,6 +12,7 @@ public enum ExternalResourceType {
     CSS(StandardCharsets.UTF_8, false, 2),
     CACHE_MANIFEST(StandardCharsets.UTF_8, false, 2),
     PLAIN_TEXT(StandardCharsets.UTF_8, false, 1),
+    TEXT(StandardCharsets.UTF_8, false, 1),
     BINARY(null, false, 0),
     UNKNOWN(null, false, 0);
 
@@ -36,7 +37,11 @@ public enum ExternalResourceType {
     }
 
     public static ExternalResourceType parse(String str) {
-        return ExternalResourceType.valueOf(str.toUpperCase().replace('-', '_'));
+        try {
+            return ExternalResourceType.valueOf(str.toUpperCase().replace('-', '_'));
+        } catch (IllegalArgumentException e) {
+            return ExternalResourceType.UNKNOWN;
+        }
     }
 
     public boolean isMoreQualified(ExternalResourceType otherType) {

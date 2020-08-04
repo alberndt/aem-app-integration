@@ -8,8 +8,6 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class HttpResourceLoaderTest {
 
 
@@ -20,6 +18,6 @@ class HttpResourceLoaderTest {
         ExternalResourceRef ref = new ExternalResourceRef("http://www.alexanderberndt.com", ExternalResourceType.HTML);
 
         ExternalResource resource = resourceLoader.load(null, ref);
-        System.out.println(resource.getString());
+        System.out.println(resource.getContentAsString());
     }
 }

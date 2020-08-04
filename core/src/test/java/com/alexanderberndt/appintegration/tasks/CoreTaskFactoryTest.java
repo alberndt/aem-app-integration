@@ -13,7 +13,7 @@ class CoreTaskFactoryTest {
 
     @Test
     void getTask() {
-        GenericTask<?> task;
+        GenericTask task;
         TaskFactory taskFactory = new CoreTaskFactory();
 
         task = taskFactory.getTask("properties");

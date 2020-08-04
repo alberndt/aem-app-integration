@@ -12,7 +12,7 @@ public class SystemResourceLoader implements ResourceLoader {
         final ExternalResource resource = new ExternalResource(resourceRef);
         // ToDo: Handle not found
         final String url = resolveRelativeUrl(baseUrl, resourceRef.getRelativeUrl());
-        resource.setInputStream(ClassLoader.getSystemResourceAsStream(url));
+        resource.setContent(ClassLoader.getSystemResourceAsStream(url));
 
         return resource;
     }

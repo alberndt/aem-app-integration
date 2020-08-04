@@ -13,9 +13,9 @@ import java.io.IOException;
 public class DownloadTask implements LoadingTask {
 
     @Override
-    public ExternalResource load(@Nonnull TaskContext<LoadingTask> context, ExternalResourceRef resourceRef) {
+    public ExternalResource load(@Nonnull TaskContext context, ExternalResourceRef resourceRef) {
         String loaderName = context.getValue("loader", String.class);
-        ResourceLoader resourceLoader = context.getResourceLoaderFactory().getResourceLoader(loaderName);
+        ResourceLoader resourceLoader = context.getResourceLoader();
 
         if (resourceLoader == null) {
             throw new AppIntegrationException("Cannot get loader " + loaderName + " from ResourceLoaderFactory");

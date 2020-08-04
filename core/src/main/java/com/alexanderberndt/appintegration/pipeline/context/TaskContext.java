@@ -1,7 +1,6 @@
 package com.alexanderberndt.appintegration.pipeline.context;
 
-import com.alexanderberndt.appintegration.engine.resources.loader.ResourceLoaderFactory;
-import com.alexanderberndt.appintegration.pipeline.task.GenericTask;
+import com.alexanderberndt.appintegration.engine.resources.loader.ResourceLoader;
 import com.alexanderberndt.appintegration.pipeline.valuemap.Ranking;
 import com.alexanderberndt.appintegration.pipeline.valuemap.ValueException;
 import org.slf4j.Logger;
@@ -11,59 +10,40 @@ import javax.annotation.Nonnull;
 import java.lang.invoke.MethodHandles;
 import java.util.Set;
 
-public abstract class TaskContext<T extends GenericTask<T>> {
+public class TaskContext {
 
     public static final String NAMESPACE_SEPARATOR = ":";
 
     private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private final T task;
-
     private final GlobalContext globalContext;
+
+    private final Ranking rank;
 
     private final String taskNamespace;
 
-    private final String messagePrefix;
-
-    private Ranking rank = Ranking.TASK_DEFAULT;
-
-    protected TaskContext(@Nonnull GlobalContext globalContext, @Nonnull T task, @Nonnull String taskNamespace, String humanReadableTaskName) {
-        this.task = task;
+    protected TaskContext(GlobalContext globalContext, Ranking rank, String taskNamespace) {
         this.globalContext = globalContext;
+        this.rank = rank;
         this.taskNamespace = taskNamespace;
-        // ToDo: Connect with parent-context
-        this.messagePrefix = String.format("%s (%s): ", humanReadableTaskName, taskNamespace);
-    }
-
-    public T getTask() {
-        return task;
     }
 
     public void addWarning(String message) {
-        globalContext.addWarning(messagePrefix + message);
+        globalContext.addWarning(taskNamespace + ": " + message);
     }
 
     public void addError(String message) {
-        globalContext.addError(messagePrefix + message);
+        globalContext.addError(taskNamespace + ": " + message);
     }
-
-    public void declareTaskPropertiesAndDefaults() {
-        this.task.declareTaskPropertiesAndDefaults(this);
-    }
-
 
     @Nonnull
-    public ResourceLoaderFactory getResourceLoaderFactory() {
-        throw new UnsupportedOperationException("Not yet implemented!");
-        //return globalContext.getResourceLoaderFactory();
+    public ResourceLoader getResourceLoader() {
+        return globalContext.getResourceLoader();
     }
 
+    @SuppressWarnings("unused")
     public Ranking getRank() {
         return rank;
-    }
-
-    protected void setRank(Ranking rank) {
-        this.rank = rank;
     }
 
     public Object getValue(@Nonnull String key) {
@@ -93,6 +73,7 @@ public abstract class TaskContext<T extends GenericTask<T>> {
     }
 
     public void setValue(@Nonnull String key, Object value) {
+        LOG.debug("setValue({}, {}, {}) @ {}", rank, key, value, this.taskNamespace);
         try {
             final NamespaceKey nk = parseNamespaceKey(key);
             globalContext.getProcessingParams().setValue(nk.namespace, nk.key, rank, value);
@@ -107,6 +88,7 @@ public abstract class TaskContext<T extends GenericTask<T>> {
     }
 
     public void setType(@Nonnull String key, Class<?> type) {
+        LOG.debug("setType({}, {}, {}) @ {}", rank, key, type, this.taskNamespace);
         final NamespaceKey nk = parseNamespaceKey(key);
         try {
             globalContext.getProcessingParams().setType(nk.namespace, nk.key, rank, type);
@@ -120,6 +102,7 @@ public abstract class TaskContext<T extends GenericTask<T>> {
     }
 
     public void setKeyComplete() {
+        LOG.debug("setKeyComplete({}) @ {} with keys = {}", rank, this.taskNamespace, this.keySet());
         globalContext.getProcessingParams().setKeyComplete(taskNamespace);
     }
 
@@ -132,7 +115,7 @@ public abstract class TaskContext<T extends GenericTask<T>> {
         }
     }
 
-    protected class NamespaceKey {
+    protected static class NamespaceKey {
 
         private final String namespace;
         private final String key;
@@ -150,6 +133,4 @@ public abstract class TaskContext<T extends GenericTask<T>> {
             return key;
         }
     }
-
-
 }

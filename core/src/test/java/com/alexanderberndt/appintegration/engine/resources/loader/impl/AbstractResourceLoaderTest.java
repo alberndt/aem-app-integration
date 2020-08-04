@@ -1,10 +1,10 @@
 
 package com.alexanderberndt.appintegration.engine.resources.loader.impl;
 
+import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
 import com.alexanderberndt.appintegration.engine.resources.loader.ResourceLoader;
-import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
@@ -27,7 +27,7 @@ class AbstractResourceLoaderTest {
         ExternalResource resource = resourceLoader1000.load("xxx", resourceRef);
 
         assertNotNull(resource);
-        assertEquals(1000 * TEST_STRING.length(), resource.getString().length());
+        assertEquals(1000 * TEST_STRING.length(), resource.getContentAsString().length());
     }
 
     @Test
@@ -36,7 +36,7 @@ class AbstractResourceLoaderTest {
         ExternalResource resource = resourceLoader1000.load("xxx", resourceRef);
 
         assertNotNull(resource);
-        assertTrue(1000 * TEST_STRING.length() <= resource.getBytes().length);
+        assertTrue(1000 * TEST_STRING.length() <= resource.getContentAsByteArray().length);
     }
 
     @Test
@@ -45,7 +45,7 @@ class AbstractResourceLoaderTest {
         ExternalResource resource = resourceLoader1000.load("xxx", resourceRef);
 
         assertNotNull(resource);
-        LineNumberReader lineNumberReader = new LineNumberReader(new InputStreamReader(resource.getInputStream()));
+        LineNumberReader lineNumberReader = new LineNumberReader(new InputStreamReader(resource.getContentAsInputStream()));
         for (int i = 0; i < 1000; i++) {
             assertEquals(TEST_STRING, lineNumberReader.readLine() + System.lineSeparator());
         }
@@ -59,7 +59,7 @@ class AbstractResourceLoaderTest {
 
         assertNotNull(resource);
 
-        LineNumberReader lineNumberReader = new LineNumberReader(resource.getReader());
+        LineNumberReader lineNumberReader = new LineNumberReader(resource.getContentAsReader());
         for (int i = 0; i < 1000; i++) {
             assertEquals(TEST_STRING, lineNumberReader.readLine() + System.lineSeparator());
         }
@@ -97,7 +97,7 @@ class AbstractResourceLoaderTest {
         @Override
         public ExternalResource load(String baseUrl, ExternalResourceRef resourceRef) {
             ExternalResource externalResource = new ExternalResource(resourceRef);
-            externalResource.setInputStream(new ByteArrayInputStream(byteArray));
+            externalResource.setContent(new ByteArrayInputStream(byteArray));
             if (charset != null) {
                 externalResource.setCharset(charset);
             }

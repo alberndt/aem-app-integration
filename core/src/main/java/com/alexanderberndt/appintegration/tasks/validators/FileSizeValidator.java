@@ -19,7 +19,7 @@ public class FileSizeValidator implements ProcessingTask {
 
     @Override
     public void process(TaskContext context, ExternalResource resource) {
-        resource.setInputStream(new ByteCountingInputStream(resource.getInputStream()));
+        resource.setContent(new ByteCountingInputStream(resource.getContentAsInputStream()));
     }
 
 

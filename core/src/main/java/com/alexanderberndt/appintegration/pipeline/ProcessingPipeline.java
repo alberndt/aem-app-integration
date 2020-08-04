@@ -14,6 +14,8 @@ import org.slf4j.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 
+import static com.alexanderberndt.appintegration.pipeline.valuemap.Ranking.PIPELINE_EXECUTION;
+
 /**
  * Processing Instance.
  */
@@ -23,16 +25,16 @@ public class ProcessingPipeline {
 
     private final GlobalContext context;
 
-    private final List<TaskContext<PreparationTask>> preparationTasks;
+    private final List<TaskInstance<PreparationTask>> preparationTasks;
 
-    private final TaskContext<LoadingTask> loadingTask;
+    private final TaskInstance<LoadingTask> loadingTask;
 
-    private final List<TaskContext<ProcessingTask>> processingTasks;
+    private final List<TaskInstance<ProcessingTask>> processingTasks;
 
     protected ProcessingPipeline(GlobalContext context,
-                                 List<TaskContext<PreparationTask>> preparationTasks,
-                                 TaskContext<LoadingTask> loadingTask,
-                                 List<TaskContext<ProcessingTask>> processingTasks) {
+                                 List<TaskInstance<PreparationTask>> preparationTasks,
+                                 TaskInstance<LoadingTask> loadingTask,
+                                 List<TaskInstance<ProcessingTask>> processingTasks) {
         this.context = context;
         this.preparationTasks = preparationTasks;
         this.loadingTask = loadingTask;
@@ -46,19 +48,26 @@ public class ProcessingPipeline {
         }
 
         // preparation tasks
-        for (TaskContext<PreparationTask> taskContext : preparationTasks) {
-            taskContext.getTask().prepare(taskContext, resourceRef);
+        for (TaskInstance<PreparationTask> taskInstance : preparationTasks) {
+            LOG.debug("{}::prepare", taskInstance.getTaskNamespace());
+            TaskContext taskContext = context.createTaskContext(PIPELINE_EXECUTION, taskInstance.getTaskNamespace());
+            taskInstance.getTask().prepare(taskContext, resourceRef);
         }
 
         // loading task
-        ExternalResource resource = loadingTask.getTask().load(loadingTask, resourceRef);
+        LOG.debug("{}::load", loadingTask.getTaskNamespace());
+        TaskContext loadContext = context.createTaskContext(PIPELINE_EXECUTION, loadingTask.getTaskNamespace());
+        ExternalResource resource = loadingTask.getTask().load(loadContext, resourceRef);
 
         // processing tasks
-        for (TaskContext<ProcessingTask> taskContext : processingTasks) {
-            taskContext.getTask().process(taskContext, resource);
+        for (TaskInstance<ProcessingTask> taskInstance : processingTasks) {
+            LOG.debug("{}::prepare", taskInstance.getTaskNamespace());
+            TaskContext taskContext = context.createTaskContext(PIPELINE_EXECUTION, taskInstance.getTaskNamespace());
+            taskInstance.getTask().process(taskContext, resource);
         }
 
         return resource;
     }
+
 
 }

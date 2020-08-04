@@ -11,7 +11,8 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class InMemoryExternalResourcesSetTest {
 
@@ -43,8 +44,8 @@ class InMemoryExternalResourcesSetTest {
         ExternalResource text1Res = resourcesSet.getResource("resources/text1.txt");
 
         assertNotNull(text1Res);
-        assertNotNull(text1Res.getInputStream());
-        assertEquals(TEST_DATA, text1Res.getString());
+        assertNotNull(text1Res.getContentAsInputStream());
+        assertEquals(TEST_DATA, text1Res.getContentAsString());
     }
 
     @Test
@@ -52,7 +53,7 @@ class InMemoryExternalResourcesSetTest {
         ExternalResource text1Res = resourcesSet.getResource("resources/text1.txt");
 
         assertNotNull(text1Res);
-        assertNotNull(text1Res.getInputStream());
-        assertEquals(TEST_DATA, text1Res.getString());
+        assertNotNull(text1Res.getContentAsInputStream());
+        assertEquals(TEST_DATA, text1Res.getContentAsString());
     }
 }
