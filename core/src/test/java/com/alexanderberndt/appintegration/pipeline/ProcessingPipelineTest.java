@@ -42,6 +42,7 @@ class ProcessingPipelineTest {
         ExternalResourceRef resourceRef = new ExternalResourceRef("simple-app1/server/application-info.json", ExternalResourceType.APPLICATION_PROPERTIES);
         ExternalResource resource = pipeline.loadAndProcessResourceRef(context, resourceRef);
 
+
         for (ExternalResourceRef ref : resource.getReferencedResources()) {
             System.out.println("found reference: " + ref);
             ExternalResource referenceResource = pipeline.loadAndProcessResourceRef(context, ref);

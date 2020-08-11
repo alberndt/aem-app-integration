@@ -23,7 +23,7 @@ class ExternalResourceTest {
 
     @BeforeEach
     void beforeEach() {
-        resource = new ExternalResource(new ExternalResourceRef("test-data.txt"));
+        resource = new ExternalResource(null, new ExternalResourceRef("test-data.txt"));
         resource.setCharset(StandardCharsets.UTF_8);
         resource.setContent(new ByteArrayInputStream(TEST_DATA.getBytes(StandardCharsets.UTF_8)));
     }

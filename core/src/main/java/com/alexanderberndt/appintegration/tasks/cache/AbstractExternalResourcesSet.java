@@ -26,9 +26,9 @@ public abstract class AbstractExternalResourcesSet implements ExternalResourcesS
 
     @Override
     public final void addResourceReference(@Nonnull ExternalResourceRef resourceRef) {
-        final String relativeUrl = resourceRef.getRelativeUrl();
+        final String relativeUrl = resourceRef.getUrl();
         if (StringUtils.isNotBlank(relativeUrl)) {
-            ExternalResourceRef prevResRef = knownReferencesMap.put(resourceRef.getRelativeUrl(), resourceRef);
+            ExternalResourceRef prevResRef = knownReferencesMap.put(resourceRef.getUrl(), resourceRef);
             // keep the expected resource type, if we already have more qualified information
             if ((prevResRef != null) && (prevResRef.getExpectedType() != null)
                     && prevResRef.getExpectedType().isMoreQualified(resourceRef.getExpectedType())) {
@@ -70,9 +70,9 @@ public abstract class AbstractExternalResourcesSet implements ExternalResourcesS
 
 
     private void prefetchInternal(@Nonnull ExternalResourceRef resourceRef, @Nonnull Predicate<ExternalResourceRef> predicate) {
-        if (!prefetchedResources.contains(resourceRef.getRelativeUrl()) && predicate.test(resourceRef)) {
+        if (!prefetchedResources.contains(resourceRef.getUrl()) && predicate.test(resourceRef)) {
             prefetch(resourceRef);
-            prefetchedResources.add(resourceRef.getRelativeUrl());
+            prefetchedResources.add(resourceRef.getUrl());
         }
     }
 

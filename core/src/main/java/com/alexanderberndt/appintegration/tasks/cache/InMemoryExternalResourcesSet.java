@@ -24,8 +24,8 @@ public class InMemoryExternalResourcesSet extends AbstractExternalResourcesSet {
     @Override
     protected void prefetch(ExternalResourceRef resourceRef) {
         try {
-            ExternalResource resource = resourceLoader.load(baseUrl, resourceRef);
-            externalResourceMap.put(resourceRef.getRelativeUrl(), resource);
+            ExternalResource resource = resourceLoader.load(resourceRef);
+            externalResourceMap.put(resourceRef.getUrl(), resource);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -38,7 +38,7 @@ public class InMemoryExternalResourcesSet extends AbstractExternalResourcesSet {
             prefetch(resourceRef);
         }
         // ToDo: Handle unknown resources, eg. throw exception
-        return externalResourceMap.get(resourceRef.getRelativeUrl());
+        return externalResourceMap.get(resourceRef.getUrl());
     }
 
     // ToDo: Support A/B Switch

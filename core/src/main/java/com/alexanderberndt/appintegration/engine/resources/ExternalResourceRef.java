@@ -2,32 +2,29 @@ package com.alexanderberndt.appintegration.engine.resources;
 
 import com.alexanderberndt.appintegration.pipeline.valuemap.RankedAndTypedValueMap;
 
+import javax.annotation.Nonnull;
+
 public class ExternalResourceRef {
 
-    private String relativeUrl;
+    @Nonnull
+    private final String url;
 
     private ExternalResourceType expectedType;
 
     private final RankedAndTypedValueMap properties = new RankedAndTypedValueMap();
 
-    public ExternalResourceRef() {
+    public ExternalResourceRef(@Nonnull String url) {
+        this.url = url;
+        this.expectedType = ExternalResourceType.UNKNOWN;
     }
 
-    public ExternalResourceRef(String relativeUrl) {
-        this.relativeUrl = relativeUrl;
-    }
-
-    public ExternalResourceRef(String relativeUrl, ExternalResourceType expectedType) {
-        this.relativeUrl = relativeUrl;
+    public ExternalResourceRef(@Nonnull String url, @Nonnull ExternalResourceType expectedType) {
+        this.url = url;
         this.expectedType = expectedType;
     }
 
-    public String getRelativeUrl() {
-        return relativeUrl;
-    }
-
-    public void setRelativeUrl(String relativeUrl) {
-        this.relativeUrl = relativeUrl;
+    public String getUrl() {
+        return url;
     }
 
     public ExternalResourceType getExpectedType() {
@@ -47,18 +44,18 @@ public class ExternalResourceRef {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ExternalResourceRef that = (ExternalResourceRef) o;
-        return (relativeUrl != null) && relativeUrl.equals(that.relativeUrl);
+        return (url != null) && url.equals(that.url);
     }
 
     @Override
     public int hashCode() {
-        return relativeUrl != null ? relativeUrl.hashCode() : 0;
+        return url != null ? url.hashCode() : 0;
     }
 
     @Override
     public String toString() {
         return "ExternalResourceRef{" +
-                "relativeUrl='" + relativeUrl + '\'' +
+                "url='" + url + '\'' +
                 ", expectedType=" + expectedType +
                 '}';
     }

@@ -1,10 +1,14 @@
 package com.alexanderberndt.appintegration.engine.resources.loader.impl;
 
+import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
+import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.Mockito;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class SystemResourceLoaderTest {
 
@@ -32,8 +36,11 @@ class SystemResourceLoaderTest {
             "/any-app/server/application-info.json,/simple-app1/server/resources/text1.txt"
     })
     void resolveRelativeUrl(String baseUrl, String relativeUrl) {
-        String url = resourceLoader.resolveRelativeUrl(baseUrl, relativeUrl);
-        assertNotNull(url);
-        assertEquals(RESOURCE_PATH, url);
+        ExternalResource baseResourceMock = Mockito.mock(ExternalResource.class);
+        Mockito.when(baseResourceMock.getUrl()).thenReturn(baseUrl);
+
+        ExternalResourceRef ref = resourceLoader.resolveRelativeUrl(baseResourceMock, relativeUrl);
+        assertNotNull(ref);
+        assertEquals(RESOURCE_PATH, ref.getUrl());
     }
 }

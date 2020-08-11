@@ -24,7 +24,7 @@ class AbstractResourceLoaderTest {
     @Test
     void loadAsString() throws IOException {
 
-        ExternalResource resource = resourceLoader1000.load("xxx", resourceRef);
+        ExternalResource resource = resourceLoader1000.load(resourceRef);
 
         assertNotNull(resource);
         assertEquals(1000 * TEST_STRING.length(), resource.getContentAsString().length());
@@ -33,7 +33,7 @@ class AbstractResourceLoaderTest {
     @Test
     void loadAsByteArray() throws IOException {
 
-        ExternalResource resource = resourceLoader1000.load("xxx", resourceRef);
+        ExternalResource resource = resourceLoader1000.load(resourceRef);
 
         assertNotNull(resource);
         assertTrue(1000 * TEST_STRING.length() <= resource.getContentAsByteArray().length);
@@ -42,7 +42,7 @@ class AbstractResourceLoaderTest {
     @Test
     void loadAsInputStream() throws IOException {
 
-        ExternalResource resource = resourceLoader1000.load("xxx", resourceRef);
+        ExternalResource resource = resourceLoader1000.load(resourceRef);
 
         assertNotNull(resource);
         LineNumberReader lineNumberReader = new LineNumberReader(new InputStreamReader(resource.getContentAsInputStream()));
@@ -55,7 +55,7 @@ class AbstractResourceLoaderTest {
     @Test
     void loadAsReader() throws IOException {
 
-        ExternalResource resource = resourceLoader1000.load("xxx", resourceRef);
+        ExternalResource resource = resourceLoader1000.load(resourceRef);
 
         assertNotNull(resource);
 
@@ -65,7 +65,6 @@ class AbstractResourceLoaderTest {
         }
         assertNull(lineNumberReader.readLine());
     }
-
 
 
     /**
@@ -95,13 +94,18 @@ class AbstractResourceLoaderTest {
         }
 
         @Override
-        public ExternalResource load(String baseUrl, ExternalResourceRef resourceRef) {
-            ExternalResource externalResource = new ExternalResource(resourceRef);
+        public ExternalResource load(ExternalResourceRef resourceRef) {
+            ExternalResource externalResource = new ExternalResource(this, resourceRef);
             externalResource.setContent(new ByteArrayInputStream(byteArray));
             if (charset != null) {
                 externalResource.setCharset(charset);
             }
             return externalResource;
+        }
+
+        @Override
+        public ExternalResourceRef resolveRelativeUrl(ExternalResource baseResource, String relativeUrl, ExternalResourceType expectedType) {
+            return null;
         }
     }
 

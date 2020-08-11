@@ -22,9 +22,9 @@ public class DownloadTask implements LoadingTask {
         }
 
         try {
-            return resourceLoader.load(null, resourceRef);
+            return resourceLoader.load(resourceRef);
         } catch (IOException e) {
-            throw new AppIntegrationException("Failed to load resource " + resourceRef.getRelativeUrl(), e);
+            throw new AppIntegrationException("Failed to load resource " + resourceRef.getUrl(), e);
         }
     }
 

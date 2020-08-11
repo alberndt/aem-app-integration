@@ -17,7 +17,7 @@ public class AddReferencedResourceTask implements ProcessingTask {
 
         final ExternalResourceType expectedType;
         if (StringUtils.isNotBlank(expectedTypeAsString)) {
-            expectedType = ExternalResourceType.parse(StringUtils.upperCase(expectedTypeAsString));
+            expectedType = ExternalResourceType.parse(expectedTypeAsString);
         } else {
             expectedType = null;
         }

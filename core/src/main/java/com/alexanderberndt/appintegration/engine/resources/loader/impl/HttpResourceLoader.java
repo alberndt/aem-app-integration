@@ -2,17 +2,15 @@ package com.alexanderberndt.appintegration.engine.resources.loader.impl;
 
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
+import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
 import com.alexanderberndt.appintegration.engine.resources.loader.ResourceLoader;
 import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
+import javax.annotation.Nonnull;
 import java.lang.invoke.MethodHandles;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URL;
+import java.net.*;
 
 public class HttpResourceLoader implements ResourceLoader {
 
@@ -25,16 +23,12 @@ public class HttpResourceLoader implements ResourceLoader {
     private static final int READ_TIMEOUT = 20000;
 
     @Override
-    public ExternalResource load(String baseUrl, ExternalResourceRef resourceRef) throws IOException {
+    public ExternalResource load(ExternalResourceRef resourceRef) {
 
         try {
-            final URL url;
-            if (StringUtils.isNotBlank(baseUrl)) {
-                final URI baseUri = new URI(baseUrl);
-                url = baseUri.resolve(resourceRef.getRelativeUrl()).toURL();
-            } else {
-                url = new URL(resourceRef.getRelativeUrl());
-            }
+            final URL url = new URL(resourceRef.getUrl());
+
+            // ToDo: Use global proxy settings
 
 //            final Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 8888));
 //            final HttpURLConnection connection = (HttpURLConnection) url.openConnection(proxy);
@@ -52,7 +46,7 @@ public class HttpResourceLoader implements ResourceLoader {
 
             if (connection.getResponseCode() == 200) {
 
-                ExternalResource resource = new ExternalResource(resourceRef);
+                ExternalResource resource = new ExternalResource(this, resourceRef);
                 resource.setContent(connection.getInputStream());
 
                 // ToDo: verify mime type, get charset
@@ -63,27 +57,26 @@ public class HttpResourceLoader implements ResourceLoader {
                 return resource;
 
             } else {
-                throw new AppIntegrationException("Failed to load resource " + resourceRef.getRelativeUrl()
+                throw new AppIntegrationException("Failed to load resource " + resourceRef.getUrl()
                         + " - status: " + connection.getResponseCode()
                         + " - message: " + connection.getResponseMessage());
             }
         } catch (Exception e) {
-            throw new AppIntegrationException("Failed to load resource " + resourceRef.getRelativeUrl(), e);
+            throw new AppIntegrationException("Failed to load resource " + resourceRef.getUrl(), e);
         }
     }
 
-//
-//    private static byte[] getResponseAsCompleteByteArray(HttpURLConnection connection) throws IOException {
-//
-//        final ByteArrayOutputStream store = new ByteArrayOutputStream();
-//        final InputStream inputStream = connection.getInputStream();
-//
-//        int readNoOfBytes;
-//        final byte[] buffer = new byte[1024];
-//        while ((readNoOfBytes = inputStream.read(buffer)) >= 0) {
-//            store.write(buffer, 0, readNoOfBytes);
-//        }
-//        return store.toByteArray();
-//    }
-//
+    @Override
+    public ExternalResourceRef resolveRelativeUrl(@Nonnull ExternalResource baseResource, @Nonnull String relativeUrl, @Nonnull ExternalResourceType expectedType) {
+        try {
+            final URI baseUri = new URI(baseResource.getUrl());
+            final URL url = baseUri.resolve(relativeUrl).toURL();
+            return resolveAbsoluteUrl(url.toString(), expectedType);
+        } catch (URISyntaxException | MalformedURLException e) {
+            LOG.error(String.format("Cannot resolve relative-url %s from base-resource %s", relativeUrl, baseResource), e);
+            // ToDo: Add error message to any context object
+            return null;
+        }
+    }
+
 }

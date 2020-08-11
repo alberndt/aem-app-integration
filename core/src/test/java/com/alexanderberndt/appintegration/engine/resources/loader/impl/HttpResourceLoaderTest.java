@@ -17,7 +17,7 @@ class HttpResourceLoaderTest {
     void load() throws IOException {
         ExternalResourceRef ref = new ExternalResourceRef("http://www.alexanderberndt.com", ExternalResourceType.HTML);
 
-        ExternalResource resource = resourceLoader.load(null, ref);
+        ExternalResource resource = resourceLoader.load(ref);
         System.out.println(resource.getContentAsString());
     }
 }
