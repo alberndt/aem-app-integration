@@ -11,8 +11,8 @@ github_username:  jekyll
 
 # Build settings
 theme: jekyll-theme-slate
-plugins:
-  - github-pages
+#plugins:
+#  - github-pages
 #  - jekyll-feed
 
 # Exclude from processing.
