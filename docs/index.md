@@ -1,7 +1,5 @@
 ---
 layout: default
-title: AEM App-Integration
-description: This is just another page
 ---
 
 Home
@@ -13,6 +11,7 @@ Design
 - [Pipeline](./design/pipeline.md)
 - [User Guide](userguide.md)
 
+This is a test
 
 # AEM Application Integration
 

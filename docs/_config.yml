@@ -11,7 +11,8 @@ github_username:  jekyll
 
 # Build settings
 theme: jekyll-theme-cayman
-#plugins:
+plugins:
+  - github-pages
 #  - jekyll-feed
 
 # Exclude from processing.
