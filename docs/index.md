@@ -1,5 +1,5 @@
 ---
-layout: default
+title: AEM Application Integration
 ---
 
 Home
