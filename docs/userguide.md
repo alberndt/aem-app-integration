@@ -1,3 +1,10 @@
+---
+layout: default
+page.title: Hello
+title: Hello2
+description: This is just another page
+---
+
 ## Roles
  - Application Developer (any technology, no AEM)
  - App Integration Manager (AEM power user, no developer)
