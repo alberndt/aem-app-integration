@@ -1,7 +1,6 @@
 ---
 layout: default
-page.title: Hello
-title: Hello2
+title: User Guide
 description: This is just another page
 ---
 
