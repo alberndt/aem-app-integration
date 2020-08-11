@@ -10,7 +10,7 @@ twitter_username: jekyllrb
 github_username:  alberndt
 
 # Build settings
-theme: jekyll-theme-slate
+theme: jekyll-theme-cayman
 #plugins:
 #  - github-pages
 #  - jekyll-feed
