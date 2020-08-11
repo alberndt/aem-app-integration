@@ -1,11 +1,10 @@
 package com.alexanderberndt.appintegration.engine;
 
-import com.alexanderberndt.appintegration.api.ApplicationInstance;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+@Deprecated
 public class ProcessingEngine<I extends ApplicationInstance> {
 
     public void prefetch(List<I> instancesList) {

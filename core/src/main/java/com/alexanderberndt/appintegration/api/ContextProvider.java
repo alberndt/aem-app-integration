@@ -1,5 +1,7 @@
 package com.alexanderberndt.appintegration.api;
 
+import com.alexanderberndt.appintegration.engine.ApplicationInstance;
+
 import javax.annotation.Nullable;
 import java.util.Map;
 
@@ -12,7 +14,7 @@ import java.util.Map;
  *
  * @param <I> Environment-dependent instance-type, e.g. a Sling-Resource in case of Apache-Sling App-Integration.
  */
-public interface ContextProvider<I> {
+public interface ContextProvider<I extends ApplicationInstance> {
 
     /**
      * Calculates a key-value map, with variables and instance-specific values.

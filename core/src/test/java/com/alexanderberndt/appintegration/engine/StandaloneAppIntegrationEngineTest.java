@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.util.Arrays;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -19,8 +18,8 @@ class StandaloneAppIntegrationEngineTest {
 
         Application newsletterApp = mock(Application.class);
         when(newsletterApp.getApplicationInfoUrl()).thenReturn("simple-app1/server/application-info.json");
-        when(newsletterApp.getUsedResourceLoader()).thenReturn("classloader");
-        when(newsletterApp.getUsedContextProviders()).thenReturn(Arrays.asList("test", "properties"));
+        when(newsletterApp.getResourceLoaderName()).thenReturn("classloader");
+        when(newsletterApp.getContextProviderNames()).thenReturn(Arrays.asList("test", "properties"));
 
 //        StandaloneAppIntegrationEngine appIntegrationEngine = new StandaloneAppIntegrationEngine();
 //        appIntegrationEngine.registerApplication("newsletter", newsletterApp);

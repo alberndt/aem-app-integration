@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.Reader;
 
+@Deprecated
 public class ApplicationInfoLoader {
 
     public ApplicationInfo load(ResourceLoader resourceLoader, String url) throws IOException {

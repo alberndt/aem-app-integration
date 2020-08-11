@@ -1,4 +1,4 @@
-package com.alexanderberndt.appintegration.api;
+package com.alexanderberndt.appintegration.engine;
 
 public interface ApplicationInstance {
 
