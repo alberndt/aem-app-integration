@@ -33,6 +33,8 @@ public class MultiValue {
         if (value == null) {
             return new MultiValue();
         } else {
+            Objects.requireNonNull(rank, "createByValue() MUST be called with non-null 'rank' parameter!");
+            Objects.requireNonNull(resourceType, "createByValue() MUST be called with non-null 'resourceType' parameter!");
             return new MultiValue(new SingleValue(rank, resourceType, value), value.getClass());
         }
     }
