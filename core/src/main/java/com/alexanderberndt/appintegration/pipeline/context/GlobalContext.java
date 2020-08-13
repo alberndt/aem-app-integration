@@ -1,8 +1,9 @@
 package com.alexanderberndt.appintegration.pipeline.context;
 
+import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
 import com.alexanderberndt.appintegration.engine.resources.loader.ResourceLoader;
-import com.alexanderberndt.appintegration.pipeline.valuemap.RankedAndTypedValueMap;
-import com.alexanderberndt.appintegration.pipeline.valuemap.Ranking;
+import com.alexanderberndt.appintegration.pipeline.configuration.PipelineConfiguration;
+import com.alexanderberndt.appintegration.pipeline.configuration.Ranking;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,20 +16,20 @@ public abstract class GlobalContext {
 
     private final ResourceLoader resourceLoader;
 
-    private final RankedAndTypedValueMap processingParams = new RankedAndTypedValueMap();
+    private final PipelineConfiguration processingParams = new PipelineConfiguration();
 
     protected GlobalContext(ResourceLoader resourceLoader) {
         this.resourceLoader = resourceLoader;
     }
 
-    public abstract TaskContext createTaskContext(@Nonnull Ranking rank, @Nonnull String taskNamespace);
+    public abstract TaskContext createTaskContext(@Nonnull Ranking rank, @Nonnull String taskNamespace, @Nonnull ExternalResourceType resourceType);
 
     @Nonnull
     public final ResourceLoader getResourceLoader() {
         return resourceLoader;
     }
 
-    public final RankedAndTypedValueMap getProcessingParams() {
+    public final PipelineConfiguration getProcessingParams() {
         return processingParams;
     }
 

@@ -12,11 +12,14 @@ public class Application {
 
     private final String resourceLoaderName;
 
+    private final String processingPipelineName;
+
     private final List<String> contextProviderNames;
 
-    public Application(String applicationInfoUrl, String resourceLoaderName, List<String> contextProviderNames) {
+    public Application(String applicationInfoUrl, String resourceLoaderName, String processingPipelineName, List<String> contextProviderNames) {
         this.applicationInfoUrl = applicationInfoUrl;
         this.resourceLoaderName = resourceLoaderName;
+        this.processingPipelineName = processingPipelineName;
         this.contextProviderNames = contextProviderNames;
     }
 
@@ -49,4 +52,7 @@ public class Application {
         return contextProviderNames;
     }
 
+    public String getProcessingPipelineName() {
+        return processingPipelineName;
+    }
 }

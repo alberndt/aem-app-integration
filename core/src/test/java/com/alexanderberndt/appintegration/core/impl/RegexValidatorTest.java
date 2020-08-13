@@ -13,9 +13,9 @@ public class RegexValidatorTest {
 //    @Test
 //    public void filter() {
 //        Map<String, Object> properties = new HashMap<>();
-//        properties.put(RegexValidator.REGEX_PARAM, "hello world");
+//        properties.put(RegexValidationTask.REGEX_PARAM, "hello world");
 //
-//        RegexValidator regexValidator = new RegexValidator();
+//        RegexValidationTask regexValidator = new RegexValidationTask();
 //
 //        regexValidator.setupTask(properties);
 //        ProcessingItem resource = ProcessingItemImpl.create(IntegrationResourceType.PLAIN_TEXT, "Here is my hello world!");

@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
-class ProcessingPipelineBuilderTest {
+class AbstractBasicPipelineBuilderTest {
 
     @Test
     void appendFilter() throws IOException {
@@ -16,9 +16,9 @@ class ProcessingPipelineBuilderTest {
 //        TaskContext context = new TaskContext();
 //
 //
-//        ProcessingPipelineBuilder<InputStream> builder = new ProcessingPipelineBuilder<>(input);
-//        builder.appendFilter(null, new FileSizeValidator());
-//        builder.appendFilter(null, new FileSizeValidator());
+//        AbstractBasicProcessingPipelineBuilder<InputStream> builder = new AbstractBasicProcessingPipelineBuilder<>(input);
+//        builder.appendFilter(null, new FileSizeValidationTask());
+//        builder.appendFilter(null, new FileSizeValidationTask());
 //        builder.appendFilter(null, new StreamToReaderConverter());
 //        builder.appendFilter(null, new TextSnippetExtractor());
 //        builder.appendFilter(null, new SearchReplaceFilter());

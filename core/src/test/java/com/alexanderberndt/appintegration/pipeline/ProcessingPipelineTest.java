@@ -23,7 +23,7 @@ class ProcessingPipelineTest {
     void simpleProcessingPipeline() throws IOException {
 
         CoreGlobalContext context = new CoreGlobalContext(new SystemResourceLoader());
-        ProcessingPipeline pipeline = ProcessingPipelineBuilder.createPipelineInstance(context)
+        ProcessingPipeline pipeline = ProcessingPipeline.createPipelineInstance(context)
                 .addTask(new PropertiesTask())
                 .withTaskParam("random-input.length", 2000)
                 .withTaskParam("something.else", true)

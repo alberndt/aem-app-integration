@@ -1,6 +1,6 @@
 {
-  "steps": [
-    {
+  "steps": {
+    "min-file-size": {
       "name": "min-file-size",
       "filter": "file-size-validator",
       "fileTypes": "html",
@@ -10,8 +10,7 @@
         "message": "File is too small for a valid html file"
       }
     },
-    {
-      "name": "stacktrace-search",
+    "stacktrace-search": {
       "filter": "text-snippet-extractor",
       "fileTypes": "html",
       "configuration": {
@@ -20,5 +19,5 @@
         "level-default": "warn"
       }
     }
-  ]
+  }
 }

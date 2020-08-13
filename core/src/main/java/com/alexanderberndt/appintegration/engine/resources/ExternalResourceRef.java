@@ -1,6 +1,6 @@
 package com.alexanderberndt.appintegration.engine.resources;
 
-import com.alexanderberndt.appintegration.pipeline.valuemap.RankedAndTypedValueMap;
+import com.alexanderberndt.appintegration.pipeline.configuration.PipelineConfiguration;
 
 import javax.annotation.Nonnull;
 
@@ -11,11 +11,11 @@ public class ExternalResourceRef {
 
     private ExternalResourceType expectedType;
 
-    private final RankedAndTypedValueMap properties = new RankedAndTypedValueMap();
+    private final PipelineConfiguration properties = new PipelineConfiguration();
 
     public ExternalResourceRef(@Nonnull String url) {
         this.url = url;
-        this.expectedType = ExternalResourceType.UNKNOWN;
+        this.expectedType = ExternalResourceType.ANY;
     }
 
     public ExternalResourceRef(@Nonnull String url, @Nonnull ExternalResourceType expectedType) {
@@ -35,7 +35,7 @@ public class ExternalResourceRef {
         this.expectedType = expectedType;
     }
 
-    public RankedAndTypedValueMap getProperties() {
+    public PipelineConfiguration getProperties() {
         return properties;
     }
 

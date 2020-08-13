@@ -1,8 +1,8 @@
 package com.alexanderberndt.appintegration.tasks;
 
 import com.alexanderberndt.appintegration.core.CoreTaskFactory;
+import com.alexanderberndt.appintegration.pipeline.TaskFactory;
 import com.alexanderberndt.appintegration.pipeline.task.GenericTask;
-import com.alexanderberndt.appintegration.pipeline.task.TaskFactory;
 import com.alexanderberndt.appintegration.tasks.prepare.PropertiesTask;
 import org.junit.jupiter.api.Test;
 

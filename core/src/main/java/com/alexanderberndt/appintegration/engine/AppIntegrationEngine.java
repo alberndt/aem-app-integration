@@ -7,6 +7,8 @@ import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
 import com.alexanderberndt.appintegration.engine.resources.loader.ResourceLoader;
 import com.alexanderberndt.appintegration.engine.resourcetypes.appinfo.ApplicationInfoJson;
 import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
+import com.alexanderberndt.appintegration.pipeline.ProcessingPipeline;
+import com.alexanderberndt.appintegration.pipeline.context.GlobalContext;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -21,6 +23,7 @@ import java.util.Map;
 public abstract class AppIntegrationEngine<I extends ApplicationInstance> {
 
     private final static ObjectMapper objectMapper = new ObjectMapper();
+
 
 //    // applications
 //    private Map<String, ApplicationRecord> applicationRecordMap = new LinkedHashMap<>();
@@ -90,26 +93,44 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance> {
     }
 
 
-    public ApplicationInfoJson loadApplicationInfoJson(@Nonnull String applicationId) throws IOException {
-        final Application application = this.getFactory().getApplication(applicationId);
-        if (application == null) {
-            throw new AppIntegrationException(String.format("Application %s is not defined!", applicationId));
-        }
-
-        final ResourceLoader loader = this.getFactory().getResourceLoader(application.getResourceLoaderName());
-        if (loader == null) {
-            throw new AppIntegrationException(String.format("ResourceLoader %s is not defined!", application.getResourceLoaderName()));
-        }
+    protected ApplicationInfoJson loadApplicationInfoJson(@Nonnull String applicationId) throws IOException {
+        final Application application = requireApplication(applicationId);
+        final ResourceLoader loader = requireResourceLoader(application);
 
         final String url = application.getApplicationInfoUrl();
         ExternalResource res = loader.load(new ExternalResourceRef(url, ExternalResourceType.APPLICATION_PROPERTIES));
 
         try {
+            // ToDo: Use Resource Converter
             return objectMapper.readerFor(ApplicationInfoJson.class).readValue(res.getContentAsReader());
         } catch (JsonProcessingException e) {
             throw new AppIntegrationException(String.format("Cannot parse %s due to: %s", url, e.getMessage()), e);
         }
     }
+
+    protected ProcessingPipeline createProcessingPipeline(@Nonnull GlobalContext context, @Nonnull String applicationId) {
+        final Application application = requireApplication(applicationId);
+        return this.getFactory().createProcessingPipeline(context, application.getProcessingPipelineName());
+    }
+
+    @Nonnull
+    protected Application requireApplication(@Nonnull String applicationId) {
+        final Application application = this.getFactory().getApplication(applicationId);
+        if (application == null) {
+            throw new AppIntegrationException(String.format("Application %s is not defined!", applicationId));
+        }
+        return application;
+    }
+
+    @Nonnull
+    private ResourceLoader requireResourceLoader(Application application) {
+        final ResourceLoader loader = this.getFactory().getResourceLoader(application.getResourceLoaderName());
+        if (loader == null) {
+            throw new AppIntegrationException(String.format("ResourceLoader %s is not defined!", application.getResourceLoaderName()));
+        }
+        return loader;
+    }
+
 
 //    private String resolveUrl(String url, List<ContextProvider<I>> contextProviderList, I instance) {
 //        Map<String, String> context = new HashMap<>();

@@ -31,7 +31,7 @@ public abstract class AbstractExternalResourcesSet implements ExternalResourcesS
             ExternalResourceRef prevResRef = knownReferencesMap.put(resourceRef.getUrl(), resourceRef);
             // keep the expected resource type, if we already have more qualified information
             if ((prevResRef != null) && (prevResRef.getExpectedType() != null)
-                    && prevResRef.getExpectedType().isMoreQualified(resourceRef.getExpectedType())) {
+                    && prevResRef.getExpectedType().isMoreQualifiedThan(resourceRef.getExpectedType())) {
                 resourceRef.setExpectedType(prevResRef.getExpectedType());
             }
 

@@ -13,7 +13,7 @@ public interface ResourceLoader {
     ExternalResource load(final ExternalResourceRef resourceRef) throws IOException;
 
     default ExternalResourceRef resolveAbsoluteUrl(final String absoluteUrl) {
-        return resolveAbsoluteUrl(absoluteUrl, ExternalResourceType.UNKNOWN);
+        return resolveAbsoluteUrl(absoluteUrl, ExternalResourceType.ANY);
     }
 
     default ExternalResourceRef resolveAbsoluteUrl(final String absoluteUrl, ExternalResourceType expectedType) {
@@ -21,7 +21,7 @@ public interface ResourceLoader {
     }
 
     default ExternalResourceRef resolveRelativeUrl(final ExternalResource baseResource, final String relativeUrl) {
-        return resolveRelativeUrl(baseResource, relativeUrl, ExternalResourceType.UNKNOWN);
+        return resolveRelativeUrl(baseResource, relativeUrl, ExternalResourceType.ANY);
     }
 
     ExternalResourceRef resolveRelativeUrl(final ExternalResource baseResource, final String relativeUrl, ExternalResourceType expectedType);

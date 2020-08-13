@@ -1,6 +1,9 @@
-package com.alexanderberndt.appintegration.pipeline;
+package com.alexanderberndt.appintegration.pipeline.builder;
 
+import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
 import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
+import com.alexanderberndt.appintegration.pipeline.ProcessingPipeline;
+import com.alexanderberndt.appintegration.pipeline.TaskInstance;
 import com.alexanderberndt.appintegration.pipeline.context.GlobalContext;
 import com.alexanderberndt.appintegration.pipeline.context.TaskContext;
 import com.alexanderberndt.appintegration.pipeline.task.GenericTask;
@@ -8,13 +11,14 @@ import com.alexanderberndt.appintegration.pipeline.task.LoadingTask;
 import com.alexanderberndt.appintegration.pipeline.task.PreparationTask;
 import com.alexanderberndt.appintegration.pipeline.task.ProcessingTask;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.alexanderberndt.appintegration.pipeline.valuemap.Ranking.PIPELINE_DEFINITION;
-import static com.alexanderberndt.appintegration.pipeline.valuemap.Ranking.TASK_DEFAULT;
+import static com.alexanderberndt.appintegration.pipeline.configuration.Ranking.PIPELINE_DEFINITION;
+import static com.alexanderberndt.appintegration.pipeline.configuration.Ranking.TASK_DEFAULT;
 
-public class ProcessingPipelineBuilder {
+public class BasicPipelineBuilder {
 
     private final GlobalContext context;
 
@@ -28,27 +32,22 @@ public class ProcessingPipelineBuilder {
 
     private TaskContext currentTaskContext;
 
-
-    private ProcessingPipelineBuilder(GlobalContext context) {
+    public BasicPipelineBuilder(@Nonnull GlobalContext context) {
         this.context = context;
     }
 
-    public static ProcessingPipelineBuilder createPipelineInstance(GlobalContext context) {
-        return new ProcessingPipelineBuilder(context);
-    }
-
-    public ProcessingPipelineBuilder addTask(GenericTask task) {
+    public BasicPipelineBuilder addTask(@Nonnull GenericTask task) {
         return addTask(task, task.getName());
     }
 
 
-    public ProcessingPipelineBuilder addTask(GenericTask task, String taskId) {
+    public BasicPipelineBuilder addTask(GenericTask task, String uniqueTaskNamespace) {
 
-        this.currentNamespace = taskId;
+        this.currentNamespace = uniqueTaskNamespace;
         this.currentTaskContext = null;
 
         // define defaults
-        TaskContext taskContext = context.createTaskContext(TASK_DEFAULT, taskId);
+        TaskContext taskContext = context.createTaskContext(TASK_DEFAULT, uniqueTaskNamespace, ExternalResourceType.ANY);
         task.declareTaskPropertiesAndDefaults(taskContext);
 
         int type = ((task instanceof PreparationTask) ? 1 : 0)
@@ -57,25 +56,25 @@ public class ProcessingPipelineBuilder {
 
         switch (type) {
             case 0:
-                throw new AppIntegrationException(String.format("Task %s must be either Preparation-, Loading- or Processing-Task!", taskId));
+                throw new AppIntegrationException(String.format("Task %s must be either Preparation-, Loading- or Processing-Task!", uniqueTaskNamespace));
             case 1:
-                addPreparationTask((PreparationTask) task, taskId);
+                addPreparationTask((PreparationTask) task, uniqueTaskNamespace);
                 break;
             case 2:
-                addLoadingTask((LoadingTask) task, taskId);
+                addLoadingTask((LoadingTask) task, uniqueTaskNamespace);
                 break;
             case 4:
-                addProcessingTask((ProcessingTask) task, taskId);
+                addProcessingTask((ProcessingTask) task, uniqueTaskNamespace);
                 break;
             case 5:
                 if (loadingTask == null) {
-                    addPreparationTask((PreparationTask) task, taskId);
+                    addPreparationTask((PreparationTask) task, uniqueTaskNamespace);
                 } else {
-                    addProcessingTask((ProcessingTask) task, taskId);
+                    addProcessingTask((ProcessingTask) task, uniqueTaskNamespace);
                 }
                 break;
             default:
-                throw new AppIntegrationException(String.format("Task %s cannot be Loading- and Preparation- or Processing-Task!", taskId));
+                throw new AppIntegrationException(String.format("Task %s cannot be Loading- and Preparation- or Processing-Task!", uniqueTaskNamespace));
         }
 
         return this;
@@ -107,9 +106,9 @@ public class ProcessingPipelineBuilder {
     }
 
 
-    public ProcessingPipelineBuilder withTaskParam(String param, Object value) {
+    public BasicPipelineBuilder withTaskParam(String param, Object value) {
         if (currentTaskContext == null) {
-            currentTaskContext = context.createTaskContext(PIPELINE_DEFINITION, currentNamespace);
+            currentTaskContext = context.createTaskContext(PIPELINE_DEFINITION, currentNamespace, ExternalResourceType.ANY);
         }
         currentTaskContext.setValue(param, value);
         return this;

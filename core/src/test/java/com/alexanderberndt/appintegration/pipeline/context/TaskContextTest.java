@@ -1,7 +1,8 @@
 package com.alexanderberndt.appintegration.pipeline.context;
 
-import com.alexanderberndt.appintegration.pipeline.valuemap.RankedAndTypedValueMap;
-import com.alexanderberndt.appintegration.pipeline.valuemap.Ranking;
+import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
+import com.alexanderberndt.appintegration.pipeline.configuration.PipelineConfiguration;
+import com.alexanderberndt.appintegration.pipeline.configuration.Ranking;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,7 +20,7 @@ class TaskContextTest {
 
     public static final String MY_NAMESPACE = "my-namespace";
 
-    private RankedAndTypedValueMap processingParams;
+    private PipelineConfiguration processingParams;
 
     private TaskContext taskContext;
 
@@ -29,8 +30,8 @@ class TaskContextTest {
 
     @BeforeEach
     void beforeEach() {
-        this.processingParams = new RankedAndTypedValueMap();
-        this.taskContext = new TaskContext(globalContextMock, Ranking.TASK_DEFAULT, MY_NAMESPACE) {
+        this.processingParams = new PipelineConfiguration();
+        this.taskContext = new TaskContext(globalContextMock, Ranking.TASK_DEFAULT, MY_NAMESPACE, ExternalResourceType.ANY) {
         };
 
         Mockito.lenient().when(globalContextMock.getProcessingParams()).thenReturn(processingParams);
@@ -105,7 +106,7 @@ class TaskContextTest {
         Mockito.verify(globalContextMock, Mockito.never()).addError(Mockito.anyString());
 
         assertEquals(Collections.singleton("test1"), processingParams.keySet(MY_NAMESPACE));
-        assertEquals("Hello", processingParams.getValue(MY_NAMESPACE, "test1"));
+        assertEquals("Hello", processingParams.getValue(MY_NAMESPACE, "test1", ExternalResourceType.ANY));
     }
 
     @Test

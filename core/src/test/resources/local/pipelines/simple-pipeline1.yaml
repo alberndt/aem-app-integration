@@ -1,0 +1,19 @@
+download:
+file-size-validation:
+  fileTypes: html
+  configuration:
+    min-size: 100
+    error-level: warn
+    message: File is too small for a valid html file
+
+stacktrace-search:
+  name: regex-validation
+  fileTypes: html, text
+  configuration:
+    regex: 'Exception: '
+  configuration.html:
+    level: "${stacktrace-in-html.error-level}"
+    level-default: warn
+  configuration.text:
+    level: "${stacktrace-in-html.error-level}"
+    level-default: warn

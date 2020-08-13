@@ -6,6 +6,8 @@ import com.alexanderberndt.appintegration.engine.AppIntegrationFactory;
 import com.alexanderberndt.appintegration.engine.resources.loader.ResourceLoader;
 import com.alexanderberndt.appintegration.engine.resources.loader.impl.HttpResourceLoader;
 import com.alexanderberndt.appintegration.engine.resources.loader.impl.SystemResourceLoader;
+import com.alexanderberndt.appintegration.pipeline.ProcessingPipeline;
+import com.alexanderberndt.appintegration.pipeline.context.GlobalContext;
 
 import javax.annotation.Nonnull;
 import java.util.Collections;
@@ -37,6 +39,7 @@ public class CoreAppIntegrationFactory implements AppIntegrationFactory<CoreAppl
         contextProviderMap.put("instance", CoreApplicationInstance::getContextMap);
     }
 
+    private static final Map<String, ProcessingPipeline> processingPipelineMap = new HashMap<>();
 
     @Override
     public Map<String, Application> getAllApplications() {
@@ -58,6 +61,12 @@ public class CoreAppIntegrationFactory implements AppIntegrationFactory<CoreAppl
         return contextProviderMap.get(id);
     }
 
+    @Override
+    public ProcessingPipeline createProcessingPipeline(GlobalContext context, String name) {
+
+        return ProcessingPipeline.createPipelineInstance(context).build();
+    }
+
     public void registerApplication(@Nonnull String id, @Nonnull Application application) {
         applicationMap.put(id, application);
     }
@@ -65,4 +74,5 @@ public class CoreAppIntegrationFactory implements AppIntegrationFactory<CoreAppl
     public void unregisterApplication(@Nonnull String id) {
         applicationMap.remove(id);
     }
+
 }

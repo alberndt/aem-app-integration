@@ -4,8 +4,6 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 class ProcessingPipelineFactoryTest {
 
     @Test
@@ -20,7 +18,7 @@ class ProcessingPipelineFactoryTest {
 //
 //        ProcessingPipelineFactory factory = new ProcessingPipelineFactory();
 //        factory.register(new TextSnippetExtractor());
-//        factory.register(new FileSizeValidator());
+//        factory.register(new FileSizeValidationTask());
 //
 //        ProcessingPipeline pipeline = factory.createPipeline(pipelineDefinition);
 //

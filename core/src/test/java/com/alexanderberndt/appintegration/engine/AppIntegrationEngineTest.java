@@ -10,6 +10,7 @@ import java.io.IOException;
 
 import static com.alexanderberndt.appintegration.core.CoreAppIntegrationFactory.CORE_CONTEXT_PROVIDERS;
 import static com.alexanderberndt.appintegration.core.CoreAppIntegrationFactory.SYSTEM_RESOURCE_LOADER_NAME;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class AppIntegrationEngineTest {
@@ -20,7 +21,7 @@ class AppIntegrationEngineTest {
     void getHtmlSnippet() throws IOException {
 
         CoreAppIntegrationFactory factory = new CoreAppIntegrationFactory();
-        factory.registerApplication("test-app", new Application(TEST_APP_URL, SYSTEM_RESOURCE_LOADER_NAME, CORE_CONTEXT_PROVIDERS));
+        factory.registerApplication("test-app", new Application(TEST_APP_URL, SYSTEM_RESOURCE_LOADER_NAME, null, CORE_CONTEXT_PROVIDERS));
 
         CoreAppIntegrationEngine engine = new CoreAppIntegrationEngine(factory);
 
@@ -28,6 +29,8 @@ class AppIntegrationEngineTest {
         ApplicationInfoJson applicationInfo = engine.loadApplicationInfoJson("test-app");
 
         assertNotNull(applicationInfo);
+        assertEquals("Newsletter", applicationInfo.getName());
+
 
     }
 }

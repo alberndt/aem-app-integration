@@ -6,13 +6,13 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.InvocationTargetException;
 
 
-public class IntegrationPipelineBuilderTest {
+public class IntegrationBasicPipelineBuilderTest {
 
 
     @Test
     public void someTest() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
 //
-//        PlainTextValidator validator = (PlainTextValidator) new RegexValidator();
+//        PlainTextValidator validator = (PlainTextValidator) new RegexValidationTask();
 //        Object config = validator.convertConfig(null, null);
 //
 ////        for (Method m : PlainTextValidator.class.getMethods()) {

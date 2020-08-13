@@ -1,4 +1,4 @@
-package com.alexanderberndt.appintegration.tasks.validators;
+package com.alexanderberndt.appintegration.tasks.process;
 
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.pipeline.context.TaskContext;
@@ -9,13 +9,8 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class FileSizeValidator implements ProcessingTask {
+public class FileSizeValidationTask implements ProcessingTask {
 
-
-    @Override
-    public String getName() {
-        return "file-size-validator";
-    }
 
     @Override
     public void process(TaskContext context, ExternalResource resource) {
