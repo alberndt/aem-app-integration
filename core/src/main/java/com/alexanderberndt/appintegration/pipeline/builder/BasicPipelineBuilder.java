@@ -13,6 +13,7 @@ import com.alexanderberndt.appintegration.pipeline.task.ProcessingTask;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static com.alexanderberndt.appintegration.pipeline.configuration.Ranking.PIPELINE_DEFINITION;
@@ -47,7 +48,7 @@ public class BasicPipelineBuilder {
         this.currentTaskContext = null;
 
         // define defaults
-        TaskContext taskContext = context.createTaskContext(TASK_DEFAULT, uniqueTaskNamespace, ExternalResourceType.ANY);
+        TaskContext taskContext = context.createTaskContext(TASK_DEFAULT, uniqueTaskNamespace, ExternalResourceType.ANY, Collections.emptyMap());
         task.declareTaskPropertiesAndDefaults(taskContext);
 
         int type = ((task instanceof PreparationTask) ? 1 : 0)
@@ -108,7 +109,7 @@ public class BasicPipelineBuilder {
 
     public BasicPipelineBuilder withTaskParam(String param, Object value) {
         if (currentTaskContext == null) {
-            currentTaskContext = context.createTaskContext(PIPELINE_DEFINITION, currentNamespace, ExternalResourceType.ANY);
+            currentTaskContext = context.createTaskContext(PIPELINE_DEFINITION, currentNamespace, ExternalResourceType.ANY, Collections.emptyMap());
         }
         currentTaskContext.setValue(param, value);
         return this;

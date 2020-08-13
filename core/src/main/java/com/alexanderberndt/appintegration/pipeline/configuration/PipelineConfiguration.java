@@ -5,10 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -24,32 +21,6 @@ public class PipelineConfiguration {
 
     public Object getValue(@Nullable String namespace, @Nonnull String key, @Nonnull ExternalResourceType resourceType) {
         return getEntryAndMap(namespace, key, multiValue -> multiValue.getValue(resourceType));
-    }
-
-    @SuppressWarnings("unchecked")
-    public <T> T getValue(@Nullable String namespace, @Nonnull String key, @Nonnull ExternalResourceType resourceType, @Nonnull Class<T> type) throws ConfigurationException {
-        final MultiValue multiValue = getEntryAndMap(namespace, key, Function.identity());
-        if (multiValue == null) {
-            return null;
-        } else {
-            final Class<?> expectedType = multiValue.getType();
-            if ((expectedType == null) || (expectedType == type)) {
-                return (T) multiValue.getValue(resourceType);
-            } else {
-                throw new ConfigurationException(String.format("parameter %s is requested as %s, but is %s!",
-                        key, type.getSimpleName(), multiValue.getType().getSimpleName()));
-            }
-        }
-    }
-
-    @Nonnull
-    public Object requireValue(@Nullable String namespace, String key, @Nonnull ExternalResourceType resourceType, Class<?> type) throws ConfigurationException {
-        final Object value = getValue(namespace, key, resourceType, type);
-        if (value != null) {
-            return value;
-        } else {
-            throw new ConfigurationException(String.format("missing required parameter %s!", key));
-        }
     }
 
     @Nonnull
@@ -111,6 +82,13 @@ public class PipelineConfiguration {
                         internalKey, getNamespaceId(namespace)));
             }
         }
+    }
+
+    public boolean isValidType(@Nullable String namespace, @Nonnull String key, Object value) {
+        return Optional.of(getInternalKey(namespace, key))
+                .map(values::get)
+                .map(multiValue -> multiValue.isValidType(value))
+                .orElse(true);
     }
 
     public void setType(@Nullable String namespace, @Nonnull String key, @Nonnull Class<?> type) throws ConfigurationException {

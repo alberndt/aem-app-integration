@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import java.lang.invoke.MethodHandles;
+import java.util.Collections;
 import java.util.List;
 
 import static com.alexanderberndt.appintegration.pipeline.configuration.Ranking.PIPELINE_EXECUTION;
@@ -63,19 +64,19 @@ public class ProcessingPipeline {
         // preparation tasks
         for (TaskInstance<PreparationTask> taskInstance : preparationTasks) {
             LOG.debug("{}::prepare", taskInstance.getTaskNamespace());
-            TaskContext taskContext = context.createTaskContext(PIPELINE_EXECUTION, taskInstance.getTaskNamespace(), resourceRef.getExpectedType());
+            TaskContext taskContext = context.createTaskContext(PIPELINE_EXECUTION, taskInstance.getTaskNamespace(), resourceRef.getExpectedType(), Collections.emptyMap());
             taskInstance.getTask().prepare(taskContext, resourceRef);
         }
 
         // loading task
         LOG.debug("{}::load", loadingTask.getTaskNamespace());
-        TaskContext loadContext = context.createTaskContext(PIPELINE_EXECUTION, loadingTask.getTaskNamespace(), resourceRef.getExpectedType());
+        TaskContext loadContext = context.createTaskContext(PIPELINE_EXECUTION, loadingTask.getTaskNamespace(), resourceRef.getExpectedType(), Collections.emptyMap());
         ExternalResource resource = loadingTask.getTask().load(loadContext, resourceRef);
 
         // processing tasks
         for (TaskInstance<ProcessingTask> taskInstance : processingTasks) {
             LOG.debug("{}::prepare", taskInstance.getTaskNamespace());
-            TaskContext taskContext = context.createTaskContext(PIPELINE_EXECUTION, taskInstance.getTaskNamespace(), resource.getType());
+            TaskContext taskContext = context.createTaskContext(PIPELINE_EXECUTION, taskInstance.getTaskNamespace(), resource.getType(), Collections.emptyMap());
             taskInstance.getTask().process(taskContext, resource);
         }
 

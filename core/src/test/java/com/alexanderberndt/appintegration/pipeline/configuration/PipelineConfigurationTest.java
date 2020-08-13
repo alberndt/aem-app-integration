@@ -2,8 +2,11 @@ package com.alexanderberndt.appintegration.pipeline.configuration;
 
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -56,22 +59,6 @@ class PipelineConfigurationTest {
         assertEquals(new Integer(-3), configuration.getValue(NAMESPACE1, UNDEFINED_VAR, ExternalResourceType.ANY, -1));
     }
 
-    @Test
-    void getValueWithType() throws ConfigurationException {
-        assertEquals(new Integer(42), configuration.getValue(NAMESPACE1, INT_VAR, ExternalResourceType.ANY, Integer.class));
-        assertNull(configuration.getValue(NAMESPACE1, UNDEFINED_VAR, ExternalResourceType.ANY, Integer.class));
-    }
-
-    @Test
-    void getValueWithWrongType() {
-        assertThrows(ConfigurationException.class, () -> configuration.getValue(NAMESPACE1, INT_VAR, ExternalResourceType.ANY, String.class));
-    }
-
-    @Test
-    void requireValue() throws ConfigurationException {
-        assertEquals(new Integer(42), configuration.requireValue(NAMESPACE1, INT_VAR, ExternalResourceType.ANY, Integer.class));
-        assertThrows(ConfigurationException.class, () -> configuration.requireValue(NAMESPACE1, UNDEFINED_VAR, ExternalResourceType.ANY, Integer.class));
-    }
 
     @Test
     void getType() {
@@ -203,6 +190,42 @@ class PipelineConfigurationTest {
 
         assertThrows(ConfigurationException.class, () -> configuration.setType(NAMESPACE1, UNDEFINED_VAR, List.class));
         assertNull(configuration.getType(NAMESPACE1, UNDEFINED_VAR));
+    }
+
+    @Test
+    void isValidType() {
+        assertTrue(configuration.isValidType(NAMESPACE1, INT_VAR, null));
+        assertTrue(configuration.isValidType(NAMESPACE1, INT_VAR, 100));
+        assertFalse(configuration.isValidType(NAMESPACE1, INT_VAR, "Hallo"));
+
+        assertTrue(configuration.isValidType(NAMESPACE1, BOOL_VAR, null));
+        assertTrue(configuration.isValidType(NAMESPACE1, BOOL_VAR, true));
+        assertFalse(configuration.isValidType(NAMESPACE1, BOOL_VAR, 100));
+
+        assertTrue(configuration.isValidType(NAMESPACE1, STRING_VAR, null));
+        assertTrue(configuration.isValidType(NAMESPACE1, STRING_VAR, "more"));
+        assertFalse(configuration.isValidType(NAMESPACE1, STRING_VAR, 100));
+
+        assertTrue(configuration.isValidType(NAMESPACE1, UNDEFINED_VAR, null));
+        assertTrue(configuration.isValidType(NAMESPACE1, UNDEFINED_VAR, "more"));
+        assertTrue(configuration.isValidType(NAMESPACE1, UNDEFINED_VAR, 100));
+        assertTrue(configuration.isValidType(NAMESPACE1, UNDEFINED_VAR, new StringReader("one, two, three")));
+    }
+
+    @Test
+    @Disabled("feature not yet implemented")
+    void isValidTypeForSubtypes() throws ConfigurationException {
+        configuration.setType(NAMESPACE1, UNDEFINED_VAR, Reader.class);
+        assertTrue(configuration.isValidType(NAMESPACE1, UNDEFINED_VAR, new StringReader("one, two, three")));
+    }
+
+    @Test
+    @Disabled("feature not yet implemented")
+    void setValueForSubtypes() throws ConfigurationException {
+        Reader reader = new StringReader("one, two, three");
+        configuration.setType(NAMESPACE1, UNDEFINED_VAR, Reader.class);
+        configuration.setValue(NAMESPACE1, UNDEFINED_VAR, PIPELINE_DEFINITION, ExternalResourceType.ANY, reader);
+        assertEquals(reader, configuration.getValue(NAMESPACE1, UNDEFINED_VAR, ExternalResourceType.ANY));
     }
 
 }

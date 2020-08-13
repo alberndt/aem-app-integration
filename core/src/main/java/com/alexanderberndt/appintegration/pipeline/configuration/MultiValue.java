@@ -113,8 +113,12 @@ public class MultiValue {
         }
     }
 
+    public boolean isValidType(Object value) {
+        return (this.valueType == null) || (value == null) || (value.getClass() == this.valueType);
+    }
+
     private void assertValueType(Object value) throws ConfigurationException {
-        if ((this.valueType != null) && (value != null) && (value.getClass() != this.valueType)) {
+        if (!isValidType(value)) {
             throw new ConfigurationException(String.format("Cannot overwrite type %s with value %s of type %s!",
                     getTypeName(), value, simpleName(value.getClass())));
         }
