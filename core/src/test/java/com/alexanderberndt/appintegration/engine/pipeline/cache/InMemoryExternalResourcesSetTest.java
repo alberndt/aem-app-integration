@@ -7,6 +7,7 @@ import com.alexanderberndt.appintegration.engine.resources.loader.ResourceLoader
 import com.alexanderberndt.appintegration.engine.resources.loader.impl.SystemResourceLoader;
 import com.alexanderberndt.appintegration.tasks.cache.InMemoryExternalResourcesSet;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -39,6 +40,7 @@ class InMemoryExternalResourcesSetTest {
     }
 
     @Test
+    @Disabled
     void prefetch() throws IOException {
         resourcesSet.prefetchAll();
         ExternalResource text1Res = resourcesSet.getResource("resources/text1.txt");
@@ -49,6 +51,7 @@ class InMemoryExternalResourcesSetTest {
     }
 
     @Test
+    @Disabled
     void getResource() throws IOException {
         ExternalResource text1Res = resourcesSet.getResource("resources/text1.txt");
 

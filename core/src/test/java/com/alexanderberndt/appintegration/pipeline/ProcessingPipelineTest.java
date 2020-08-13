@@ -8,6 +8,7 @@ import com.alexanderberndt.appintegration.engine.resources.loader.impl.SystemRes
 import com.alexanderberndt.appintegration.tasks.load.DownloadTask;
 import com.alexanderberndt.appintegration.tasks.prepare.PropertiesTask;
 import com.alexanderberndt.appintegration.tasks.process.AddReferencedResourceTask;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,7 @@ class ProcessingPipelineTest {
     private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Test
+    @Disabled
     void simpleProcessingPipeline() throws IOException {
 
         CoreGlobalContext context = new CoreGlobalContext(new SystemResourceLoader());
