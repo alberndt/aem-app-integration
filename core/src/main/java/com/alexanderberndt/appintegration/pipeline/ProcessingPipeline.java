@@ -15,8 +15,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import java.lang.invoke.MethodHandles;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.alexanderberndt.appintegration.pipeline.configuration.Ranking.PIPELINE_EXECUTION;
 
@@ -61,22 +62,24 @@ public class ProcessingPipeline {
             throw new AppIntegrationException("A LoadingTask must be added to the Pipeline before!");
         }
 
+        final Map<String, Object> processingData = new HashMap<>();
+
         // preparation tasks
         for (TaskInstance<PreparationTask> taskInstance : preparationTasks) {
             LOG.debug("{}::prepare", taskInstance.getTaskNamespace());
-            TaskContext taskContext = context.createTaskContext(PIPELINE_EXECUTION, taskInstance.getTaskNamespace(), resourceRef.getExpectedType(), Collections.emptyMap());
+            TaskContext taskContext = context.createTaskContext(PIPELINE_EXECUTION, taskInstance.getTaskNamespace(), resourceRef.getExpectedType(), processingData);
             taskInstance.getTask().prepare(taskContext, resourceRef);
         }
 
         // loading task
         LOG.debug("{}::load", loadingTask.getTaskNamespace());
-        TaskContext loadContext = context.createTaskContext(PIPELINE_EXECUTION, loadingTask.getTaskNamespace(), resourceRef.getExpectedType(), Collections.emptyMap());
+        TaskContext loadContext = context.createTaskContext(PIPELINE_EXECUTION, loadingTask.getTaskNamespace(), resourceRef.getExpectedType(), processingData);
         ExternalResource resource = loadingTask.getTask().load(loadContext, resourceRef);
 
         // processing tasks
         for (TaskInstance<ProcessingTask> taskInstance : processingTasks) {
             LOG.debug("{}::prepare", taskInstance.getTaskNamespace());
-            TaskContext taskContext = context.createTaskContext(PIPELINE_EXECUTION, taskInstance.getTaskNamespace(), resource.getType(), Collections.emptyMap());
+            TaskContext taskContext = context.createTaskContext(PIPELINE_EXECUTION, taskInstance.getTaskNamespace(), resource.getType(), processingData);
             taskInstance.getTask().process(taskContext, resource);
         }
 
