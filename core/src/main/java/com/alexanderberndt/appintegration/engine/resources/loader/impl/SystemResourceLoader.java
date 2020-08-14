@@ -17,12 +17,12 @@ public class SystemResourceLoader implements ResourceLoader {
     }
 
     @Override
-    public ExternalResourceRef resolveRelativeUrl(ExternalResource baseResource, String relativeUrl, ExternalResourceType expectedType) {
+    public ExternalResourceRef resolveRelativeUrl(String baseUrl, String relativeUrl, ExternalResourceType expectedType) {
         final String url;
-        if (!StringUtils.contains(baseResource.getUrl(), '/') || StringUtils.startsWith(relativeUrl, "/")) {
+        if (!StringUtils.contains(baseUrl, '/') || StringUtils.startsWith(relativeUrl, "/")) {
             url = trimSlashes(relativeUrl);
         } else {
-            String basePath = StringUtils.substringBeforeLast(baseResource.getUrl(), "/");
+            String basePath = StringUtils.substringBeforeLast(baseUrl, "/");
             url = trimSlashes(basePath) + "/" + trimSlashes(relativeUrl);
         }
         return resolveAbsoluteUrl(url, expectedType);

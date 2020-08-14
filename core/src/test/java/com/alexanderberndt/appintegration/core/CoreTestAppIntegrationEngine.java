@@ -3,16 +3,16 @@ package com.alexanderberndt.appintegration.core;
 import com.alexanderberndt.appintegration.engine.AppIntegrationEngine;
 import com.alexanderberndt.appintegration.engine.AppIntegrationFactory;
 
-public class CoreTestAppIntegrationEngine extends AppIntegrationEngine<CoreTestApplicationInstance> {
+public class CoreTestAppIntegrationEngine extends AppIntegrationEngine<CoreTestAppInstance> {
 
-    private final AppIntegrationFactory<CoreTestApplicationInstance> factory;
+    private final AppIntegrationFactory<CoreTestAppInstance> factory;
 
-    public CoreTestAppIntegrationEngine(AppIntegrationFactory<CoreTestApplicationInstance> factory) {
+    public CoreTestAppIntegrationEngine(AppIntegrationFactory<CoreTestAppInstance> factory) {
         this.factory = factory;
     }
 
     @Override
-    protected AppIntegrationFactory<CoreTestApplicationInstance> getFactory() {
+    protected AppIntegrationFactory<CoreTestAppInstance> getFactory() {
         return factory;
     }
 }

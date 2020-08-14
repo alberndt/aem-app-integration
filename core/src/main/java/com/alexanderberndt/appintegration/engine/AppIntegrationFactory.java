@@ -7,6 +7,7 @@ import com.alexanderberndt.appintegration.pipeline.ProcessingPipeline;
 import com.alexanderberndt.appintegration.pipeline.context.GlobalContext;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Map;
 
 public interface AppIntegrationFactory<I extends ApplicationInstance> {
@@ -17,7 +18,8 @@ public interface AppIntegrationFactory<I extends ApplicationInstance> {
 
     ResourceLoader getResourceLoader(String id);
 
-    ContextProvider<I> getContextProvider(String id);
+    @Nullable
+    ContextProvider<I> getContextProvider(@Nonnull final String providerName);
 
     ProcessingPipeline createProcessingPipeline(GlobalContext context, String name);
 }

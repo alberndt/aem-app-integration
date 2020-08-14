@@ -1,21 +1,25 @@
 package com.alexanderberndt.appintegration.engine;
 
 import com.alexanderberndt.appintegration.api.Application;
+import com.alexanderberndt.appintegration.api.ContextProvider;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
 import com.alexanderberndt.appintegration.engine.resources.loader.ResourceLoader;
 import com.alexanderberndt.appintegration.engine.resourcetypes.appinfo.ApplicationInfoJson;
+import com.alexanderberndt.appintegration.engine.resourcetypes.appinfo.ComponentInfoJson;
 import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
 import com.alexanderberndt.appintegration.pipeline.ProcessingPipeline;
 import com.alexanderberndt.appintegration.pipeline.context.GlobalContext;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.StringSubstitutor;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.ref.SoftReference;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,25 +45,89 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance> {
     protected abstract AppIntegrationFactory<I> getFactory();
 
 
-    public String getHtmlSnippet(I instance) throws IOException {
+    /* Runtime methods */
+
+    public ExternalResource getHtmlSnippet(I instance) throws IOException {
         return loadHtmlSnippet(instance.getApplicationId(), instance.getComponentId(), instance);
     }
 
-    public InputStream getStaticResource(String path) {
-        // ToDo: Support caching headers
+    public ExternalResource getStaticResource(String relativePath) {
         return null;
+    }
+
+    public boolean isDynamicPath(String relativePath) {
+        return false;
     }
 
     public List<String> getDynamicPaths() {
         throw new UnsupportedOperationException("method not implemented!");
     }
 
+    /* Prefetch methods */
+
     public void prefetch(List<I> instanceList, boolean prefetchResources) throws IOException {
         throw new UnsupportedOperationException("method not implemented!");
     }
 
 
-    public String loadHtmlSnippet(String applicationId, String componentId, I instance) throws IOException {
+    /* Management methods ??? */
+
+
+
+    /* Internal methods */
+
+    protected ApplicationInfoJson loadApplicationInfoJson(@Nonnull Application application) throws IOException {
+        final ResourceLoader loader = requireResourceLoader(application);
+
+        final String url = application.getApplicationInfoUrl();
+        ExternalResource res = loader.load(new ExternalResourceRef(url, ExternalResourceType.APPLICATION_PROPERTIES));
+
+        try {
+            // ToDo: Use Resource Converter
+            return objectMapper.readerFor(ApplicationInfoJson.class).readValue(res.getContentAsReader());
+        } catch (JsonProcessingException e) {
+            throw new AppIntegrationException(String.format("Cannot parse %s due to: %s", url, e.getMessage()), e);
+        }
+    }
+
+
+    protected ExternalResourceRef resolveSnippetResource(
+            @Nonnull VerifiedAppInstance<I> instance,
+            @Nonnull ApplicationInfoJson applicationInfo) {
+
+        final ComponentInfoJson componentInfo = applicationInfo.getComponents().get(instance.getComponentId());
+        if (componentInfo == null) {
+            throw new AppIntegrationException(
+                    String.format("Unknown component %s for application %s", instance.getComponentId(), instance.getApplicationId()));
+        }
+
+        final String baseUrl = instance.getApplication().getApplicationInfoUrl();
+        final String relativeUrlTemplate = componentInfo.getUrl();
+        final String relativeUrl = resolveStringWithContextVariables(instance, relativeUrlTemplate);
+        return instance.getResourceLoader().resolveRelativeUrl(baseUrl, relativeUrl, ExternalResourceType.HTML_SNIPPET);
+    }
+
+
+    protected String resolveStringWithContextVariables(@Nonnull final VerifiedAppInstance<I> instance, @Nonnull final String inputString) {
+        // evaluate context
+        final Map<String, String> contextMap = new HashMap<>();
+        for (ContextProvider<I> contextProvider : requireContextProviders(instance)) {
+            final Map<String, String> curCtxMap = contextProvider.getContext(instance.getInstance());
+            if (curCtxMap != null) {
+                contextMap.putAll(curCtxMap);
+            }
+        }
+        final String resolvedString = StringSubstitutor.replace(inputString, contextMap);
+        if (StringUtils.containsAny(resolvedString, '$', '{', '}')) {
+            throw new AppIntegrationException(String.format(
+                    "Could not fully resolve template \"%s\". It remained \"%s\".", inputString, resolvedString));
+        } else {
+            return resolvedString;
+        }
+    }
+
+
+    protected ExternalResource loadHtmlSnippet(String applicationId, String componentId, I instance) throws IOException {
         throw new UnsupportedOperationException("method not implemented!");
 
 //        // get global data
@@ -93,21 +161,6 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance> {
     }
 
 
-    protected ApplicationInfoJson loadApplicationInfoJson(@Nonnull String applicationId) throws IOException {
-        final Application application = requireApplication(applicationId);
-        final ResourceLoader loader = requireResourceLoader(application);
-
-        final String url = application.getApplicationInfoUrl();
-        ExternalResource res = loader.load(new ExternalResourceRef(url, ExternalResourceType.APPLICATION_PROPERTIES));
-
-        try {
-            // ToDo: Use Resource Converter
-            return objectMapper.readerFor(ApplicationInfoJson.class).readValue(res.getContentAsReader());
-        } catch (JsonProcessingException e) {
-            throw new AppIntegrationException(String.format("Cannot parse %s due to: %s", url, e.getMessage()), e);
-        }
-    }
-
     protected ProcessingPipeline createProcessingPipeline(@Nonnull GlobalContext context, @Nonnull String applicationId) {
         final Application application = requireApplication(applicationId);
         return this.getFactory().createProcessingPipeline(context, application.getProcessingPipelineName());
@@ -129,6 +182,28 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance> {
             throw new AppIntegrationException(String.format("ResourceLoader %s is not defined!", application.getResourceLoaderName()));
         }
         return loader;
+    }
+
+
+    @Nonnull
+    protected List<ContextProvider<I>> requireContextProviders(VerifiedAppInstance<I> instance) {
+        final List<String> notFoundContextProviders = new ArrayList<>();
+        final List<ContextProvider<I>> contextProviders = new ArrayList<>();
+        for (final String providerName : instance.getApplication().getContextProviderNames()) {
+            final ContextProvider<I> provider = getFactory().getContextProvider(providerName);
+            if (provider != null) {
+                contextProviders.add(provider);
+            } else {
+                notFoundContextProviders.add(providerName);
+            }
+        }
+        if (notFoundContextProviders.isEmpty()) {
+            return contextProviders;
+        } else {
+            throw new AppIntegrationException(String.format(
+                    "The requested context providers %s for application %s are not available",
+                    notFoundContextProviders, instance.getApplicationId()));
+        }
     }
 
 

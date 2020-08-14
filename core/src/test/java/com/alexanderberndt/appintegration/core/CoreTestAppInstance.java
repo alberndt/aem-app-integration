@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CoreTestApplicationInstance implements ApplicationInstance {
+public class CoreTestAppInstance implements ApplicationInstance {
 
     private final String applicationId;
 
@@ -14,12 +14,12 @@ public class CoreTestApplicationInstance implements ApplicationInstance {
 
     private final Map<String, String> contextMap = new HashMap<>();
 
-    public CoreTestApplicationInstance(String applicationId, String componentId) {
+    public CoreTestAppInstance(String applicationId, String componentId) {
         this.applicationId = applicationId;
         this.componentId = componentId;
     }
 
-    public CoreTestApplicationInstance(String applicationId, String componentId, Map<String, String> contextMap) {
+    public CoreTestAppInstance(String applicationId, String componentId, Map<String, String> contextMap) {
         this.applicationId = applicationId;
         this.componentId = componentId;
         this.contextMap.putAll(contextMap);

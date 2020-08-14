@@ -10,12 +10,13 @@ import com.alexanderberndt.appintegration.pipeline.ProcessingPipeline;
 import com.alexanderberndt.appintegration.pipeline.context.GlobalContext;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CoreAppIntegrationFactory implements AppIntegrationFactory<CoreTestApplicationInstance> {
+public class CoreAppIntegrationFactory implements AppIntegrationFactory<CoreTestAppInstance> {
 
     public static final String SYSTEM_RESOURCE_LOADER_NAME = "classpath";
     public static final String HTTP_RESOURCE_LOADER_NAME = "http";
@@ -33,10 +34,10 @@ public class CoreAppIntegrationFactory implements AppIntegrationFactory<CoreTest
         resourceLoaderMap.put(HTTP_RESOURCE_LOADER_NAME, new HttpResourceLoader());
     }
 
-    private static final Map<String, ContextProvider<CoreTestApplicationInstance>> contextProviderMap = new HashMap<>();
+    private static final Map<String, ContextProvider<CoreTestAppInstance>> contextProviderMap = new HashMap<>();
 
     static {
-        contextProviderMap.put("instance", CoreTestApplicationInstance::getContextMap);
+        contextProviderMap.put("instance", CoreTestAppInstance::getContextMap);
     }
 
     private static final Map<String, ProcessingPipeline> processingPipelineMap = new HashMap<>();
@@ -57,8 +58,9 @@ public class CoreAppIntegrationFactory implements AppIntegrationFactory<CoreTest
     }
 
     @Override
-    public ContextProvider<CoreTestApplicationInstance> getContextProvider(String id) {
-        return contextProviderMap.get(id);
+    public @Nullable
+    ContextProvider<CoreTestAppInstance> getContextProvider(@Nonnull String providerName) {
+        return contextProviderMap.get(providerName);
     }
 
     @Override

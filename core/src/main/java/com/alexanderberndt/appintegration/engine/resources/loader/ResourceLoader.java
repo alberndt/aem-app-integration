@@ -24,7 +24,11 @@ public interface ResourceLoader {
         return resolveRelativeUrl(baseResource, relativeUrl, ExternalResourceType.ANY);
     }
 
-    ExternalResourceRef resolveRelativeUrl(final ExternalResource baseResource, final String relativeUrl, ExternalResourceType expectedType);
+    default ExternalResourceRef resolveRelativeUrl(final ExternalResource baseResource, final String relativeUrl, ExternalResourceType expectedType) {
+        return resolveRelativeUrl(baseResource.getUrl(), relativeUrl, expectedType);
+    }
+
+    ExternalResourceRef resolveRelativeUrl(final String baseUrl, final String relativeUrl, ExternalResourceType expectedType);
 
 
 }

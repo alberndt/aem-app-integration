@@ -67,13 +67,13 @@ public class HttpResourceLoader implements ResourceLoader {
     }
 
     @Override
-    public ExternalResourceRef resolveRelativeUrl(@Nonnull ExternalResource baseResource, @Nonnull String relativeUrl, @Nonnull ExternalResourceType expectedType) {
+    public ExternalResourceRef resolveRelativeUrl(@Nonnull String baseUrl, @Nonnull String relativeUrl, @Nonnull ExternalResourceType expectedType) {
         try {
-            final URI baseUri = new URI(baseResource.getUrl());
+            final URI baseUri = new URI(baseUrl);
             final URL url = baseUri.resolve(relativeUrl).toURL();
             return resolveAbsoluteUrl(url.toString(), expectedType);
         } catch (URISyntaxException | MalformedURLException e) {
-            LOG.error(String.format("Cannot resolve relative-url %s from base-resource %s", relativeUrl, baseResource), e);
+            LOG.error(String.format("Cannot resolve relative-url %s from base-url %s", relativeUrl, baseUrl), e);
             // ToDo: Add error message to any context object
             return null;
         }

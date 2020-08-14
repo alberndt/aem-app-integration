@@ -104,7 +104,7 @@ class AbstractResourceLoaderTest {
         }
 
         @Override
-        public ExternalResourceRef resolveRelativeUrl(ExternalResource baseResource, String relativeUrl, ExternalResourceType expectedType) {
+        public ExternalResourceRef resolveRelativeUrl(String baseUrl, String relativeUrl, ExternalResourceType expectedType) {
             return null;
         }
     }
