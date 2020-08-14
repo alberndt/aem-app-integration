@@ -9,16 +9,16 @@ import com.alexanderberndt.appintegration.pipeline.context.TaskContext;
 import javax.annotation.Nonnull;
 import java.util.Map;
 
-public class CoreGlobalContext extends GlobalContext {
+public class CoreTestGlobalContext extends GlobalContext {
 
-    public CoreGlobalContext(ResourceLoader resourceLoader) {
+    public CoreTestGlobalContext(ResourceLoader resourceLoader) {
         super(resourceLoader);
     }
 
     @Nonnull
     @Override
     public TaskContext createTaskContext(@Nonnull Ranking rank, @Nonnull String taskNamespace, @Nonnull ExternalResourceType resourceType, @Nonnull Map<String, Object> processingData) {
-        return new CoreTaskContext(this, rank, taskNamespace, resourceType, processingData);
+        return new CoreTestTaskContext(this, rank, taskNamespace, resourceType, processingData);
     }
 
 }

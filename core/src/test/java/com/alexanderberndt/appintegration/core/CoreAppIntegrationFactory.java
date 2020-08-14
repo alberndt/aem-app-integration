@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CoreAppIntegrationFactory implements AppIntegrationFactory<CoreApplicationInstance> {
+public class CoreAppIntegrationFactory implements AppIntegrationFactory<CoreTestApplicationInstance> {
 
     public static final String SYSTEM_RESOURCE_LOADER_NAME = "classpath";
     public static final String HTTP_RESOURCE_LOADER_NAME = "http";
@@ -33,10 +33,10 @@ public class CoreAppIntegrationFactory implements AppIntegrationFactory<CoreAppl
         resourceLoaderMap.put(HTTP_RESOURCE_LOADER_NAME, new HttpResourceLoader());
     }
 
-    private static final Map<String, ContextProvider<CoreApplicationInstance>> contextProviderMap = new HashMap<>();
+    private static final Map<String, ContextProvider<CoreTestApplicationInstance>> contextProviderMap = new HashMap<>();
 
     static {
-        contextProviderMap.put("instance", CoreApplicationInstance::getContextMap);
+        contextProviderMap.put("instance", CoreTestApplicationInstance::getContextMap);
     }
 
     private static final Map<String, ProcessingPipeline> processingPipelineMap = new HashMap<>();
@@ -57,7 +57,7 @@ public class CoreAppIntegrationFactory implements AppIntegrationFactory<CoreAppl
     }
 
     @Override
-    public ContextProvider<CoreApplicationInstance> getContextProvider(String id) {
+    public ContextProvider<CoreTestApplicationInstance> getContextProvider(String id) {
         return contextProviderMap.get(id);
     }
 

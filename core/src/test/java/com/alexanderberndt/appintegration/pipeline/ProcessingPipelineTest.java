@@ -1,6 +1,6 @@
 package com.alexanderberndt.appintegration.pipeline;
 
-import com.alexanderberndt.appintegration.core.CoreGlobalContext;
+import com.alexanderberndt.appintegration.core.CoreTestGlobalContext;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
@@ -18,7 +18,7 @@ class ProcessingPipelineTest {
     @Test
     void simpleProcessingPipeline() {
 
-        CoreGlobalContext context = new CoreGlobalContext(new SystemResourceLoader());
+        CoreTestGlobalContext context = new CoreTestGlobalContext(new SystemResourceLoader());
         ProcessingPipeline pipeline = ProcessingPipeline.createPipelineInstance(context)
                 .addTask(new PropertiesTask())
                 .withTaskParam("random-input.length", 2000)

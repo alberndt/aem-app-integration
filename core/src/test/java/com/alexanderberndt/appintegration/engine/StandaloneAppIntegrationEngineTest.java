@@ -1,6 +1,7 @@
 package com.alexanderberndt.appintegration.engine;
 
 import com.alexanderberndt.appintegration.api.Application;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -9,9 +10,11 @@ import java.util.Arrays;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@Deprecated
 class StandaloneAppIntegrationEngineTest {
 
     @Test
+    @Disabled
     void loadHtmlSnippet() throws IOException {
 
         // ToDo: Re-Implement Test

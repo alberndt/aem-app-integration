@@ -22,7 +22,7 @@ import java.util.Map;
 
 public abstract class AppIntegrationEngine<I extends ApplicationInstance> {
 
-    private final static ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
 
 //    // applications

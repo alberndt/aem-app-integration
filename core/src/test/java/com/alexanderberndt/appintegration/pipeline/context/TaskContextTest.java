@@ -1,6 +1,6 @@
 package com.alexanderberndt.appintegration.pipeline.context;
 
-import com.alexanderberndt.appintegration.core.CoreGlobalContext;
+import com.alexanderberndt.appintegration.core.CoreTestGlobalContext;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
 import com.alexanderberndt.appintegration.engine.resources.loader.ResourceLoader;
 import com.alexanderberndt.appintegration.pipeline.configuration.Ranking;
@@ -34,7 +34,7 @@ class TaskContextTest {
     @BeforeEach
     void beforeEach() {
         assertNotNull(resourceLoaderMock);
-        globalContext = Mockito.spy(new CoreGlobalContext(resourceLoaderMock));
+        globalContext = Mockito.spy(new CoreTestGlobalContext(resourceLoaderMock));
         this.taskContext = Mockito.spy(new TaskContext(globalContext, Ranking.TASK_DEFAULT, MY_NAMESPACE, ExternalResourceType.ANY, Collections.emptyMap()));
     }
 

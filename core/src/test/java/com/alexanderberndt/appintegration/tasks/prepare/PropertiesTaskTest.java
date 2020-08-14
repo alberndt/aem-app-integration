@@ -23,7 +23,7 @@ class PropertiesTaskTest {
 //        globalProperties.put("global", "do NOT copy!!!");
 //        globalProperties.put("properties.predefined", "this SHOULD work!");
 //        PipelineConfiguration globalParams = new PipelineConfiguration(globalProperties, false);
-//        CoreGlobalContext globalContext = new CoreGlobalContext(null, globalParams);
+//        CoreTestGlobalContext globalContext = new CoreTestGlobalContext(null, globalParams);
 //
 //        // task properties
 //        Map<String, Object> taskProperties = new HashMap<>();

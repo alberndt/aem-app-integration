@@ -1,6 +1,6 @@
 package com.alexanderberndt.appintegration.pipeline.context;
 
-import com.alexanderberndt.appintegration.core.CoreGlobalContext;
+import com.alexanderberndt.appintegration.core.CoreTestGlobalContext;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
 import com.alexanderberndt.appintegration.engine.resources.loader.ResourceLoader;
 import com.alexanderberndt.appintegration.pipeline.configuration.Ranking;
@@ -25,7 +25,7 @@ class GlobalContextTest {
     @BeforeEach
     void setUp() {
         assertNotNull(resourceLoaderMock);
-        globalContext = new CoreGlobalContext(resourceLoaderMock);
+        globalContext = new CoreTestGlobalContext(resourceLoaderMock);
     }
 
     @Test
