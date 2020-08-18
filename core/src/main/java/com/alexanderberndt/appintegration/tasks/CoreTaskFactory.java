@@ -1,4 +1,4 @@
-package com.alexanderberndt.appintegration.core;
+package com.alexanderberndt.appintegration.tasks;
 
 import com.alexanderberndt.appintegration.pipeline.TaskFactory;
 import com.alexanderberndt.appintegration.pipeline.task.GenericTask;

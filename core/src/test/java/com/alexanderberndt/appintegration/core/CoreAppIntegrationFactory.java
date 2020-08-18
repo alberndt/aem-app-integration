@@ -8,6 +8,7 @@ import com.alexanderberndt.appintegration.engine.resources.loader.impl.HttpResou
 import com.alexanderberndt.appintegration.engine.resources.loader.impl.SystemResourceLoader;
 import com.alexanderberndt.appintegration.pipeline.ProcessingPipelineFactory;
 import com.alexanderberndt.appintegration.pipeline.SystemResourcePipelineFactory;
+import com.alexanderberndt.appintegration.tasks.CoreTaskFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

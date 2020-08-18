@@ -1,7 +1,5 @@
-package com.alexanderberndt.appintegration.core;
+package com.alexanderberndt.appintegration.engine.resources.loader;
 
-import com.alexanderberndt.appintegration.engine.resources.loader.ResourceLoader;
-import com.alexanderberndt.appintegration.engine.resources.loader.ResourceLoaderFactory;
 import com.alexanderberndt.appintegration.engine.resources.loader.impl.HttpResourceLoader;
 import com.alexanderberndt.appintegration.engine.resources.loader.impl.SystemResourceLoader;
 
