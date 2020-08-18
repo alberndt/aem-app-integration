@@ -1,7 +1,7 @@
 package com.alexanderberndt.appintegration.core;
 
+import com.alexanderberndt.appintegration.engine.ResourceLoader;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
-import com.alexanderberndt.appintegration.engine.resources.loader.ResourceLoader;
 import com.alexanderberndt.appintegration.pipeline.configuration.Ranking;
 import com.alexanderberndt.appintegration.pipeline.context.GlobalContext;
 import com.alexanderberndt.appintegration.pipeline.context.TaskContext;

@@ -1,9 +1,9 @@
-package com.alexanderberndt.appintegration.engine.resources.loader.impl;
+package com.alexanderberndt.appintegration.engine.loader;
 
+import com.alexanderberndt.appintegration.engine.ResourceLoader;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
-import com.alexanderberndt.appintegration.engine.resources.loader.ResourceLoader;
 import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

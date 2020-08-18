@@ -1,9 +1,10 @@
-package com.alexanderberndt.appintegration.engine.resources.loader.impl;
+package com.alexanderberndt.appintegration.engine.loader.impl;
 
+import com.alexanderberndt.appintegration.engine.ResourceLoader;
+import com.alexanderberndt.appintegration.engine.loader.HttpResourceLoader;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
-import com.alexanderberndt.appintegration.engine.resources.loader.ResourceLoader;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;

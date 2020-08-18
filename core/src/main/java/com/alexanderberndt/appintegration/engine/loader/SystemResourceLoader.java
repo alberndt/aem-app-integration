@@ -1,9 +1,9 @@
-package com.alexanderberndt.appintegration.engine.resources.loader.impl;
+package com.alexanderberndt.appintegration.engine.loader;
 
+import com.alexanderberndt.appintegration.engine.ResourceLoader;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
-import com.alexanderberndt.appintegration.engine.resources.loader.ResourceLoader;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;

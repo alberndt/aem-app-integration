@@ -1,7 +1,7 @@
 package com.alexanderberndt.appintegration.pipeline.context;
 
+import com.alexanderberndt.appintegration.engine.ResourceLoader;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
-import com.alexanderberndt.appintegration.engine.resources.loader.ResourceLoader;
 import com.alexanderberndt.appintegration.pipeline.configuration.PipelineConfiguration;
 import com.alexanderberndt.appintegration.pipeline.configuration.Ranking;
 import org.slf4j.Logger;

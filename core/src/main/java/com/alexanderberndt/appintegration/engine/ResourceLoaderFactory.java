@@ -1,4 +1,4 @@
-package com.alexanderberndt.appintegration.engine.resources.loader;
+package com.alexanderberndt.appintegration.engine;
 
 import javax.annotation.Nullable;
 

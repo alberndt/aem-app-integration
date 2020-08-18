@@ -1,10 +1,10 @@
 package com.alexanderberndt.appintegration.engine.pipeline.cache;
 
+import com.alexanderberndt.appintegration.engine.ResourceLoader;
+import com.alexanderberndt.appintegration.engine.loader.SystemResourceLoader;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourcesSet;
-import com.alexanderberndt.appintegration.engine.resources.loader.ResourceLoader;
-import com.alexanderberndt.appintegration.engine.resources.loader.impl.SystemResourceLoader;
 import com.alexanderberndt.appintegration.tasks.cache.InMemoryExternalResourcesSet;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;

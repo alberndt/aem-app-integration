@@ -1,7 +1,9 @@
-package com.alexanderberndt.appintegration.engine.resources.loader;
+package com.alexanderberndt.appintegration.engine.core;
 
-import com.alexanderberndt.appintegration.engine.resources.loader.impl.HttpResourceLoader;
-import com.alexanderberndt.appintegration.engine.resources.loader.impl.SystemResourceLoader;
+import com.alexanderberndt.appintegration.engine.ResourceLoader;
+import com.alexanderberndt.appintegration.engine.ResourceLoaderFactory;
+import com.alexanderberndt.appintegration.engine.loader.HttpResourceLoader;
+import com.alexanderberndt.appintegration.engine.loader.SystemResourceLoader;
 
 import java.util.HashMap;
 import java.util.Map;

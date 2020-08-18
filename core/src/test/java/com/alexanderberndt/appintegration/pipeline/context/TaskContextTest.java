@@ -1,8 +1,8 @@
 package com.alexanderberndt.appintegration.pipeline.context;
 
 import com.alexanderberndt.appintegration.core.CoreTestGlobalContext;
+import com.alexanderberndt.appintegration.engine.ResourceLoader;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
-import com.alexanderberndt.appintegration.engine.resources.loader.ResourceLoader;
 import com.alexanderberndt.appintegration.pipeline.configuration.Ranking;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -1,10 +1,10 @@
 package com.alexanderberndt.appintegration.pipeline;
 
 import com.alexanderberndt.appintegration.core.CoreTestGlobalContext;
+import com.alexanderberndt.appintegration.engine.loader.SystemResourceLoader;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
-import com.alexanderberndt.appintegration.engine.resources.loader.impl.SystemResourceLoader;
 import com.alexanderberndt.appintegration.tasks.load.DownloadTask;
 import com.alexanderberndt.appintegration.tasks.prepare.PropertiesTask;
 import com.alexanderberndt.appintegration.tasks.process.AddReferencedResourceTask;

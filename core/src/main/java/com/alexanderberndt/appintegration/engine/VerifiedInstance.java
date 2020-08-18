@@ -1,7 +1,5 @@
 package com.alexanderberndt.appintegration.engine;
 
-import com.alexanderberndt.appintegration.engine.resources.loader.ResourceLoader;
-
 import javax.annotation.Nonnull;
 
 import static com.alexanderberndt.appintegration.helper.ValidationUtil.requireNotNull;

@@ -1,12 +1,8 @@
 package com.alexanderberndt.appintegration.core;
 
-import com.alexanderberndt.appintegration.engine.AppIntegrationFactory;
-import com.alexanderberndt.appintegration.engine.Application;
-import com.alexanderberndt.appintegration.engine.ContextProvider;
-import com.alexanderberndt.appintegration.engine.resources.loader.ResourceLoader;
-import com.alexanderberndt.appintegration.engine.resources.loader.impl.HttpResourceLoader;
-import com.alexanderberndt.appintegration.engine.resources.loader.impl.SystemResourceLoader;
-import com.alexanderberndt.appintegration.pipeline.ProcessingPipelineFactory;
+import com.alexanderberndt.appintegration.engine.*;
+import com.alexanderberndt.appintegration.engine.loader.HttpResourceLoader;
+import com.alexanderberndt.appintegration.engine.loader.SystemResourceLoader;
 import com.alexanderberndt.appintegration.pipeline.SystemResourcePipelineFactory;
 import com.alexanderberndt.appintegration.tasks.CoreTaskFactory;
 

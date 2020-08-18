@@ -6,14 +6,13 @@ import com.alexanderberndt.appintegration.pipeline.context.TaskContext;
 
 /**
  * <p>Filter for a {@link ProcessingPipeline}, which is applied for all applicable resources of an
- * {@link com.alexanderberndt.appintegration.ExternalApplication}.</p>
+ * {@link com.alexanderberndt.appintegration.engine.Application}.</p>
  * <p>The following types are supported as input and output:</p>
  * <ul>
  *     <li>{@link java.io.InputStream}</li>
  *     <li>{@link java.io.Reader} (text file-types only)</li>
  *     <li>{@link org.jsoup.nodes.Document} (html-snippets only)</li>
  * </ul>
- *
  */
 public interface ProcessingTask extends GenericTask {
 

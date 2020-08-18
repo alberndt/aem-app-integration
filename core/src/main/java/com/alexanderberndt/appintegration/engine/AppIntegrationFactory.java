@@ -1,8 +1,5 @@
 package com.alexanderberndt.appintegration.engine;
 
-import com.alexanderberndt.appintegration.engine.resources.loader.ResourceLoader;
-import com.alexanderberndt.appintegration.pipeline.ProcessingPipelineFactory;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Map;

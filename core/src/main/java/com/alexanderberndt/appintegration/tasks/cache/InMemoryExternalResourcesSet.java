@@ -1,8 +1,8 @@
 package com.alexanderberndt.appintegration.tasks.cache;
 
+import com.alexanderberndt.appintegration.engine.ResourceLoader;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
-import com.alexanderberndt.appintegration.engine.resources.loader.ResourceLoader;
 
 import java.io.IOException;
 import java.util.HashMap;

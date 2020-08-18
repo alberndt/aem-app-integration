@@ -1,5 +1,6 @@
-package com.alexanderberndt.appintegration.engine.resources.loader.impl;
+package com.alexanderberndt.appintegration.engine.loader.impl;
 
+import com.alexanderberndt.appintegration.engine.loader.SystemResourceLoader;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
 import org.junit.jupiter.api.Test;

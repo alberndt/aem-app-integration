@@ -1,5 +1,6 @@
 package com.alexanderberndt.appintegration.pipeline;
 
+import com.alexanderberndt.appintegration.engine.ProcessingPipelineFactory;
 import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
 import com.alexanderberndt.appintegration.pipeline.builder.YamlPipelineBuilder;
 import com.alexanderberndt.appintegration.pipeline.builder.definition.PipelineDefinition;

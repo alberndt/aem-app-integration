@@ -1,4 +1,4 @@
-package com.alexanderberndt.appintegration.engine.resources.loader;
+package com.alexanderberndt.appintegration.engine;
 
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;

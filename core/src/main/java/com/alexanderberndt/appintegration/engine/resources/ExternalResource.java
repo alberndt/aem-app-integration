@@ -1,7 +1,7 @@
 package com.alexanderberndt.appintegration.engine.resources;
 
+import com.alexanderberndt.appintegration.engine.ResourceLoader;
 import com.alexanderberndt.appintegration.engine.resources.conversion.*;
-import com.alexanderberndt.appintegration.engine.resources.loader.ResourceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
