@@ -10,7 +10,10 @@ import com.alexanderberndt.appintegration.engine.resourcetypes.appinfo.Applicati
 import com.alexanderberndt.appintegration.engine.resourcetypes.appinfo.ComponentInfoJson;
 import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
 import com.alexanderberndt.appintegration.pipeline.ProcessingPipeline;
+import com.alexanderberndt.appintegration.pipeline.ProcessingPipelineFactory;
+import com.alexanderberndt.appintegration.pipeline.configuration.Ranking;
 import com.alexanderberndt.appintegration.pipeline.context.GlobalContext;
+import com.alexanderberndt.appintegration.pipeline.context.TaskContext;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
@@ -19,36 +22,25 @@ import org.apache.commons.text.StringSubstitutor;
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.lang.ref.SoftReference;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public abstract class AppIntegrationEngine<I extends ApplicationInstance> {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
-
-//    // applications
-//    private Map<String, ApplicationRecord> applicationRecordMap = new LinkedHashMap<>();
-
     // Cache for application-infos.json objects
     private final Map<String, SoftReference<ApplicationInfoJson>> applicationInfoCache = new HashMap<>();
 
-//    // helper services
-//    private Map<String, ResourceLoader> resourceLoaderMap = new LinkedHashMap<>();
-//    private Map<String, ContextProvider<I>> contextProviderMap = new LinkedHashMap<>();
-//
-//    // services
-//    private ApplicationInfoLoader applicationInfoLoader = new ApplicationInfoLoader();
-
     protected abstract AppIntegrationFactory<I> getFactory();
+
+    protected abstract GlobalContext createGlobalContext(@Nonnull final Application application);
 
 
     /* Runtime methods */
 
     public ExternalResource getHtmlSnippet(I instance) throws IOException {
-        return loadHtmlSnippet(instance.getApplicationId(), instance.getComponentId(), instance);
+        return null;
+        //return loadHtmlSnippet(instance.getApplicationId(), instance.getComponentId(), instance);
     }
 
     public ExternalResource getStaticResource(String relativePath) {
@@ -65,8 +57,95 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance> {
 
     /* Prefetch methods */
 
-    public void prefetch(List<I> instanceList, boolean prefetchResources) throws IOException {
-        throw new UnsupportedOperationException("method not implemented!");
+    public void prefetch(List<I> instanceList) throws IOException {
+
+
+//        // verify instance and get referenced objects from the factory
+//        List<VerifiedInstance<I>> verifiedInstanceList = new ArrayList<>();
+//        for (I instance : instanceList) {
+//            verifiedInstanceList.add(VerifiedInstance.verify(instance, getFactory()));
+//        }
+
+        // group instances by application-id
+        final Map<String, List<I>> instanceMap = new HashMap<>();
+        for (I instance : instanceList) {
+            final String applicationId = instance.getApplicationId();
+            final List<I> existingList = instanceMap.get(applicationId);
+            if (existingList != null) {
+                existingList.add(instance);
+            } else {
+                final List<I> newList = new ArrayList<>();
+                newList.add(instance);
+                instanceMap.put(applicationId, newList);
+            }
+        }
+
+        for (String applicationId : instanceMap.keySet()) {
+
+
+            final Application application = this.getFactory().getApplication(applicationId);
+            if (application == null) {
+                //context.addError(String.format("Application %s is undefined", applicationId));
+                continue;
+            }
+
+            final GlobalContext context = this.createGlobalContext(application);
+
+            // build processing pipeline
+            final String pipelineName = application.getProcessingPipelineName();
+            final ProcessingPipeline pipeline = createProcessingPipeline(context, pipelineName);
+            if (pipeline == null) {
+                context.addError(String.format("Cannot create pipeline %s for application %s", pipelineName, applicationId));
+                continue;
+            }
+
+            // add global properties
+            final Map<String, Object> globalProperties = application.getGlobalProperties();
+            if (globalProperties != null) {
+                final TaskContext taskContext = context.createTaskContext(
+                        Ranking.GLOBAL, "global", ExternalResourceType.ANY, Collections.emptyMap());
+                for (final Map.Entry<String, Object> propEntry : globalProperties.entrySet()) {
+                    taskContext.setValue(propEntry.getKey(), propEntry.getValue());
+                }
+            }
+
+            // set global context read-only - values are only written to
+            context.getProcessingParams().setReadOnly();
+
+            // load application-properties.json
+            final ApplicationInfoJson applicationInfo = loadApplicationInfoJson(application);
+
+            // resolve url for all instances (some may resolve to the same url)
+            final Set<ExternalResourceRef> resolvedSnippetsSet = new LinkedHashSet<>();
+            for (I instance : instanceMap.get(applicationId)) {
+                final VerifiedInstance<I> verifiedInstance = VerifiedInstance.verify(instance, Objects.requireNonNull(getFactory()));
+                final ExternalResourceRef snippetRef = resolveSnippetResource(verifiedInstance, applicationInfo);
+                resolvedSnippetsSet.add(snippetRef);
+            }
+
+
+            // Load all resolved snippets
+            // ToDo: Replace with ExternalResourceSet
+            final Set<ExternalResourceRef> referencedResourcesSet = new LinkedHashSet<>();
+            for (ExternalResourceRef snippetRef : resolvedSnippetsSet) {
+                final ExternalResource snippet = pipeline.loadAndProcessResourceRef(context, snippetRef);
+                System.out.println(snippet.getContentAsString());
+                referencedResourcesSet.addAll(snippet.getReferencedResources());
+            }
+
+
+            // load all referenced resources (which may could load more)
+            for (ExternalResourceRef resourceRef : referencedResourcesSet) {
+                final ExternalResource resource = pipeline.loadAndProcessResourceRef(context, resourceRef);
+                System.out.println(resource.getContentAsString());
+                referencedResourcesSet.addAll(resource.getReferencedResources());
+            }
+
+
+            // ToDo: Implement Cache Provider
+
+            // ToDo: Error handling or logging
+        }
     }
 
 
@@ -92,7 +171,7 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance> {
 
 
     protected ExternalResourceRef resolveSnippetResource(
-            @Nonnull VerifiedAppInstance<I> instance,
+            @Nonnull VerifiedInstance<I> instance,
             @Nonnull ApplicationInfoJson applicationInfo) {
 
         final ComponentInfoJson componentInfo = applicationInfo.getComponents().get(instance.getComponentId());
@@ -108,7 +187,8 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance> {
     }
 
 
-    protected String resolveStringWithContextVariables(@Nonnull final VerifiedAppInstance<I> instance, @Nonnull final String inputString) {
+    protected String resolveStringWithContextVariables(@Nonnull final VerifiedInstance<I> instance,
+                                                       @Nonnull final String inputString) {
         // evaluate context
         final Map<String, String> contextMap = new HashMap<>();
         for (ContextProvider<I> contextProvider : requireContextProviders(instance)) {
@@ -127,43 +207,15 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance> {
     }
 
 
-    protected ExternalResource loadHtmlSnippet(String applicationId, String componentId, I instance) throws IOException {
+    protected ExternalResource loadHtmlSnippet(@Nonnull final VerifiedInstance<I> instance) throws IOException {
         throw new UnsupportedOperationException("method not implemented!");
 
-//        // get global data
-//
-//        // get application-info
-//
-//        // get context
-//
-//        // get url
-//
-//        //
-//
-//        final ApplicationRecord app = getApplicationRecord(applicationId);
-//        final ApplicationInfo appInfo = applicationInfoLoader.load(app.getResourceLoader(), app.getApplicationInfoUrl());
-//
-//        final ApplicationInfo.ComponentInfo componentInfo = appInfo.getComponents().get(componentId);
-//        if (componentInfo == null) {
-//            throw new AppIntegrationException("Cannot find info for component " + componentId + " of application " + applicationId);
-//        }
-//
-//        final String resolvedRelativeComponentUrl = resolveUrl(componentInfo.getUrl(), app.getContextProviders(), instance);
-//        final String resolvedAbsoluteComponentUrl = app.resolveRelativeUrl(resolvedRelativeComponentUrl);
-//
-//
-//        String htmlSnippet = null;//app.getResourceLoader().load(resolvedAbsoluteComponentUrl, String.class);
-//        if (StringUtils.isBlank(htmlSnippet)) {
-//            throw new AppIntegrationException("Cannot load html-snippet " + resolvedAbsoluteComponentUrl);
-//        }
-//
-//        return htmlSnippet;
     }
 
 
-    protected ProcessingPipeline createProcessingPipeline(@Nonnull GlobalContext context, @Nonnull String applicationId) {
-        final Application application = requireApplication(applicationId);
-        return this.getFactory().createProcessingPipeline(context, application.getProcessingPipelineName());
+    protected ProcessingPipeline createProcessingPipeline(@Nonnull GlobalContext context, @Nonnull String pipelineName) {
+        final ProcessingPipelineFactory pipelineFactory = getFactory().getProcessingPipelineFactory();
+        return pipelineFactory.createProcessingPipeline(context, pipelineName);
     }
 
     @Nonnull
@@ -186,7 +238,7 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance> {
 
 
     @Nonnull
-    protected List<ContextProvider<I>> requireContextProviders(VerifiedAppInstance<I> instance) {
+    protected List<ContextProvider<I>> requireContextProviders(VerifiedInstance<I> instance) {
         final List<String> notFoundContextProviders = new ArrayList<>();
         final List<ContextProvider<I>> contextProviders = new ArrayList<>();
         for (final String providerName : instance.getApplication().getContextProviderNames()) {

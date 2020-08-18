@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,29 +30,36 @@ class AppIntegrationEngineTest {
 
     private CoreTestAppIntegrationEngine engine;
 
-    private VerifiedAppInstance<CoreTestAppInstance> verifiedAppInstance;
+    private CoreTestAppInstance instance;
+
+    private VerifiedInstance<CoreTestAppInstance> verifiedInstance;
 
     @BeforeEach
     void before() {
         factory = new CoreAppIntegrationFactory();
-        factory.registerApplication("test-app", new Application(TEST_APP_URL, SYSTEM_RESOURCE_LOADER_NAME, null, CORE_CONTEXT_PROVIDERS));
+        factory.registerApplication("test-app", new Application(TEST_APP_URL, SYSTEM_RESOURCE_LOADER_NAME, "simple-pipeline1", CORE_CONTEXT_PROVIDERS, null));
         engine = new CoreTestAppIntegrationEngine(factory);
 
         Map<String, String> instanceContextMap = new HashMap<>();
         instanceContextMap.put("hello", "world");
         instanceContextMap.put("language", "de");
         instanceContextMap.put("newsletterId", "product-news");
-        CoreTestAppInstance instance = new CoreTestAppInstance("test-app", "subscribe", instanceContextMap);
-        verifiedAppInstance = VerifiedAppInstance.verify(instance, factory);
-        assertNotNull(verifiedAppInstance);
+        instance = new CoreTestAppInstance("test-app", "subscribe", instanceContextMap);
+        verifiedInstance = VerifiedInstance.verify(instance, factory);
+        assertNotNull(verifiedInstance);
     }
 
     @Test
     void loadApplicationInfoJson() throws IOException {
-        ApplicationInfoJson applicationInfo = engine.loadApplicationInfoJson(verifiedAppInstance.getApplication());
+        ApplicationInfoJson applicationInfo = engine.loadApplicationInfoJson(verifiedInstance.getApplication());
 
         assertNotNull(applicationInfo);
         assertEquals("Newsletter", applicationInfo.getName());
+    }
+
+    @Test
+    void prefetch() throws IOException {
+        engine.prefetch(Collections.singletonList(instance));
     }
 
     @Test
@@ -65,15 +73,15 @@ class AppIntegrationEngineTest {
 
     @Test
     void resolveStringWithContextVariables() {
-        assertEquals("Hello world from de", engine.resolveStringWithContextVariables(verifiedAppInstance, "Hello ${hello} from ${language}"));
-        assertThrows(AppIntegrationException.class, () -> engine.resolveStringWithContextVariables(verifiedAppInstance, "Hello ${hello} from ${language} with ${something-unknown}"));
+        assertEquals("Hello world from de", engine.resolveStringWithContextVariables(verifiedInstance, "Hello ${hello} from ${language}"));
+        assertThrows(AppIntegrationException.class, () -> engine.resolveStringWithContextVariables(verifiedInstance, "Hello ${hello} from ${language} with ${something-unknown}"));
     }
 
     @Test
     void resolveSnippetResource() throws IOException {
-        ApplicationInfoJson applicationInfoJson = engine.loadApplicationInfoJson(verifiedAppInstance.getApplication());
+        ApplicationInfoJson applicationInfoJson = engine.loadApplicationInfoJson(verifiedInstance.getApplication());
 
-        final ExternalResourceRef resourceRef = engine.resolveSnippetResource(verifiedAppInstance, applicationInfoJson);
+        final ExternalResourceRef resourceRef = engine.resolveSnippetResource(verifiedInstance, applicationInfoJson);
 
         assertNotNull(resourceRef);
         assertEquals(ExternalResourceType.HTML_SNIPPET, resourceRef.getExpectedType());

@@ -1,7 +1,13 @@
 package com.alexanderberndt.appintegration.core;
 
+import com.alexanderberndt.appintegration.api.Application;
 import com.alexanderberndt.appintegration.engine.AppIntegrationEngine;
 import com.alexanderberndt.appintegration.engine.AppIntegrationFactory;
+import com.alexanderberndt.appintegration.engine.resources.loader.ResourceLoader;
+import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
+import com.alexanderberndt.appintegration.pipeline.context.GlobalContext;
+
+import javax.annotation.Nonnull;
 
 public class CoreTestAppIntegrationEngine extends AppIntegrationEngine<CoreTestAppInstance> {
 
@@ -14,5 +20,16 @@ public class CoreTestAppIntegrationEngine extends AppIntegrationEngine<CoreTestA
     @Override
     protected AppIntegrationFactory<CoreTestAppInstance> getFactory() {
         return factory;
+    }
+
+    @Override
+    protected GlobalContext createGlobalContext(@Nonnull final Application application) {
+        final String resourceLoaderName = application.getResourceLoaderName();
+        final ResourceLoader resourceLoader = factory.getResourceLoader(resourceLoaderName);
+        if (resourceLoader != null) {
+            return new CoreTestGlobalContext(resourceLoader);
+        } else {
+            throw new AppIntegrationException(String.format("ResourceLoader %s not found. Cannot create context", resourceLoaderName));
+        }
     }
 }

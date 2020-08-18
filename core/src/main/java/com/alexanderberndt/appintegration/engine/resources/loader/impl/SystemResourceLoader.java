@@ -6,14 +6,22 @@ import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
 import com.alexanderberndt.appintegration.engine.resources.loader.ResourceLoader;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 public class SystemResourceLoader implements ResourceLoader {
 
     @Override
-    public ExternalResource load(ExternalResourceRef resourceRef) {
+    public ExternalResource load(ExternalResourceRef resourceRef) throws IOException {
         final ExternalResource resource = new ExternalResource(this, resourceRef);
-        // ToDo: Handle not found
-        resource.setContent(ClassLoader.getSystemResourceAsStream(resourceRef.getUrl()));
-        return resource;
+        final InputStream inputStream = ClassLoader.getSystemResourceAsStream(resourceRef.getUrl());
+
+        if (inputStream != null) {
+            resource.setContent(inputStream);
+            return resource;
+        } else {
+            throw new IOException(String.format("Resource %s not found!", resourceRef.getUrl()));
+        }
     }
 
     @Override

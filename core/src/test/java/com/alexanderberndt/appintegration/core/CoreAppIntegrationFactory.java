@@ -6,8 +6,8 @@ import com.alexanderberndt.appintegration.engine.AppIntegrationFactory;
 import com.alexanderberndt.appintegration.engine.resources.loader.ResourceLoader;
 import com.alexanderberndt.appintegration.engine.resources.loader.impl.HttpResourceLoader;
 import com.alexanderberndt.appintegration.engine.resources.loader.impl.SystemResourceLoader;
-import com.alexanderberndt.appintegration.pipeline.ProcessingPipeline;
-import com.alexanderberndt.appintegration.pipeline.context.GlobalContext;
+import com.alexanderberndt.appintegration.pipeline.ProcessingPipelineFactory;
+import com.alexanderberndt.appintegration.pipeline.SystemResourcePipelineFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -23,50 +23,53 @@ public class CoreAppIntegrationFactory implements AppIntegrationFactory<CoreTest
 
     public static final List<String> CORE_CONTEXT_PROVIDERS = Collections.singletonList("instance");
 
-
     private final Map<String, Application> applicationMap = new HashMap<>();
 
-    private static final Map<String, ResourceLoader> resourceLoaderMap = new HashMap<>();
+    private final Map<String, ResourceLoader> resourceLoaderMap;
 
+    private final ProcessingPipelineFactory processingPipelineFactory;
 
-    static {
+    private final Map<String, ContextProvider<CoreTestAppInstance>> contextProviderMap;
+
+    public CoreAppIntegrationFactory() {
+        resourceLoaderMap = new HashMap<>();
         resourceLoaderMap.put(SYSTEM_RESOURCE_LOADER_NAME, new SystemResourceLoader());
         resourceLoaderMap.put(HTTP_RESOURCE_LOADER_NAME, new HttpResourceLoader());
-    }
 
-    private static final Map<String, ContextProvider<CoreTestAppInstance>> contextProviderMap = new HashMap<>();
+        processingPipelineFactory = new SystemResourcePipelineFactory(new CoreTaskFactory(), "local/pipelines");
 
-    static {
+        contextProviderMap = new HashMap<>();
         contextProviderMap.put("instance", CoreTestAppInstance::getContextMap);
     }
 
-    private static final Map<String, ProcessingPipeline> processingPipelineMap = new HashMap<>();
-
     @Override
-    public Map<String, Application> getAllApplications() {
+    public @Nonnull
+    Map<String, Application> getAllApplications() {
         return Collections.unmodifiableMap(applicationMap);
     }
 
+    @Nullable
     @Override
     public Application getApplication(@Nonnull String id) {
         return applicationMap.get(id);
     }
 
+    @Nullable
     @Override
     public ResourceLoader getResourceLoader(String id) {
         return resourceLoaderMap.get(id);
+    }
+
+    @Nonnull
+    @Override
+    public ProcessingPipelineFactory getProcessingPipelineFactory() {
+        return processingPipelineFactory;
     }
 
     @Override
     public @Nullable
     ContextProvider<CoreTestAppInstance> getContextProvider(@Nonnull String providerName) {
         return contextProviderMap.get(providerName);
-    }
-
-    @Override
-    public ProcessingPipeline createProcessingPipeline(GlobalContext context, String name) {
-
-        return ProcessingPipeline.createPipelineInstance(context).build();
     }
 
     public void registerApplication(@Nonnull String id, @Nonnull Application application) {
