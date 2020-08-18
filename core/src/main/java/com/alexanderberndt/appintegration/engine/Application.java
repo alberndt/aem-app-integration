@@ -1,4 +1,4 @@
-package com.alexanderberndt.appintegration.api;
+package com.alexanderberndt.appintegration.engine;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

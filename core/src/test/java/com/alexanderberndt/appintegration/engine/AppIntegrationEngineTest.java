@@ -1,6 +1,5 @@
 package com.alexanderberndt.appintegration.engine;
 
-import com.alexanderberndt.appintegration.api.Application;
 import com.alexanderberndt.appintegration.core.CoreAppIntegrationFactory;
 import com.alexanderberndt.appintegration.core.CoreTestAppInstance;
 import com.alexanderberndt.appintegration.core.CoreTestAppIntegrationEngine;

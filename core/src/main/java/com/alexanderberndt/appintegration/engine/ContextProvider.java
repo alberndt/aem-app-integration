@@ -1,6 +1,4 @@
-package com.alexanderberndt.appintegration.api;
-
-import com.alexanderberndt.appintegration.engine.ApplicationInstance;
+package com.alexanderberndt.appintegration.engine;
 
 import javax.annotation.Nullable;
 import java.util.Map;

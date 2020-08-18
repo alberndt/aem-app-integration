@@ -1,6 +1,5 @@
 package com.alexanderberndt.appintegration.engine;
 
-import com.alexanderberndt.appintegration.api.Application;
 import com.alexanderberndt.appintegration.engine.resources.loader.ResourceLoader;
 
 import javax.annotation.Nonnull;

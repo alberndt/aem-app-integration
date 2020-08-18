@@ -1,6 +1,5 @@
 package com.alexanderberndt.appintegration.engine;
 
-import com.alexanderberndt.appintegration.api.Application;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 

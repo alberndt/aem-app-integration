@@ -1,7 +1,7 @@
 package com.alexanderberndt.appintegration.standalone.old.context;
 
-import com.alexanderberndt.appintegration.api.ContextProvider;
 import com.alexanderberndt.appintegration.engine.ApplicationInstance;
+import com.alexanderberndt.appintegration.engine.ContextProvider;
 
 import java.util.HashMap;
 import java.util.Map;
