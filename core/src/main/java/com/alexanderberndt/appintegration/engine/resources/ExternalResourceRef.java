@@ -1,6 +1,8 @@
 package com.alexanderberndt.appintegration.engine.resources;
 
 import com.alexanderberndt.appintegration.pipeline.configuration.PipelineConfiguration;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.annotation.Nonnull;
 
@@ -23,6 +25,7 @@ public class ExternalResourceRef {
         this.expectedType = expectedType;
     }
 
+    @Nonnull
     public String getUrl() {
         return url;
     }
@@ -39,17 +42,22 @@ public class ExternalResourceRef {
         return properties;
     }
 
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ExternalResourceRef that = (ExternalResourceRef) o;
-        return (url != null) && url.equals(that.url);
+        return new EqualsBuilder()
+                .append(url, that.url)
+                .isEquals();
     }
 
     @Override
     public int hashCode() {
-        return url != null ? url.hashCode() : 0;
+        return new HashCodeBuilder(17, 37)
+                .append(url)
+                .toHashCode();
     }
 
     @Override
