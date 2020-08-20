@@ -1,5 +1,7 @@
 package com.alexanderberndt.appintegration.engine;
 
+import com.alexanderberndt.appintegration.engine.logging.ResourceLog;
+import com.alexanderberndt.appintegration.engine.logging.TaskLog;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
@@ -14,13 +16,20 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
+import java.lang.invoke.MethodHandles;
 import java.lang.ref.SoftReference;
 import java.util.*;
 
 public abstract class AppIntegrationEngine<I extends ApplicationInstance> {
+
+    private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -53,8 +62,9 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance> {
 
     /* Prefetch methods */
 
-    public void prefetch(List<I> instanceList) throws IOException {
+    public void prefetch(@Nonnull final List<I> instanceList) throws IOException {
 
+        LOG.info("prefetch {} instances in total", instanceList.size());
 
 //        // verify instance and get referenced objects from the factory
 //        List<VerifiedInstance<I>> verifiedInstanceList = new ArrayList<>();
@@ -77,11 +87,12 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance> {
         }
 
         for (String applicationId : instanceMap.keySet()) {
-
+            LOG.info("prefetch {} instances for application {}", instanceMap.get(applicationId).size(), applicationId);
 
             final Application application = this.getFactory().getApplication(applicationId);
             if (application == null) {
-                //context.addError(String.format("Application %s is undefined", applicationId));
+                LOG.error("Application {} is undefined", applicationId);
+                // ToDo: Log in integration log
                 continue;
             }
 
@@ -98,8 +109,10 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance> {
             // add global properties
             final Map<String, Object> globalProperties = application.getGlobalProperties();
             if (globalProperties != null) {
+                ResourceLog resourceLog = context.getIntegrationLog().createResourceEntry(new ExternalResourceRef("global", ExternalResourceType.ANY));
+                final TaskLog taskLog = resourceLog.createTaskEntry("set-globals", "Set Global Properties Task");
                 final TaskContext taskContext = context.createTaskContext(
-                        Ranking.GLOBAL, "global", ExternalResourceType.ANY, Collections.emptyMap());
+                        taskLog, Ranking.GLOBAL, "global", ExternalResourceType.ANY, Collections.emptyMap());
                 for (final Map.Entry<String, Object> propEntry : globalProperties.entrySet()) {
                     taskContext.setValue(propEntry.getKey(), propEntry.getValue());
                 }
@@ -124,7 +137,7 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance> {
             // ToDo: Replace with ExternalResourceSet
             final Set<ExternalResourceRef> referencedResourcesSet = new LinkedHashSet<>();
             for (ExternalResourceRef snippetRef : resolvedSnippetsSet) {
-                final ExternalResource snippet = pipeline.loadAndProcessResourceRef(context, snippetRef);
+                final ExternalResource snippet = pipeline.loadAndProcessResourceRef(snippetRef);
                 System.out.println(snippet.getContentAsString());
                 referencedResourcesSet.addAll(snippet.getReferencedResources());
             }
@@ -132,7 +145,7 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance> {
 
             // load all referenced resources (which may could load more)
             for (ExternalResourceRef resourceRef : referencedResourcesSet) {
-                final ExternalResource resource = pipeline.loadAndProcessResourceRef(context, resourceRef);
+                final ExternalResource resource = pipeline.loadAndProcessResourceRef(resourceRef);
                 System.out.println(resource.getContentAsString());
                 referencedResourcesSet.addAll(resource.getReferencedResources());
             }
@@ -141,6 +154,11 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance> {
             // ToDo: Implement Cache Provider
 
             // ToDo: Error handling or logging
+
+            try (final Writer writer = new FileWriter(String.format("../logviewer/public/%s-log.json", applicationId))) {
+                context.getIntegrationLog().writeJson(writer);
+            }
+
         }
     }
 

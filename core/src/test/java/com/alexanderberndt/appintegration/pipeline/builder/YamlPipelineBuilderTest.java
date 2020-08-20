@@ -2,10 +2,12 @@ package com.alexanderberndt.appintegration.pipeline.builder;
 
 import com.alexanderberndt.appintegration.core.CoreTestGlobalContext;
 import com.alexanderberndt.appintegration.engine.loader.SystemResourceLoader;
+import com.alexanderberndt.appintegration.engine.logging.ResourceLog;
 import com.alexanderberndt.appintegration.pipeline.ProcessingPipeline;
 import com.alexanderberndt.appintegration.pipeline.builder.definition.PipelineDefinition;
 import com.alexanderberndt.appintegration.tasks.CoreTaskFactory;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,7 +26,8 @@ class YamlPipelineBuilderTest {
 
         CoreTestGlobalContext context = new CoreTestGlobalContext(new SystemResourceLoader());
         CoreTaskFactory taskFactory = new CoreTaskFactory();
-        ProcessingPipeline pipeline = YamlPipelineBuilder.build(context, taskFactory, pipelineDef);
+        ResourceLog pipelineLogMock = Mockito.mock(ResourceLog.class);
+        ProcessingPipeline pipeline = YamlPipelineBuilder.build(context, taskFactory, pipelineLogMock, pipelineDef);
         assertNotNull(pipeline);
 
     }

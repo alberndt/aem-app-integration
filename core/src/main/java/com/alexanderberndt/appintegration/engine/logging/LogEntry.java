@@ -22,6 +22,7 @@ import static com.alexanderberndt.appintegration.engine.logging.LogStatus.WARNIN
         @Type(value = LogEntry.class, name = "message"),
         @Type(value = IntegrationLog.class, name = "integration"),
         @Type(value = ResourceLog.class, name = "resource"),
+        @Type(value = TaskLog.class, name = "task"),
         @Type(value = MessageEntry.class, name = "message2")
 })
 class LogEntry {

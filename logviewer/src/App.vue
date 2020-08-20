@@ -1,13 +1,15 @@
 <template>
   <div id="app">
+
+    <h1>Log</h1>
+    <LogEntryBlock :entry="log"/>
+    <p>done</p>
     <p>log: {{ log }}</p>
-    <img alt="Vue logo" src="./assets/logo.png"/>
-    <HelloWorld msg="Welcome to Your Vue.js App by"/>
   </div>
 </template>
 
 <script>
-import HelloWorld from "./components/HelloWorld.vue";
+import LogEntryBlock from "./components/LogEntryBlock.vue";
 
 async function load(url) {
   console.log("load " + url);
@@ -22,6 +24,9 @@ async function load(url) {
 
 export default {
   name: "App",
+  components: {
+    LogEntryBlock
+  },
   props: {
     message: String,
   },
@@ -43,10 +48,7 @@ export default {
       console.log("url changed to " + val);
       load(this.url).then((log) => (this.log = log));
     },
-  },
-  components: {
-    HelloWorld,
-  },
+  }
 };
 </script>
 
@@ -55,7 +57,6 @@ export default {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #2c3e50;
   margin-top: 60px;
 }

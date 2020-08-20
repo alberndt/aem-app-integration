@@ -2,6 +2,7 @@ package com.alexanderberndt.appintegration.pipeline;
 
 import com.alexanderberndt.appintegration.core.CoreTestGlobalContext;
 import com.alexanderberndt.appintegration.engine.loader.SystemResourceLoader;
+import com.alexanderberndt.appintegration.engine.logging.ResourceLog;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
@@ -9,6 +10,7 @@ import com.alexanderberndt.appintegration.tasks.load.DownloadTask;
 import com.alexanderberndt.appintegration.tasks.prepare.PropertiesTask;
 import com.alexanderberndt.appintegration.tasks.process.AddReferencedResourceTask;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -19,7 +21,9 @@ class ProcessingPipelineTest {
     void simpleProcessingPipeline() {
 
         CoreTestGlobalContext context = new CoreTestGlobalContext(new SystemResourceLoader());
-        ProcessingPipeline pipeline = ProcessingPipeline.createPipelineInstance(context)
+        ResourceLog resourceLogMock = Mockito.mock(ResourceLog.class);
+
+        ProcessingPipeline pipeline = ProcessingPipeline.createPipelineInstance(context, resourceLogMock)
                 .addTask(new PropertiesTask())
                 .withTaskParam("random-input.length", 2000)
                 .withTaskParam("something.else", true)
@@ -33,7 +37,7 @@ class ProcessingPipelineTest {
                 .build();
 
         ExternalResourceRef resourceRef = new ExternalResourceRef("simple-app1/server/application-info.json", ExternalResourceType.APPLICATION_PROPERTIES);
-        ExternalResource resource = pipeline.loadAndProcessResourceRef(context, resourceRef);
+        ExternalResource resource = pipeline.loadAndProcessResourceRef(resourceRef);
 
         assertNotNull(resource);
         assertNotNull(resource.getReferencedResources());

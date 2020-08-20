@@ -1,6 +1,7 @@
 package com.alexanderberndt.appintegration.engine.logging;
 
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
+import com.alexanderberndt.appintegration.pipeline.task.GenericTask;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang3.StringUtils;
@@ -13,6 +14,9 @@ public class ResourceLog extends LogEntry {
 
     @JsonProperty
     private String url;
+
+    @JsonProperty
+    private String loadStatus;
 
     @JsonProperty
     private String name;
@@ -41,6 +45,13 @@ public class ResourceLog extends LogEntry {
         }
     }
 
+    public TaskLog createTaskEntry(String taskName, String humanReadableTaskName) {
+        return addEntry(new TaskLog(taskName, humanReadableTaskName));
+    }
+
+    public TaskLog createTaskEntry(GenericTask task, String taskNamespace) {
+        return addEntry(new TaskLog(task, taskNamespace));
+    }
 
     public String getUrl() {
         return url;
@@ -48,6 +59,14 @@ public class ResourceLog extends LogEntry {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getLoadStatus() {
+        return loadStatus;
+    }
+
+    public void setLoadStatus(String loadStatus) {
+        this.loadStatus = loadStatus;
     }
 
     public String getName() {
@@ -89,4 +108,5 @@ public class ResourceLog extends LogEntry {
     public void setInitiator(String initiator) {
         this.initiator = initiator;
     }
+
 }

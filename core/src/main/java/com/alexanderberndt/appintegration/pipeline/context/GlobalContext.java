@@ -1,6 +1,8 @@
 package com.alexanderberndt.appintegration.pipeline.context;
 
 import com.alexanderberndt.appintegration.engine.ResourceLoader;
+import com.alexanderberndt.appintegration.engine.logging.IntegrationLog;
+import com.alexanderberndt.appintegration.engine.logging.TaskLog;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
 import com.alexanderberndt.appintegration.pipeline.configuration.PipelineConfiguration;
 import com.alexanderberndt.appintegration.pipeline.configuration.Ranking;
@@ -22,12 +24,17 @@ public abstract class GlobalContext {
     @Nonnull
     private final PipelineConfiguration processingParams = new PipelineConfiguration();
 
+    @Nonnull
+    private final IntegrationLog integrationLog = new IntegrationLog();
+
+
     protected GlobalContext(@Nonnull ResourceLoader resourceLoader) {
         this.resourceLoader = resourceLoader;
     }
 
     @Nonnull
     public abstract TaskContext createTaskContext(
+            @Nonnull TaskLog taskLog,
             @Nonnull Ranking rank,
             @Nonnull String taskNamespace,
             @Nonnull ExternalResourceType resourceType,
@@ -43,10 +50,17 @@ public abstract class GlobalContext {
         return processingParams;
     }
 
+    @Nonnull
+    public IntegrationLog getIntegrationLog() {
+        return integrationLog;
+    }
+
+    @Deprecated
     public void addWarning(String message) {
         LOG.warn("{}", message);
     }
 
+    @Deprecated
     public void addError(String message) {
         LOG.error("{}", message);
     }

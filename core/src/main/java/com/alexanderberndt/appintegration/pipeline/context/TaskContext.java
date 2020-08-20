@@ -1,6 +1,7 @@
 package com.alexanderberndt.appintegration.pipeline.context;
 
 import com.alexanderberndt.appintegration.engine.ResourceLoader;
+import com.alexanderberndt.appintegration.engine.logging.TaskLog;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
 import com.alexanderberndt.appintegration.pipeline.configuration.ConfigurationException;
 import com.alexanderberndt.appintegration.pipeline.configuration.Ranking;
@@ -43,14 +44,19 @@ public class TaskContext {
     @Nonnull
     private final Map<String, Object> executionDataMap;
 
+    @Nonnull
+    private final TaskLog taskLog;
+
 
     protected TaskContext(
             @Nonnull GlobalContext globalContext,
+            @Nonnull TaskLog taskLog,
             @Nonnull Ranking rank,
             @Nonnull String taskNamespace,
             @Nonnull ExternalResourceType resourceType,
             @Nonnull Map<String, Object> executionDataMap) {
         this.globalContext = globalContext;
+        this.taskLog = taskLog;
         this.rank = rank;
         this.taskNamespace = taskNamespace;
         this.resourceType = resourceType;

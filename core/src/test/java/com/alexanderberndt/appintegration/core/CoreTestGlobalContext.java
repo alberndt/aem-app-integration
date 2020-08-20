@@ -1,6 +1,7 @@
 package com.alexanderberndt.appintegration.core;
 
 import com.alexanderberndt.appintegration.engine.ResourceLoader;
+import com.alexanderberndt.appintegration.engine.logging.TaskLog;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
 import com.alexanderberndt.appintegration.pipeline.configuration.Ranking;
 import com.alexanderberndt.appintegration.pipeline.context.GlobalContext;
@@ -17,8 +18,8 @@ public class CoreTestGlobalContext extends GlobalContext {
 
     @Nonnull
     @Override
-    public TaskContext createTaskContext(@Nonnull Ranking rank, @Nonnull String taskNamespace, @Nonnull ExternalResourceType resourceType, @Nonnull Map<String, Object> processingData) {
-        return new CoreTestTaskContext(this, rank, taskNamespace, resourceType, processingData);
+    public TaskContext createTaskContext(@Nonnull TaskLog taskLog, @Nonnull Ranking rank, @Nonnull String taskNamespace, @Nonnull ExternalResourceType resourceType, @Nonnull Map<String, Object> processingData) {
+        return new CoreTestTaskContext(this, taskLog, rank, taskNamespace, resourceType, processingData);
     }
 
 }

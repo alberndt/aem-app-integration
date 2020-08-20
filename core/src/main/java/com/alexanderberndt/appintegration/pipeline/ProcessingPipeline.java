@@ -1,5 +1,7 @@
 package com.alexanderberndt.appintegration.pipeline;
 
+import com.alexanderberndt.appintegration.engine.logging.ResourceLog;
+import com.alexanderberndt.appintegration.engine.logging.TaskLog;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
 import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
@@ -10,6 +12,7 @@ import com.alexanderberndt.appintegration.pipeline.context.TaskContext;
 import com.alexanderberndt.appintegration.pipeline.task.LoadingTask;
 import com.alexanderberndt.appintegration.pipeline.task.PreparationTask;
 import com.alexanderberndt.appintegration.pipeline.task.ProcessingTask;
+import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +21,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static com.alexanderberndt.appintegration.pipeline.configuration.Ranking.PIPELINE_EXECUTION;
 
@@ -47,43 +51,57 @@ public class ProcessingPipeline {
     }
 
 
-    public static BasicPipelineBuilder createPipelineInstance(@Nonnull GlobalContext context) {
-        return new BasicPipelineBuilder(context);
+    @Deprecated
+    public static BasicPipelineBuilder createPipelineInstance(@Nonnull GlobalContext context, @Nonnull ResourceLog pipelineLog) {
+        return new BasicPipelineBuilder(context, pipelineLog);
     }
 
-    public static PipelineBuilder createPipelineInstance(@Nonnull GlobalContext context, @Nonnull TaskFactory taskFactory) {
-        return new PipelineBuilder(context, taskFactory);
+    @Deprecated
+    public static PipelineBuilder createPipelineInstance(@Nonnull GlobalContext context, @Nonnull TaskFactory taskFactory, @Nonnull ResourceLog pipelineLog) {
+        return new PipelineBuilder(context, taskFactory, pipelineLog);
     }
 
 
-    public ExternalResource loadAndProcessResourceRef(GlobalContext context, ExternalResourceRef resourceRef) {
+    public ExternalResource loadAndProcessResourceRef(ExternalResourceRef resourceRef) {
 
-        if (loadingTask == null) {
-            throw new AppIntegrationException("A LoadingTask must be added to the Pipeline before!");
-        }
+        validatePipeline();
 
+        final ResourceLog log = context.getIntegrationLog().createResourceEntry(resourceRef);
         final Map<String, Object> processingData = new HashMap<>();
+
+        final StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
 
         // preparation tasks
         for (TaskInstance<PreparationTask> taskInstance : preparationTasks) {
             LOG.debug("{}::prepare", taskInstance.getTaskNamespace());
-            TaskContext taskContext = context.createTaskContext(PIPELINE_EXECUTION, taskInstance.getTaskNamespace(), resourceRef.getExpectedType(), processingData);
+            final TaskLog taskLog = log.createTaskEntry(taskInstance.getTask(), taskInstance.getTaskNamespace());
+            TaskContext taskContext = context.createTaskContext(taskLog, PIPELINE_EXECUTION, taskInstance.getTaskNamespace(), resourceRef.getExpectedType(), processingData);
             taskInstance.getTask().prepare(taskContext, resourceRef);
         }
 
         // loading task
         LOG.debug("{}::load", loadingTask.getTaskNamespace());
-        TaskContext loadContext = context.createTaskContext(PIPELINE_EXECUTION, loadingTask.getTaskNamespace(), resourceRef.getExpectedType(), processingData);
+        final TaskLog loadTaskLog = log.createTaskEntry(loadingTask.getTask(), loadingTask.getTaskNamespace());
+        TaskContext loadContext = context.createTaskContext(loadTaskLog, PIPELINE_EXECUTION, loadingTask.getTaskNamespace(), resourceRef.getExpectedType(), processingData);
         ExternalResource resource = loadingTask.getTask().load(loadContext, resourceRef);
 
         // processing tasks
         for (TaskInstance<ProcessingTask> taskInstance : processingTasks) {
             LOG.debug("{}::prepare", taskInstance.getTaskNamespace());
-            TaskContext taskContext = context.createTaskContext(PIPELINE_EXECUTION, taskInstance.getTaskNamespace(), resource.getType(), processingData);
+            final TaskLog taskLog = log.createTaskEntry(taskInstance.getTask(), taskInstance.getTaskNamespace());
+            TaskContext taskContext = context.createTaskContext(taskLog, PIPELINE_EXECUTION, taskInstance.getTaskNamespace(), resource.getType(), processingData);
             taskInstance.getTask().process(taskContext, resource);
         }
 
+        log.setTime(String.format("%,d ms", stopWatch.getTime(TimeUnit.MILLISECONDS)));
         return resource;
+    }
+
+    public void validatePipeline() {
+        if (loadingTask == null) {
+            throw new AppIntegrationException("A LoadingTask must be added to the Pipeline before!");
+        }
     }
 
 

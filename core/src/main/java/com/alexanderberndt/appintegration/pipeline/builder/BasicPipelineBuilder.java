@@ -1,5 +1,7 @@
 package com.alexanderberndt.appintegration.pipeline.builder;
 
+import com.alexanderberndt.appintegration.engine.logging.ResourceLog;
+import com.alexanderberndt.appintegration.engine.logging.TaskLog;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
 import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
 import com.alexanderberndt.appintegration.pipeline.ProcessingPipeline;
@@ -29,12 +31,18 @@ public class BasicPipelineBuilder {
 
     private final List<TaskInstance<ProcessingTask>> processingTasks = new ArrayList<>();
 
+    @Nonnull
+    private final ResourceLog pipelineLog;
+
     private String currentNamespace = null;
 
     private TaskContext currentTaskContext;
 
-    public BasicPipelineBuilder(@Nonnull GlobalContext context) {
+    private TaskLog currentTaskLog;
+
+    public BasicPipelineBuilder(@Nonnull GlobalContext context, @Nonnull ResourceLog pipelineLog) {
         this.context = context;
+        this.pipelineLog = pipelineLog;
     }
 
     public BasicPipelineBuilder addTask(@Nonnull GenericTask task) {
@@ -48,7 +56,8 @@ public class BasicPipelineBuilder {
         this.currentTaskContext = null;
 
         // define defaults
-        TaskContext taskContext = context.createTaskContext(TASK_DEFAULT, uniqueTaskNamespace, ExternalResourceType.ANY, Collections.emptyMap());
+        currentTaskLog = pipelineLog.createTaskEntry(task, uniqueTaskNamespace);
+        TaskContext taskContext = context.createTaskContext(currentTaskLog, TASK_DEFAULT, uniqueTaskNamespace, ExternalResourceType.ANY, Collections.emptyMap());
         task.declareTaskPropertiesAndDefaults(taskContext);
 
         int type = ((task instanceof PreparationTask) ? 1 : 0)
@@ -109,7 +118,7 @@ public class BasicPipelineBuilder {
 
     public BasicPipelineBuilder withTaskParam(String param, Object value) {
         if (currentTaskContext == null) {
-            currentTaskContext = context.createTaskContext(PIPELINE_DEFINITION, currentNamespace, ExternalResourceType.ANY, Collections.emptyMap());
+            currentTaskContext = context.createTaskContext(currentTaskLog, PIPELINE_DEFINITION, currentNamespace, ExternalResourceType.ANY, Collections.emptyMap());
         }
         currentTaskContext.setValue(param, value);
         return this;

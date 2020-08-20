@@ -1,0 +1,106 @@
+{
+  "type": "integration",
+  "status": "INFO",
+  "entries": [
+    {
+      "type": "resource",
+      "status": "INFO",
+      "url": "file:/C:/projekte/aem/aem-app-integration/core/target/test-classes/local/pipelines/simple-pipeline1.yaml",
+      "loadStatus": "Found",
+      "name": "simple-pipeline1.yaml",
+      "path": "/C:/projekte/aem/aem-app-integration/core/target/test-classes/local/pipelines",
+      "entries": [
+        {
+          "type": "task",
+          "status": "INFO",
+          "msg": null,
+          "taskName": "download",
+          "humanReadableTaskName": "Download",
+          "entries": null
+        },
+        {
+          "type": "task",
+          "status": "INFO",
+          "msg": null,
+          "taskName": "file-size-validation",
+          "humanReadableTaskName": "File Size Validation",
+          "entries": null
+        },
+        {
+          "type": "task",
+          "status": "INFO",
+          "msg": null,
+          "taskName": "stacktrace-search (regex-validation)",
+          "humanReadableTaskName": "Regex Validation",
+          "entries": null
+        }
+      ]
+    },
+    {
+      "type": "resource",
+      "status": "INFO",
+      "url": "simple-app1/server/subscribe.product-news.de.html",
+      "name": "simple-app1/server/subscribe.product-news.de.html",
+      "time": "6 ms",
+      "entries": [
+        {
+          "type": "task",
+          "status": "INFO",
+          "msg": null,
+          "taskName": "download",
+          "humanReadableTaskName": "Download",
+          "entries": null
+        },
+        {
+          "type": "task",
+          "status": "INFO",
+          "msg": null,
+          "taskName": "file-size-validation",
+          "humanReadableTaskName": "File Size Validation",
+          "entries": null
+        },
+        {
+          "type": "task",
+          "status": "INFO",
+          "msg": null,
+          "taskName": "stacktrace-search (regex-validation)",
+          "humanReadableTaskName": "Regex Validation",
+          "entries": null
+        }
+      ]
+    },
+    {
+      "type": "resource",
+      "status": "INFO",
+      "url": "simple-app1/server/subscribe.product-news.en.html",
+      "name": "simple-app1/server/subscribe.product-news.en.html",
+      "time": "1 ms",
+      "entries": [
+        {
+          "type": "task",
+          "status": "INFO",
+          "msg": null,
+          "taskName": "download",
+          "humanReadableTaskName": "Download",
+          "entries": null
+        },
+        {
+          "type": "task",
+          "status": "INFO",
+          "msg": null,
+          "taskName": "file-size-validation",
+          "humanReadableTaskName": "File Size Validation",
+          "entries": null
+        },
+        {
+          "type": "task",
+          "status": "INFO",
+          "msg": null,
+          "taskName": "stacktrace-search (regex-validation)",
+          "humanReadableTaskName": "Regex Validation",
+          "entries": null
+        }
+      ]
+    }
+  ]
+}

@@ -7,7 +7,7 @@ window.myapp = new Vue({
   render: h => h(App),
   data: function () {
     return {
-      "url": "integration-log.json"
+      "url": "test-app-log.json"
     }
   }
 }).$mount('#app')

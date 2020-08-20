@@ -2,6 +2,7 @@ package com.alexanderberndt.appintegration.pipeline.context;
 
 import com.alexanderberndt.appintegration.core.CoreTestGlobalContext;
 import com.alexanderberndt.appintegration.engine.ResourceLoader;
+import com.alexanderberndt.appintegration.engine.logging.TaskLog;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
 import com.alexanderberndt.appintegration.pipeline.configuration.Ranking;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,12 +31,15 @@ class TaskContextTest {
 
     private TaskContext taskContext;
 
+    private TaskLog taskLogMock;
+
 
     @BeforeEach
     void beforeEach() {
         assertNotNull(resourceLoaderMock);
         globalContext = Mockito.spy(new CoreTestGlobalContext(resourceLoaderMock));
-        this.taskContext = Mockito.spy(new TaskContext(globalContext, Ranking.TASK_DEFAULT, MY_NAMESPACE, ExternalResourceType.ANY, Collections.emptyMap()));
+        this.taskLogMock = Mockito.mock(TaskLog.class);
+        this.taskContext = Mockito.spy(new TaskContext(globalContext, taskLogMock, Ranking.TASK_DEFAULT, MY_NAMESPACE, ExternalResourceType.ANY, Collections.emptyMap()));
     }
 
     @Test
@@ -239,7 +243,7 @@ class TaskContextTest {
     @Test
     void getAndSetValueDuringExecution() {
         final Map<String, Object> executionDataMap = new HashMap<>();
-        final TaskContext executionTaskContext = Mockito.spy(new TaskContext(globalContext, Ranking.PIPELINE_EXECUTION, MY_NAMESPACE, ExternalResourceType.HTML, executionDataMap));
+        final TaskContext executionTaskContext = Mockito.spy(new TaskContext(globalContext, taskLogMock, Ranking.PIPELINE_EXECUTION, MY_NAMESPACE, ExternalResourceType.HTML, executionDataMap));
 
         taskContext.setValue("test", "Hello World!");
         assertTrue(executionDataMap.isEmpty());
@@ -259,7 +263,7 @@ class TaskContextTest {
     @Test
     void getAndSetValueDuringExecutionWithTypeConflicts() {
         final Map<String, Object> executionDataMap = new HashMap<>();
-        final TaskContext executionTaskContext = Mockito.spy(new TaskContext(globalContext, Ranking.PIPELINE_EXECUTION, MY_NAMESPACE, ExternalResourceType.HTML, executionDataMap));
+        final TaskContext executionTaskContext = Mockito.spy(new TaskContext(globalContext, taskLogMock, Ranking.PIPELINE_EXECUTION, MY_NAMESPACE, ExternalResourceType.HTML, executionDataMap));
 
         executionTaskContext.setValue("test", 10);
         taskContext.setValue("test", "Hello World!");
@@ -272,7 +276,7 @@ class TaskContextTest {
     @Test
     void setValueDuringExecutionWithTypeConflicts() {
         final Map<String, Object> executionDataMap = new HashMap<>();
-        final TaskContext executionTaskContext = Mockito.spy(new TaskContext(globalContext, Ranking.PIPELINE_EXECUTION, MY_NAMESPACE, ExternalResourceType.HTML, executionDataMap));
+        final TaskContext executionTaskContext = Mockito.spy(new TaskContext(globalContext, taskLogMock, Ranking.PIPELINE_EXECUTION, MY_NAMESPACE, ExternalResourceType.HTML, executionDataMap));
 
         taskContext.setValue("test", "Hello World!");
         executionTaskContext.setValue("test", 10);

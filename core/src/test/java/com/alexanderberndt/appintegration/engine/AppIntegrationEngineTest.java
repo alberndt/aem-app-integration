@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,7 +29,8 @@ class AppIntegrationEngineTest {
 
     private CoreTestAppIntegrationEngine engine;
 
-    private CoreTestAppInstance instance;
+    private CoreTestAppInstance instance1;
+    private CoreTestAppInstance instance2;
 
     private VerifiedInstance<CoreTestAppInstance> verifiedInstance;
 
@@ -43,8 +44,10 @@ class AppIntegrationEngineTest {
         instanceContextMap.put("hello", "world");
         instanceContextMap.put("language", "de");
         instanceContextMap.put("newsletterId", "product-news");
-        instance = new CoreTestAppInstance("test-app", "subscribe", instanceContextMap);
-        verifiedInstance = VerifiedInstance.verify(instance, factory);
+        instance1 = new CoreTestAppInstance("test-app", "subscribe", instanceContextMap);
+        instanceContextMap.put("language", "en");
+        instance2 = new CoreTestAppInstance("test-app", "subscribe", instanceContextMap);
+        verifiedInstance = VerifiedInstance.verify(instance1, factory);
         assertNotNull(verifiedInstance);
     }
 
@@ -58,7 +61,7 @@ class AppIntegrationEngineTest {
 
     @Test
     void prefetch() throws IOException {
-        engine.prefetch(Collections.singletonList(instance));
+        engine.prefetch(Arrays.asList(instance1, instance2));
     }
 
     @Test

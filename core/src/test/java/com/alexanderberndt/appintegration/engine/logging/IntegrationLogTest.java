@@ -33,6 +33,8 @@ class IntegrationLogTest {
         stringWriter.close();
         System.out.println(stringWriter);
         assertNotNull(mainLogger);
+
+
     }
 
 
