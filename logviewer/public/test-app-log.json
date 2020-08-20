@@ -16,7 +16,13 @@
           "msg": null,
           "taskName": "download",
           "humanReadableTaskName": "Download",
-          "entries": null
+          "entries": [
+            {
+              "type": "message2",
+              "status": "INFO",
+              "msg": "Effective configuration..."
+            }
+          ]
         },
         {
           "type": "task",
@@ -24,7 +30,18 @@
           "msg": null,
           "taskName": "file-size-validation",
           "humanReadableTaskName": "File Size Validation",
-          "entries": null
+          "entries": [
+            {
+              "type": "message2",
+              "status": "INFO",
+              "msg": "Effective configuration..."
+            },
+            {
+              "type": "message2",
+              "status": "INFO",
+              "msg": "Effective configuration..."
+            }
+          ]
         },
         {
           "type": "task",
@@ -32,7 +49,18 @@
           "msg": null,
           "taskName": "stacktrace-search (regex-validation)",
           "humanReadableTaskName": "Regex Validation",
-          "entries": null
+          "entries": [
+            {
+              "type": "message2",
+              "status": "INFO",
+              "msg": "Effective configuration..."
+            },
+            {
+              "type": "message2",
+              "status": "INFO",
+              "msg": "Effective configuration..."
+            }
+          ]
         }
       ]
     },
@@ -41,7 +69,7 @@
       "status": "INFO",
       "url": "simple-app1/server/subscribe.product-news.de.html",
       "name": "simple-app1/server/subscribe.product-news.de.html",
-      "time": "6 ms",
+      "time": "8 ms",
       "entries": [
         {
           "type": "task",
@@ -49,7 +77,20 @@
           "msg": null,
           "taskName": "download",
           "humanReadableTaskName": "Download",
-          "entries": null
+          "entries": [
+            {
+              "type": "message2",
+              "status": "INFO",
+              "msg": "Effective configuration...",
+              "entries": [
+                {
+                  "type": "message2",
+                  "status": "INFO",
+                  "msg": "download:loader = null"
+                }
+              ]
+            }
+          ]
         },
         {
           "type": "task",
@@ -57,7 +98,13 @@
           "msg": null,
           "taskName": "file-size-validation",
           "humanReadableTaskName": "File Size Validation",
-          "entries": null
+          "entries": [
+            {
+              "type": "message2",
+              "status": "INFO",
+              "msg": "Effective configuration..."
+            }
+          ]
         },
         {
           "type": "task",
@@ -65,7 +112,20 @@
           "msg": null,
           "taskName": "stacktrace-search (regex-validation)",
           "humanReadableTaskName": "Regex Validation",
-          "entries": null
+          "entries": [
+            {
+              "type": "message2",
+              "status": "INFO",
+              "msg": "Effective configuration...",
+              "entries": [
+                {
+                  "type": "message2",
+                  "status": "INFO",
+                  "msg": "stacktrace-search:regex = Exception: "
+                }
+              ]
+            }
+          ]
         }
       ]
     },
@@ -82,7 +142,20 @@
           "msg": null,
           "taskName": "download",
           "humanReadableTaskName": "Download",
-          "entries": null
+          "entries": [
+            {
+              "type": "message2",
+              "status": "INFO",
+              "msg": "Effective configuration...",
+              "entries": [
+                {
+                  "type": "message2",
+                  "status": "INFO",
+                  "msg": "download:loader = null"
+                }
+              ]
+            }
+          ]
         },
         {
           "type": "task",
@@ -90,7 +163,13 @@
           "msg": null,
           "taskName": "file-size-validation",
           "humanReadableTaskName": "File Size Validation",
-          "entries": null
+          "entries": [
+            {
+              "type": "message2",
+              "status": "INFO",
+              "msg": "Effective configuration..."
+            }
+          ]
         },
         {
           "type": "task",
@@ -98,7 +177,20 @@
           "msg": null,
           "taskName": "stacktrace-search (regex-validation)",
           "humanReadableTaskName": "Regex Validation",
-          "entries": null
+          "entries": [
+            {
+              "type": "message2",
+              "status": "INFO",
+              "msg": "Effective configuration...",
+              "entries": [
+                {
+                  "type": "message2",
+                  "status": "INFO",
+                  "msg": "stacktrace-search:regex = Exception: "
+                }
+              ]
+            }
+          ]
         }
       ]
     }

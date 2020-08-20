@@ -1,8 +1,11 @@
 <template>
   <div class="log-entry-block">
-    <LogEntry :entry="entry"/>
-    <div class="log-entry-block__sub-entries" v-for="(subEntry, index) in entry.entries" :key="index">
-      <LogEntryBlock :entry="subEntry"/>
+    <div class="log-entry-block__line">
+      <LogEntry :entry="entry" v-on:toggle="toggle"/>
+    </div>
+    <div v-if="!collapsed" class="log-entry-block__sub-entries">
+      <LogEntryBlock v-for="(subEntry, index) in entry.entries"
+                     :key="index" :entry="subEntry"/>
     </div>
   </div>
 </template>
@@ -13,23 +16,42 @@ import LogEntry from "./LogEntry.vue";
 export default {
   name: "LogEntryBlock",
   components: {
-    LogEntry
+    LogEntry,
   },
   props: {
     entry: Object,
+  },
+  data: function () {
+    return {
+      collapsed: false
+    };
+  },
+  // created() {
+  //   this.$on("toggle", (m) => {
+  //     console.log("receiv toggle " + m);
+  //   });
+  // },
+  methods: {
+    toggle: function () {
+      console.log("toggle was received");
+      this.collapsed = !this.collapsed;
+    },
   },
 };
 </script>
 
 
-<style scoped>
-
-
-details {
-  margin: 1rem;
+<style>
+.log-entry-block {
+  border-top: 1px solid #666;
+  border-left: 1px solid #666;
 }
 
-summary {
-  font-weight: bold;
+.log-entry-block__line {
+  padding: 5px 10px 4px 10px;
+}
+
+.log-entry-block__sub-entries {
+  padding-left: 30px;
 }
 </style>

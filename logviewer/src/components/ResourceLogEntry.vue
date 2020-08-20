@@ -1,5 +1,6 @@
 <template>
   <div class="log-entry log-entry--resource">
+    <ToggleButton v-if="entry.entries"/>
     <div :title="entry.url">
       <span class="log-entry__name">{{ entry.name }}</span>
       <br/>
@@ -11,15 +12,25 @@
 </template>
 
 <script>
+import ToggleButton from "./ToggleButton.vue";
+
 export default {
   name: "LogEntry",
+  components: {
+    ToggleButton
+  },
   props: {
     entry: Object,
   },
+  methods: {
+    toggle: function () {
+      this.$emit("toggle");
+    }
+  }
 };
 </script>
 
-<style scoped>
+<style>
 .log-entry--resource {
   display: flex;
 }

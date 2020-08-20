@@ -2,14 +2,15 @@
   <div id="app">
 
     <h1>Log</h1>
-    <LogEntryBlock :entry="log"/>
+    <IntegrationLog :log="log"/>
     <p>done</p>
-    <p>log: {{ log }}</p>
+    <h3>log:</h3>
+    <pre>{{ log }}</pre>
   </div>
 </template>
 
 <script>
-import LogEntryBlock from "./components/LogEntryBlock.vue";
+import IntegrationLog from "./components/IntegrationLog.vue";
 
 async function load(url) {
   console.log("load " + url);
@@ -25,7 +26,7 @@ async function load(url) {
 export default {
   name: "App",
   components: {
-    LogEntryBlock
+    IntegrationLog
   },
   props: {
     message: String,

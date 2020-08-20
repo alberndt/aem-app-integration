@@ -1,5 +1,5 @@
 <template>
-  <div class="log-entry log-entry--resource">
+  <div class="log-entry log-entry--integration">
     <div :title="entry.url">
       <span class="log-entry__name">{{ entry.name }}</span>
       <br/>
@@ -19,7 +19,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 .log-entry--resource {
   display: flex;
 }

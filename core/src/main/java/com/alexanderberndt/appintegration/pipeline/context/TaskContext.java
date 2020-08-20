@@ -1,6 +1,8 @@
 package com.alexanderberndt.appintegration.pipeline.context;
 
 import com.alexanderberndt.appintegration.engine.ResourceLoader;
+import com.alexanderberndt.appintegration.engine.logging.LogEntry;
+import com.alexanderberndt.appintegration.engine.logging.LogStatus;
 import com.alexanderberndt.appintegration.engine.logging.TaskLog;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
 import com.alexanderberndt.appintegration.pipeline.configuration.ConfigurationException;
@@ -47,6 +49,8 @@ public class TaskContext {
     @Nonnull
     private final TaskLog taskLog;
 
+    private final LogEntry readConfigurationLog;
+
 
     protected TaskContext(
             @Nonnull GlobalContext globalContext,
@@ -57,6 +61,7 @@ public class TaskContext {
             @Nonnull Map<String, Object> executionDataMap) {
         this.globalContext = globalContext;
         this.taskLog = taskLog;
+        this.readConfigurationLog = taskLog.addSubMessage(LogStatus.INFO, "Effective configuration...");
         this.rank = rank;
         this.taskNamespace = taskNamespace;
         this.resourceType = resourceType;
@@ -71,6 +76,7 @@ public class TaskContext {
         globalContext.addError(taskNamespace + ": " + formatMessage(message, args));
     }
 
+    @Deprecated
     protected String formatMessage(String message, Object... args) {
         String formattedMsg;
         try {
@@ -117,6 +123,7 @@ public class TaskContext {
 
         if (!globalContext.getProcessingParams().isValidType(nk.getNamespace(), nk.getKey(), defaultValue)) {
             addWarning("Type of default-value %s (%s) is not valid for key %s!", defaultValue, defaultValue.getClass(), key);
+            readConfigurationLog.addSubMessage(LogStatus.WARNING, "%s = %s (default, wrong type)", nk.getPlainKey(), defaultValue);
             return defaultValue;
         }
 
@@ -125,17 +132,20 @@ public class TaskContext {
     }
 
     protected Object getValueInternal(NamespaceKey nk) {
+        Object returnValue;
         final Object executionValue = executionDataMap.get(nk.getPlainKey());
         if (executionValue != null) {
             try {
-                return globalContext.getProcessingParams().getValue(nk.getNamespace(), nk.getKey(), resourceType, executionValue);
+                returnValue = globalContext.getProcessingParams().getValue(nk.getNamespace(), nk.getKey(), resourceType, executionValue);
             } catch (ConfigurationException e) {
                 addWarning(e.getMessage());
-                return globalContext.getProcessingParams().getValue(nk.getNamespace(), nk.getKey(), resourceType);
+                returnValue = globalContext.getProcessingParams().getValue(nk.getNamespace(), nk.getKey(), resourceType);
             }
         } else {
-            return globalContext.getProcessingParams().getValue(nk.getNamespace(), nk.getKey(), resourceType);
+            returnValue = globalContext.getProcessingParams().getValue(nk.getNamespace(), nk.getKey(), resourceType);
         }
+        readConfigurationLog.addSubMessage(LogStatus.INFO, "%s = %s", nk.getPlainKey(), returnValue);
+        return returnValue;
     }
 
     // ToDo: Check for required namespace during execution

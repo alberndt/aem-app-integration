@@ -25,6 +25,7 @@ import static com.alexanderberndt.appintegration.engine.logging.LogStatus.WARNIN
         @Type(value = TaskLog.class, name = "task"),
         @Type(value = MessageEntry.class, name = "message2")
 })
+public
 class LogEntry {
 
     @JsonProperty
