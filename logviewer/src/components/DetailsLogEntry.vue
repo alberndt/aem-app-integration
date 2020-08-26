@@ -1,10 +1,6 @@
 <template>
-  <div class="log-entry log-entry--task">
+  <div class="log-entry log-entry--details">
     <ToggleButton v-if="entry.entries"/>
-    <div class="log-entry--task__name" :title="entry.properties.humanReadableTaskName">{{
-        entry.properties.taskName
-      }}
-    </div>
     <div>{{ entry.status || "no status" }}</div>
     <div>{{ entry.message || "no message" }}</div>
   </div>
@@ -23,16 +19,13 @@ export default {
 </script>
 
 <style>
-.log-entry--task {
+.log-entry--details {
   display: flex;
 }
 
-.log-entry--task > div {
+.log-entry--details > div {
   margin-right: calc(5px + 1vw);
 }
 
-.log-entry--task__name {
-  min-width: 20%;
-}
 
 </style>

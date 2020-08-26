@@ -1,13 +1,13 @@
 <template>
   <div class="log-entry log-entry--resource">
     <ToggleButton v-if="entry.entries"/>
-    <div :title="entry.url">
-      <span class="log-entry__name">{{ entry.name }}</span>
+    <div :title="entry.properties.url">
+      <span class="log-entry__name">{{ entry.properties.name }}</span>
       <br/>
-      <span class="log-entry__path">{{ entry.path }}</span>
+      <span class="log-entry__path">{{ entry.properties.path }}</span>
     </div>
-    <div>{{ entry.status }}</div>
-    <div>{{ entry.loadStatus }}</div>
+    <div>{{ entry.properties.status }}</div>
+    <div>{{ entry.properties.loadStatus }}</div>
   </div>
 </template>
 

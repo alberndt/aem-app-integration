@@ -13,6 +13,10 @@ public class Slf4jLogAppender implements IntegrationLogAppender {
 
     private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
+    public Slf4jLogAppender() {
+        LOG.info("New Slf4jLogAppender created...");
+    }
+
     @Override
     public void appendLogger(@Nonnull AbstractLogger logger) {
         LOG.info("append {}", logger.getLoggerName());

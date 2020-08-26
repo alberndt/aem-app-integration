@@ -1,7 +1,204 @@
 [
   {
-    "propertyMap": {
-      "type": "integration"
-    }
+    "type": "integration",
+    "entries": [
+      {
+        "type": "resource",
+        "properties": {
+          "path": "/C:/projekte/aem/aem-app-integration/engine/target/test-classes/local/pipelines",
+          "loadStatus": "Found",
+          "name": "simple-pipeline1.yaml",
+          "url": "file:/C:/projekte/aem/aem-app-integration/engine/target/test-classes/local/pipelines/simple-pipeline1.yaml"
+        },
+        "entries": [
+          {
+            "type": "task",
+            "properties": {
+              "humanReadableTaskName": "Download",
+              "taskName": "download"
+            },
+            "entries": [
+              {
+                "type": "details",
+                "status": "INFO",
+                "message": "Effective configuration..."
+              }
+            ]
+          },
+          {
+            "type": "task",
+            "properties": {
+              "humanReadableTaskName": "File Size Validation",
+              "taskName": "file-size-validation"
+            },
+            "entries": [
+              {
+                "type": "details",
+                "status": "INFO",
+                "message": "Effective configuration..."
+              },
+              {
+                "type": "details",
+                "status": "INFO",
+                "message": "Effective configuration..."
+              }
+            ]
+          },
+          {
+            "type": "task",
+            "properties": {
+              "humanReadableTaskName": "Regex Validation",
+              "taskName": "stacktrace-search (regex-validation)"
+            },
+            "entries": [
+              {
+                "type": "details",
+                "status": "INFO",
+                "message": "Effective configuration..."
+              },
+              {
+                "type": "details",
+                "status": "INFO",
+                "message": "Effective configuration..."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "resource",
+        "properties": {
+          "path": null,
+          "name": "simple-app1/server/subscribe.product-news.de.html",
+          "time": "8 ms",
+          "url": "simple-app1/server/subscribe.product-news.de.html"
+        },
+        "entries": [
+          {
+            "type": "task",
+            "properties": {
+              "humanReadableTaskName": "Download",
+              "taskName": "download"
+            },
+            "entries": [
+              {
+                "type": "details",
+                "status": "INFO",
+                "message": "Effective configuration...",
+                "entries": [
+                  {
+                    "type": "details",
+                    "status": "INFO",
+                    "message": "download:loader = null"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "task",
+            "properties": {
+              "humanReadableTaskName": "File Size Validation",
+              "taskName": "file-size-validation"
+            },
+            "entries": [
+              {
+                "type": "details",
+                "status": "INFO",
+                "message": "Effective configuration..."
+              }
+            ]
+          },
+          {
+            "type": "task",
+            "properties": {
+              "humanReadableTaskName": "Regex Validation",
+              "taskName": "stacktrace-search (regex-validation)"
+            },
+            "entries": [
+              {
+                "type": "details",
+                "status": "INFO",
+                "message": "Effective configuration...",
+                "entries": [
+                  {
+                    "type": "details",
+                    "status": "INFO",
+                    "message": "stacktrace-search:regex = Exception: "
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "resource",
+        "properties": {
+          "path": null,
+          "name": "simple-app1/server/subscribe.product-news.en.html",
+          "time": "2 ms",
+          "url": "simple-app1/server/subscribe.product-news.en.html"
+        },
+        "entries": [
+          {
+            "type": "task",
+            "properties": {
+              "humanReadableTaskName": "Download",
+              "taskName": "download"
+            },
+            "entries": [
+              {
+                "type": "details",
+                "status": "INFO",
+                "message": "Effective configuration...",
+                "entries": [
+                  {
+                    "type": "details",
+                    "status": "INFO",
+                    "message": "download:loader = null"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "task",
+            "properties": {
+              "humanReadableTaskName": "File Size Validation",
+              "taskName": "file-size-validation"
+            },
+            "entries": [
+              {
+                "type": "details",
+                "status": "INFO",
+                "message": "Effective configuration..."
+              }
+            ]
+          },
+          {
+            "type": "task",
+            "properties": {
+              "humanReadableTaskName": "Regex Validation",
+              "taskName": "stacktrace-search (regex-validation)"
+            },
+            "entries": [
+              {
+                "type": "details",
+                "status": "INFO",
+                "message": "Effective configuration...",
+                "entries": [
+                  {
+                    "type": "details",
+                    "status": "INFO",
+                    "message": "stacktrace-search:regex = Exception: "
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
   }
 ]

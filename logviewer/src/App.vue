@@ -1,9 +1,6 @@
 <template>
   <div id="app">
-
-    <h1>Log</h1>
-    <IntegrationLog :log="log"/>
-    <p>done</p>
+    <IntegrationLog v-for="(logRoot, index) in log" :key="index" :log="logRoot"/>
     <h3>log:</h3>
     <pre>{{ log }}</pre>
   </div>

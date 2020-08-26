@@ -25,7 +25,6 @@ public abstract class AbstractLogger {
         this.parentLogger = parentLogger;
         this.appender = appender;
         this.appender.appendLogger(this);
-        this.setProperty("type", this.getType());
     }
 
     protected AbstractLogger(@Nonnull AbstractLogger parentLogger) {
@@ -38,7 +37,7 @@ public abstract class AbstractLogger {
     }
 
     @Nonnull
-    protected abstract String getType();
+    public abstract String getType();
 
     @Nonnull
     public String getLoggerName() {

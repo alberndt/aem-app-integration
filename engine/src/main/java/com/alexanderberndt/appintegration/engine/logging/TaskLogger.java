@@ -34,7 +34,7 @@ public class TaskLogger extends AbstractLogger {
 
     @Nonnull
     @Override
-    protected String getType() {
+    public String getType() {
         return "task";
     }
 

@@ -16,7 +16,7 @@ public class IntegrationLogger extends AbstractLogger {
 
     @Nonnull
     @Override
-    protected String getType() {
+    public String getType() {
         return "integration";
     }
 

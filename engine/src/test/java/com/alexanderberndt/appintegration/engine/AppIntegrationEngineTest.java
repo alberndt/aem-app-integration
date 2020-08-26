@@ -41,6 +41,7 @@ class AppIntegrationEngineTest {
         factory = new CoreAppIntegrationFactory();
         factory.registerApplication("test-app", new Application(TEST_APP_URL, SYSTEM_RESOURCE_LOADER_NAME, "simple-pipeline1", CORE_CONTEXT_PROVIDERS, null));
         engine = new CoreTestAppIntegrationEngine(factory, () -> new JsonLogAppender(() -> new FileWriter("../logviewer/public/test-app-log.json")));
+        //engine = new CoreTestAppIntegrationEngine(factory, Slf4jLogAppender::new);
 
         Map<String, String> instanceContextMap = new HashMap<>();
         instanceContextMap.put("hello", "world");

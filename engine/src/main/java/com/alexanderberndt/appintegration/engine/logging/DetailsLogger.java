@@ -10,7 +10,7 @@ public class DetailsLogger extends AbstractLogger {
 
     @Nonnull
     @Override
-    protected String getType() {
+    public String getType() {
         return "details";
     }
 

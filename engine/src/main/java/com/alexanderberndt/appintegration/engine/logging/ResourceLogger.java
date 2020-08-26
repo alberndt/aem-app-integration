@@ -30,7 +30,7 @@ public class ResourceLogger extends AbstractLogger {
 
     @Nonnull
     @Override
-    protected String getType() {
+    public String getType() {
         return "resource";
     }
 
