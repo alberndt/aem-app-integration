@@ -1,0 +1,30 @@
+[
+  {
+    "task": "properties",
+    "base-url": "http://www.spiegel.de",
+    "verbose": true
+  },
+  {
+    "task": "download"
+  },
+  {
+    "task": "switch",
+    "branches": [
+      {
+        "branch": "html???",
+        "tasks": [
+          {
+            "task": "check-max-size",
+            "warn-size": "1mb",
+            "error-size": "10mb"
+          },
+          {
+            "task": "validate-regex",
+            "regex": "abc",
+            "warn": "contains abc!"
+          }
+        ]
+      }
+    ]
+  }
+]

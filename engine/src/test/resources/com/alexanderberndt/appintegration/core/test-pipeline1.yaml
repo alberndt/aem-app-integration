@@ -1,0 +1,29 @@
+# Test Pipeline 1
+---
+properties:
+  base-url: http://www.spiegel.de
+  verbose: true
+subtasks:
+  - task: http-download
+  - task: validate-regex
+    properties:
+      regex: "abc"
+      warn: "contains abc!"
+  - task: parse-html
+    subtasks:
+      - task: unwrap
+        properties:
+          selector: div.anything
+      - task: remove
+        properties:
+          selector: head
+  - task: something-else
+  - task: more
+  - task: more
+    properties:
+      param1: alex
+      param2: alex2
+  - task: more
+    properties:
+      param1: alex
+      param2: alex2
