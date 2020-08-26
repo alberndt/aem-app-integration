@@ -19,7 +19,7 @@
     </properties>
 
     <modules>
-        <module>core</module>
+        <module>engine</module>
         <module>server</module>
     </modules>
 
@@ -91,7 +91,6 @@
                     </reportSet>
                 </reportSets>
                 <configuration>
-                    <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
                 </configuration>
             </plugin>
 

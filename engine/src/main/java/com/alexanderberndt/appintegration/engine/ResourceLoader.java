@@ -1,16 +1,18 @@
 package com.alexanderberndt.appintegration.engine;
 
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
+import com.alexanderberndt.appintegration.engine.resources.ExternalResourceFactory;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 
 public interface ResourceLoader {
 
     // ToDo: Handle Metadata
 
-    ExternalResource load(final ExternalResourceRef resourceRef) throws IOException;
+    ExternalResource load(@Nonnull final ExternalResourceRef resourceRef, @Nonnull final ExternalResourceFactory factory) throws IOException;
 
     default ExternalResourceRef resolveAbsoluteUrl(final String absoluteUrl) {
         return resolveAbsoluteUrl(absoluteUrl, ExternalResourceType.ANY);

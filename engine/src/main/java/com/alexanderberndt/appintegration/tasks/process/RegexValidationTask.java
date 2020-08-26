@@ -34,7 +34,8 @@ public class RegexValidationTask implements ProcessingTask {
             LOG.info("validate regex {}", pattern);
 //        if (resource.isText()) {
             final Matcher m;
-            m = pattern.matcher(resource.getContentAsString());
+            // ToDo: Re-implement based on reader
+            m = pattern.matcher(resource.getContentAsParsedObject(String.class));
             if (m.find()) {
                 LOG.info("Found pattern");
                 context.addWarning(String.format("Found pattern %s", pattern.pattern()));

@@ -1,14 +1,12 @@
 package com.alexanderberndt.appintegration.engine.resources;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.util.Collections;
 
 class ExternalResourceTest {
 
@@ -24,7 +22,7 @@ class ExternalResourceTest {
 
     @BeforeEach
     void beforeEach() {
-        resource = new ExternalResource(null, new ExternalResourceRef("test-data.txt"));
+        resource = new ExternalResource(null, new ExternalResourceRef("test-data.txt"), Collections::emptyList);
         resource.setCharset(StandardCharsets.UTF_8);
         resource.setContent(new ByteArrayInputStream(TEST_DATA.getBytes(StandardCharsets.UTF_8)));
     }
@@ -52,14 +50,6 @@ class ExternalResourceTest {
 
     @Test
     void getReader() {
-    }
-
-    @Test
-    @Disabled
-    void getString() throws IOException {
-        assertEquals(TEST_DATA, resource.getContentAsString());
-        assertEquals(TEST_DATA, resource.getContentAsString());
-        assertEquals(TEST_DATA, resource.getContentAsString());
     }
 
     @Test

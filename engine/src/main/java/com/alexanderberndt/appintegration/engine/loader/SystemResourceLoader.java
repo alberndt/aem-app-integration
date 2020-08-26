@@ -2,6 +2,7 @@ package com.alexanderberndt.appintegration.engine.loader;
 
 import com.alexanderberndt.appintegration.engine.ResourceLoader;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
+import com.alexanderberndt.appintegration.engine.resources.ExternalResourceFactory;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
 import org.apache.commons.lang3.StringUtils;
@@ -12,13 +13,11 @@ import java.io.InputStream;
 public class SystemResourceLoader implements ResourceLoader {
 
     @Override
-    public ExternalResource load(ExternalResourceRef resourceRef) throws IOException {
-        final ExternalResource resource = new ExternalResource(this, resourceRef);
+    public ExternalResource load(ExternalResourceRef resourceRef, ExternalResourceFactory factory) throws IOException {
         final InputStream inputStream = ClassLoader.getSystemResourceAsStream(resourceRef.getUrl());
 
         if (inputStream != null) {
-            resource.setContent(inputStream);
-            return resource;
+            return factory.createExternalResource(inputStream, resourceRef, this);
         } else {
             throw new IOException(String.format("Resource %s not found!", resourceRef.getUrl()));
         }

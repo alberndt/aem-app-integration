@@ -5,10 +5,10 @@
     {
       "type": "resource",
       "status": "INFO",
-      "url": "file:/C:/projekte/aem/aem-app-integration/core/target/test-classes/local/pipelines/simple-pipeline1.yaml",
+      "url": "file:/C:/projekte/aem/aem-app-integration/engine/target/test-classes/local/pipelines/simple-pipeline1.yaml",
       "loadStatus": "Found",
       "name": "simple-pipeline1.yaml",
-      "path": "/C:/projekte/aem/aem-app-integration/core/target/test-classes/local/pipelines",
+      "path": "/C:/projekte/aem/aem-app-integration/engine/target/test-classes/local/pipelines",
       "entries": [
         {
           "type": "task",
@@ -69,7 +69,7 @@
       "status": "INFO",
       "url": "simple-app1/server/subscribe.product-news.de.html",
       "name": "simple-app1/server/subscribe.product-news.de.html",
-      "time": "8 ms",
+      "time": "4 ms",
       "entries": [
         {
           "type": "task",
@@ -134,7 +134,7 @@
       "status": "INFO",
       "url": "simple-app1/server/subscribe.product-news.en.html",
       "name": "simple-app1/server/subscribe.product-news.en.html",
-      "time": "1 ms",
+      "time": "2 ms",
       "entries": [
         {
           "type": "task",

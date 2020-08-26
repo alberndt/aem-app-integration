@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Writer;
 import java.lang.invoke.MethodHandles;
 import java.lang.ref.SoftReference;
@@ -137,16 +138,14 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance> {
             // ToDo: Replace with ExternalResourceSet
             final Set<ExternalResourceRef> referencedResourcesSet = new LinkedHashSet<>();
             for (ExternalResourceRef snippetRef : resolvedSnippetsSet) {
-                final ExternalResource snippet = pipeline.loadAndProcessResourceRef(snippetRef);
-                System.out.println(snippet.getContentAsString());
+                final ExternalResource snippet = pipeline.loadAndProcessResourceRef(snippetRef, this::createExternalResource);
                 referencedResourcesSet.addAll(snippet.getReferencedResources());
             }
 
 
             // load all referenced resources (which may could load more)
             for (ExternalResourceRef resourceRef : referencedResourcesSet) {
-                final ExternalResource resource = pipeline.loadAndProcessResourceRef(resourceRef);
-                System.out.println(resource.getContentAsString());
+                final ExternalResource resource = pipeline.loadAndProcessResourceRef(resourceRef, this::createExternalResource);
                 referencedResourcesSet.addAll(resource.getReferencedResources());
             }
 
@@ -169,14 +168,18 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance> {
 
     /* Internal methods */
 
+    protected ExternalResource createExternalResource(InputStream inputStream, ExternalResourceRef resourceRef, ResourceLoader loader) {
+        return new ExternalResource(loader, resourceRef, () -> getFactory().getAllTextParsers());
+    }
+
     protected ApplicationInfoJson loadApplicationInfoJson(@Nonnull Application application) throws IOException {
         final ResourceLoader loader = requireResourceLoader(application);
 
         final String url = application.getApplicationInfoUrl();
-        ExternalResource res = loader.load(new ExternalResourceRef(url, ExternalResourceType.APPLICATION_PROPERTIES));
+        ExternalResource res = loader.load(new ExternalResourceRef(url, ExternalResourceType.APPLICATION_PROPERTIES), this::createExternalResource);
 
         try {
-            // ToDo: Use Resource Converter
+            // ToDo: Use Resource TextParser
             return objectMapper.readerFor(ApplicationInfoJson.class).readValue(res.getContentAsReader());
         } catch (JsonProcessingException e) {
             throw new AppIntegrationException(String.format("Cannot parse %s due to: %s", url, e.getMessage()), e);

@@ -6,6 +6,7 @@ import com.alexanderberndt.appintegration.pipeline.task.ProcessingTask;
 import com.alexanderberndt.appintegration.tasks.utils.LineFilterReader;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.IOException;
 import java.io.Reader;
 
 public class RegexReplaceFilter implements ProcessingTask {
@@ -16,7 +17,7 @@ public class RegexReplaceFilter implements ProcessingTask {
     }
 
     @Override
-    public void process(TaskContext context, ExternalResource resource) {
+    public void process(TaskContext context, ExternalResource resource) throws IOException {
         final String regex = context.getValue("regex", String.class);
         final String replacement = context.getValue("replacement", String.class);
 

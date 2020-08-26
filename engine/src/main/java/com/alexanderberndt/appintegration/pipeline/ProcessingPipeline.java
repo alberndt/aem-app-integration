@@ -3,6 +3,7 @@ package com.alexanderberndt.appintegration.pipeline;
 import com.alexanderberndt.appintegration.engine.logging.ResourceLog;
 import com.alexanderberndt.appintegration.engine.logging.TaskLog;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
+import com.alexanderberndt.appintegration.engine.resources.ExternalResourceFactory;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
 import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
 import com.alexanderberndt.appintegration.pipeline.builder.BasicPipelineBuilder;
@@ -17,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.List;
@@ -62,7 +64,7 @@ public class ProcessingPipeline {
     }
 
 
-    public ExternalResource loadAndProcessResourceRef(ExternalResourceRef resourceRef) {
+    public ExternalResource loadAndProcessResourceRef(ExternalResourceRef resourceRef, ExternalResourceFactory factory) throws IOException {
 
         validatePipeline();
 
@@ -84,7 +86,7 @@ public class ProcessingPipeline {
         LOG.debug("{}::load", loadingTask.getTaskNamespace());
         final TaskLog loadTaskLog = log.createTaskEntry(loadingTask.getTask(), loadingTask.getTaskNamespace());
         TaskContext loadContext = context.createTaskContext(loadTaskLog, PIPELINE_EXECUTION, loadingTask.getTaskNamespace(), resourceRef.getExpectedType(), processingData);
-        ExternalResource resource = loadingTask.getTask().load(loadContext, resourceRef);
+        ExternalResource resource = loadingTask.getTask().load(loadContext, resourceRef, factory);
 
         // processing tasks
         for (TaskInstance<ProcessingTask> taskInstance : processingTasks) {

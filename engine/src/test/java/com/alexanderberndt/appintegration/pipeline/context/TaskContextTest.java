@@ -2,6 +2,7 @@ package com.alexanderberndt.appintegration.pipeline.context;
 
 import com.alexanderberndt.appintegration.core.CoreTestGlobalContext;
 import com.alexanderberndt.appintegration.engine.ResourceLoader;
+import com.alexanderberndt.appintegration.engine.logging.MessageEntry;
 import com.alexanderberndt.appintegration.engine.logging.TaskLog;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
 import com.alexanderberndt.appintegration.pipeline.configuration.Ranking;
@@ -33,12 +34,16 @@ class TaskContextTest {
 
     private TaskLog taskLogMock;
 
+    private MessageEntry messageEntryMock;
+
 
     @BeforeEach
     void beforeEach() {
         assertNotNull(resourceLoaderMock);
         globalContext = Mockito.spy(new CoreTestGlobalContext(resourceLoaderMock));
         this.taskLogMock = Mockito.mock(TaskLog.class);
+        this.messageEntryMock = Mockito.mock(MessageEntry.class);
+        Mockito.when(taskLogMock.addSubMessage(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(this.messageEntryMock);
         this.taskContext = Mockito.spy(new TaskContext(globalContext, taskLogMock, Ranking.TASK_DEFAULT, MY_NAMESPACE, ExternalResourceType.ANY, Collections.emptyMap()));
     }
 

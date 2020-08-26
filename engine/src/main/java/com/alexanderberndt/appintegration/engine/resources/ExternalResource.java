@@ -1,7 +1,8 @@
 package com.alexanderberndt.appintegration.engine.resources;
 
 import com.alexanderberndt.appintegration.engine.ResourceLoader;
-import com.alexanderberndt.appintegration.engine.resources.conversion.*;
+import com.alexanderberndt.appintegration.engine.resources.conversion.ConversionSupplier;
+import com.alexanderberndt.appintegration.engine.resources.conversion.ConvertibleValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,11 +31,15 @@ public class ExternalResource {
 
     private final List<ExternalResourceRef> referencedResources = new ArrayList<>();
 
-    public ExternalResource(@Nonnull ResourceLoader loader, @Nonnull ExternalResourceRef resourceRef) {
+    public ExternalResource(
+            @Nonnull ResourceLoader loader,
+            @Nonnull ExternalResourceRef resourceRef,
+            @Nonnull ConversionSupplier conversionSupplier) {
         this.loader = loader;
         this.url = resourceRef.getUrl();
         this.type = resourceRef.getExpectedType();
-        this.content = new ConvertibleNullValue(Charset.defaultCharset());
+        // ToDo: Add TextParsers
+        this.content = new ConvertibleValue<>(null, Charset.defaultCharset(), conversionSupplier);
     }
 
     public void setMetadata(String name, String value) {
@@ -46,46 +51,32 @@ public class ExternalResource {
         return metadataMap.get(name);
     }
 
-    public InputStream getContentAsInputStream() {
+    public InputStream getContentAsInputStream() throws IOException {
         return content.convertToInputStreamValue().get();
     }
 
-    public Reader getContentAsReader() {
+    public Reader getContentAsReader() throws IOException {
         return content.convertToReaderValue().get();
-    }
-
-    public byte[] getContentAsByteArray() throws IOException {
-        return content.convertToByteArrayValue().get();
-    }
-
-    public String getContentAsString() throws IOException {
-        return content.convertToStringValue().get();
-    }
-
-    public <C> C getContentAsObject(@Nonnull Class<C> expectedType) {
-        return content.get(expectedType);
     }
 
     public void setContent(InputStream inputStream) {
         LOG.debug("setContent(InputStream = {})", inputStream);
-        this.content = new ConvertibleInputStreamValue(inputStream, this.getCharset());
+        this.content = this.content.recreateWithNewContent(inputStream);
     }
 
     public void setContent(Reader reader) {
         LOG.debug("setContent(Reader = {})", reader);
-        this.content = new ConvertibleReaderValue(reader, this.getCharset());
+        this.content = this.content.recreateWithNewContent(reader);
     }
 
-    public void setContent(byte[] bytes) {
-        LOG.debug("setContent(byte[] = {})", System.identityHashCode(bytes));
-        this.content = new ConvertibleByteArrayValue(bytes, this.getCharset());
+    public <C> C getContentAsParsedObject(@Nonnull Class<C> expectedType) throws IOException {
+        return content.convertTo(expectedType).get();
     }
 
-    public void setContent(String content) {
-        LOG.debug("setContent(String = {})", System.identityHashCode(content));
-        this.content = new ConvertibleStringValue(content, this.getCharset());
+    public void setContentAsParsedObject(Object parsedContent) {
+        LOG.debug("setContent(parsedContent = {})", parsedContent);
+        this.content = this.content.recreateWithNewContent(parsedContent);
     }
-
 
     public Charset getCharset() {
         Charset charset = content.getCharset();
@@ -96,7 +87,7 @@ public class ExternalResource {
 
     public void setCharset(Charset charset) {
         LOG.debug("setCharset({})", charset);
-        this.content = this.content.changeCharset(charset);
+        this.content = this.content.recreateWithNewCharset(charset);
     }
 
 
