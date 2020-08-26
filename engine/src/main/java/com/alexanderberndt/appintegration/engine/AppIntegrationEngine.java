@@ -12,8 +12,6 @@ import com.alexanderberndt.appintegration.pipeline.ProcessingPipeline;
 import com.alexanderberndt.appintegration.pipeline.configuration.Ranking;
 import com.alexanderberndt.appintegration.pipeline.context.GlobalContext;
 import com.alexanderberndt.appintegration.pipeline.context.TaskContext;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.slf4j.Logger;
@@ -29,8 +27,6 @@ import java.util.*;
 public abstract class AppIntegrationEngine<I extends ApplicationInstance> {
 
     private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
-    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     // Cache for application-infos.json objects
     private final Map<String, SoftReference<ApplicationInfoJson>> applicationInfoCache = new HashMap<>();
@@ -85,8 +81,10 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance> {
             }
         }
 
-        for (String applicationId : instanceMap.keySet()) {
-            LOG.info("prefetch {} instances for application {}", instanceMap.get(applicationId).size(), applicationId);
+        for (Map.Entry<String, List<I>> applicationEntry : instanceMap.entrySet()) {
+            final String applicationId = applicationEntry.getKey();
+            final List<I> applicationInstanceList = applicationEntry.getValue();
+            LOG.info("prefetch {} instances for application {}", applicationInstanceList.size(), applicationId);
 
             final Application application = this.getFactory().getApplication(applicationId);
             if (application == null) {
@@ -125,7 +123,7 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance> {
 
             // resolve url for all instances (some may resolve to the same url)
             final Set<ExternalResourceRef> resolvedSnippetsSet = new LinkedHashSet<>();
-            for (I instance : instanceMap.get(applicationId)) {
+            for (I instance : applicationInstanceList) {
                 final VerifiedInstance<I> verifiedInstance = VerifiedInstance.verify(instance, Objects.requireNonNull(getFactory()));
                 final ExternalResourceRef snippetRef = resolveSnippetResource(verifiedInstance, applicationInfo);
                 resolvedSnippetsSet.add(snippetRef);
@@ -172,16 +170,9 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance> {
 
     protected ApplicationInfoJson loadApplicationInfoJson(@Nonnull Application application) throws IOException {
         final ResourceLoader loader = requireResourceLoader(application);
-
         final String url = application.getApplicationInfoUrl();
         ExternalResource res = loader.load(new ExternalResourceRef(url, ExternalResourceType.APPLICATION_PROPERTIES), this::createExternalResource);
-
-        try {
-            // ToDo: Use Resource TextParser
-            return objectMapper.readerFor(ApplicationInfoJson.class).readValue(res.getContentAsReader());
-        } catch (JsonProcessingException e) {
-            throw new AppIntegrationException(String.format("Cannot parse %s due to: %s", url, e.getMessage()), e);
-        }
+        return res.getContentAsParsedObject(ApplicationInfoJson.class);
     }
 
 
