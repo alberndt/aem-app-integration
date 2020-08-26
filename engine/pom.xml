@@ -4,15 +4,20 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>aem-appintegration-core</artifactId>
-    <name>App Integration - Core</name>
-    <description>Plain Java core functionality for the AEM App-Integration</description>
+    <artifactId>aem-appintegration-engine</artifactId>
+    <name>App Integration - Engine</name>
+    <description>Plain Java functionality for the AEM App-Integration</description>
 
     <parent>
         <groupId>com.alexanderberndt.appintegration</groupId>
         <artifactId>aem-appintegration-reactor</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
+
+    <properties>
+        <surefireLogLevel>debug</surefireLogLevel>
+    </properties>
+
 
     <build>
         <plugins>
@@ -21,6 +26,10 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <argLine>-Dfile.encoding=UTF-8</argLine>
+                    <systemPropertyVariables>
+                        <org.slf4j.simpleLogger.defaultLogLevel>${surefireLogLevel}
+                        </org.slf4j.simpleLogger.defaultLogLevel>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
 
