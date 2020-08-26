@@ -24,49 +24,33 @@ class AbstractResourceLoaderTest {
 
     private static final ExternalResourceRef resourceRef = new ExternalResourceRef("xxx", ExternalResourceType.PLAIN_TEXT);
 
-    protected ExternalResource createExternalResource(InputStream inputStream, ExternalResourceRef resourceRef, ResourceLoader loader) {
-        return new ExternalResource(loader, resourceRef, () -> Collections.singletonList(new StringConverter()));
-    }
-
     @Test
     void loadAsString() throws IOException {
-
         ExternalResource resource = resourceLoader1000.load(resourceRef, this::createExternalResource);
-
         assertNotNull(resource);
         assertEquals(1000 * TEST_STRING.length(), resource.getContentAsParsedObject(String.class).length());
     }
 
-//    @Test
-//    void loadAsByteArray() throws IOException {
-//
-//        ExternalResource resource = resourceLoader1000.load(resourceRef);
-//
-//        assertNotNull(resource);
-//        assertTrue(1000 * TEST_STRING.length() <= resource.getContentAsByteArray().length);
-//    }
-
     @Test
     void loadAsInputStream() throws IOException {
-
         ExternalResource resource = resourceLoader1000.load(resourceRef, this::createExternalResource);
-
         assertNotNull(resource);
-        LineNumberReader lineNumberReader = new LineNumberReader(new InputStreamReader(resource.getContentAsInputStream()));
-        for (int i = 0; i < 1000; i++) {
-            assertEquals(TEST_STRING, lineNumberReader.readLine() + System.lineSeparator());
-        }
-        assertNull(lineNumberReader.readLine());
+        assert1000Lines(new LineNumberReader(new InputStreamReader(resource.getContentAsInputStream())));
     }
 
     @Test
     void loadAsReader() throws IOException {
-
         ExternalResource resource = resourceLoader1000.load(resourceRef, this::createExternalResource);
-
         assertNotNull(resource);
+        assert1000Lines(new LineNumberReader(resource.getContentAsReader()));
+    }
 
-        LineNumberReader lineNumberReader = new LineNumberReader(resource.getContentAsReader());
+    protected ExternalResource createExternalResource(InputStream inputStream, ExternalResourceRef resourceRef, ResourceLoader loader) {
+        return new ExternalResource(inputStream, loader, resourceRef, () -> Collections.singletonList(new StringConverter()));
+    }
+
+
+    private void assert1000Lines(LineNumberReader lineNumberReader) throws IOException {
         for (int i = 0; i < 1000; i++) {
             assertEquals(TEST_STRING, lineNumberReader.readLine() + System.lineSeparator());
         }

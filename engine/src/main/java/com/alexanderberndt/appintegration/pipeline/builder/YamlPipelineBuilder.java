@@ -1,6 +1,6 @@
 package com.alexanderberndt.appintegration.pipeline.builder;
 
-import com.alexanderberndt.appintegration.engine.logging.ResourceLog;
+import com.alexanderberndt.appintegration.engine.logging.ResourceLogger;
 import com.alexanderberndt.appintegration.pipeline.ProcessingPipeline;
 import com.alexanderberndt.appintegration.pipeline.TaskFactory;
 import com.alexanderberndt.appintegration.pipeline.builder.definition.PipelineDefinition;
@@ -29,7 +29,7 @@ public class YamlPipelineBuilder {
     public static ProcessingPipeline build(
             @Nonnull GlobalContext context,
             @Nonnull TaskFactory taskFactory,
-            @Nonnull ResourceLog pipelineLog,
+            @Nonnull ResourceLogger pipelineLog,
             @Nonnull PipelineDefinition pipelineDef) {
 
         final PipelineBuilder builder = new PipelineBuilder(context, taskFactory, pipelineLog);

@@ -1,6 +1,6 @@
 package com.alexanderberndt.appintegration.core;
 
-import com.alexanderberndt.appintegration.engine.logging.TaskLog;
+import com.alexanderberndt.appintegration.engine.logging.TaskLogger;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
 import com.alexanderberndt.appintegration.pipeline.configuration.Ranking;
 import com.alexanderberndt.appintegration.pipeline.context.GlobalContext;
@@ -11,7 +11,7 @@ import java.util.Map;
 
 public final class CoreTestTaskContext extends TaskContext {
 
-    protected CoreTestTaskContext(GlobalContext globalContext, TaskLog taskLog, Ranking rank, String taskNamespace, ExternalResourceType resourceType, @Nonnull Map<String, Object> executionDataMap) {
-        super(globalContext, taskLog, rank, taskNamespace, resourceType, executionDataMap);
+    protected CoreTestTaskContext(GlobalContext globalContext, TaskLogger taskLogger, Ranking rank, String taskNamespace, ExternalResourceType resourceType, @Nonnull Map<String, Object> executionDataMap) {
+        super(globalContext, taskLogger, rank, taskNamespace, resourceType, executionDataMap);
     }
 }

@@ -3,6 +3,7 @@ package com.alexanderberndt.appintegration.engine;
 import com.alexanderberndt.appintegration.core.CoreAppIntegrationFactory;
 import com.alexanderberndt.appintegration.core.CoreTestAppInstance;
 import com.alexanderberndt.appintegration.core.CoreTestAppIntegrationEngine;
+import com.alexanderberndt.appintegration.engine.logging.appender.JsonLogAppender;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -38,7 +40,7 @@ class AppIntegrationEngineTest {
     void before() {
         factory = new CoreAppIntegrationFactory();
         factory.registerApplication("test-app", new Application(TEST_APP_URL, SYSTEM_RESOURCE_LOADER_NAME, "simple-pipeline1", CORE_CONTEXT_PROVIDERS, null));
-        engine = new CoreTestAppIntegrationEngine(factory);
+        engine = new CoreTestAppIntegrationEngine(factory, () -> new JsonLogAppender(() -> new FileWriter("../logviewer/public/test-app-log.json")));
 
         Map<String, String> instanceContextMap = new HashMap<>();
         instanceContextMap.put("hello", "world");

@@ -38,8 +38,18 @@ public class ExternalResource {
         this.loader = loader;
         this.url = resourceRef.getUrl();
         this.type = resourceRef.getExpectedType();
-        // ToDo: Add TextParsers
         this.content = new ConvertibleValue<>(null, Charset.defaultCharset(), conversionSupplier);
+    }
+
+    public ExternalResource(
+            @Nonnull InputStream inputStream,
+            @Nonnull ResourceLoader loader,
+            @Nonnull ExternalResourceRef resourceRef,
+            @Nonnull ConversionSupplier conversionSupplier) {
+        this.loader = loader;
+        this.url = resourceRef.getUrl();
+        this.type = resourceRef.getExpectedType();
+        this.content = new ConvertibleValue<>(inputStream, Charset.defaultCharset(), conversionSupplier);
     }
 
     public void setMetadata(String name, String value) {

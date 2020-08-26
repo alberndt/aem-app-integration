@@ -3,7 +3,8 @@ package com.alexanderberndt.appintegration.pipeline;
 import com.alexanderberndt.appintegration.core.CoreTestGlobalContext;
 import com.alexanderberndt.appintegration.engine.ResourceLoader;
 import com.alexanderberndt.appintegration.engine.loader.SystemResourceLoader;
-import com.alexanderberndt.appintegration.engine.logging.ResourceLog;
+import com.alexanderberndt.appintegration.engine.logging.ResourceLogger;
+import com.alexanderberndt.appintegration.engine.logging.appender.Slf4jLogAppender;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
@@ -12,7 +13,6 @@ import com.alexanderberndt.appintegration.tasks.load.DownloadTask;
 import com.alexanderberndt.appintegration.tasks.prepare.PropertiesTask;
 import com.alexanderberndt.appintegration.tasks.process.AddReferencedResourceTask;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,10 +30,10 @@ class ProcessingPipelineTest {
     @Test
     void simpleProcessingPipeline() throws IOException {
 
-        CoreTestGlobalContext context = new CoreTestGlobalContext(new SystemResourceLoader());
-        ResourceLog resourceLogMock = Mockito.mock(ResourceLog.class);
+        CoreTestGlobalContext context = new CoreTestGlobalContext(new SystemResourceLoader(), Slf4jLogAppender::new);
+        ResourceLogger resourceLogger = context.getIntegrationLog().createResourceLogger("simple-processing-pipeline");
 
-        ProcessingPipeline pipeline = ProcessingPipeline.createPipelineInstance(context, resourceLogMock)
+        ProcessingPipeline pipeline = ProcessingPipeline.createPipelineInstance(context, resourceLogger)
                 .addTask(new PropertiesTask())
                 .withTaskParam("random-input.length", 2000)
                 .withTaskParam("something.else", true)

@@ -2,7 +2,7 @@ package com.alexanderberndt.appintegration.pipeline;
 
 import com.alexanderberndt.appintegration.engine.ProcessingPipelineFactory;
 import com.alexanderberndt.appintegration.engine.logging.LogStatus;
-import com.alexanderberndt.appintegration.engine.logging.ResourceLog;
+import com.alexanderberndt.appintegration.engine.logging.ResourceLogger;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
 import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
@@ -53,12 +53,12 @@ public class SystemResourcePipelineFactory implements ProcessingPipelineFactory 
     @Nonnull
     public ProcessingPipeline createProcessingPipeline(@Nonnull final GlobalContext context, @Nonnull final String name) {
         final URL pipelineDefUrl = ClassLoader.getSystemResource(rootPath + StringUtils.appendIfMissing(name, ".yaml"));
-        final ResourceLog pipelineLog = context.getIntegrationLog().createResourceEntry(new ExternalResourceRef(pipelineDefUrl.toExternalForm(), ExternalResourceType.ANY));
+        final ResourceLogger pipelineLog = context.getIntegrationLog().createResourceLogger(new ExternalResourceRef(pipelineDefUrl.toExternalForm(), ExternalResourceType.ANY));
         return YamlPipelineBuilder.build(context, taskFactory, pipelineLog, getPipelineDefinition(pipelineLog, pipelineDefUrl, name));
     }
 
     @Nonnull
-    private PipelineDefinition getPipelineDefinition(@Nonnull ResourceLog pipelineLog, @Nonnull URL pipelineDefUrl, @Nonnull String name) {
+    private PipelineDefinition getPipelineDefinition(@Nonnull ResourceLogger pipelineLog, @Nonnull URL pipelineDefUrl, @Nonnull String name) {
 
         final URI pipelineDefUri;
         try {
@@ -78,8 +78,7 @@ public class SystemResourcePipelineFactory implements ProcessingPipelineFactory 
             try {
                 loadedDef = YamlPipelineBuilder.parsePipelineDefinitionYaml(pipelineDefUrl.openStream());
             } catch (IOException e) {
-                pipelineLog.setMsg("Failed to parse %s due to %s!", e.getMessage());
-                pipelineLog.setStatus(LogStatus.ERROR);
+                pipelineLog.setSummary(LogStatus.ERROR, "Failed to parse %s due to %s!", e.getMessage());
             } finally {
                 definition = loadedDef;
                 pipelineDefinitionMap.put(pipelineDefUri, loadedDef);

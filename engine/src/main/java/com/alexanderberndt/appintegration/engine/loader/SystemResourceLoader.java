@@ -7,13 +7,14 @@ import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.InputStream;
 
 public class SystemResourceLoader implements ResourceLoader {
 
     @Override
-    public ExternalResource load(ExternalResourceRef resourceRef, ExternalResourceFactory factory) throws IOException {
+    public ExternalResource load(@Nonnull ExternalResourceRef resourceRef, @Nonnull ExternalResourceFactory factory) throws IOException {
         final InputStream inputStream = ClassLoader.getSystemResourceAsStream(resourceRef.getUrl());
 
         if (inputStream != null) {

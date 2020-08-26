@@ -2,7 +2,8 @@ package com.alexanderberndt.appintegration.pipeline.context;
 
 import com.alexanderberndt.appintegration.core.CoreTestGlobalContext;
 import com.alexanderberndt.appintegration.engine.ResourceLoader;
-import com.alexanderberndt.appintegration.engine.logging.TaskLog;
+import com.alexanderberndt.appintegration.engine.logging.TaskLogger;
+import com.alexanderberndt.appintegration.engine.logging.appender.Slf4jLogAppender;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
 import com.alexanderberndt.appintegration.pipeline.configuration.Ranking;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,12 +28,12 @@ class GlobalContextTest {
     @BeforeEach
     void setUp() {
         assertNotNull(resourceLoaderMock);
-        globalContext = new CoreTestGlobalContext(resourceLoaderMock);
+        globalContext = new CoreTestGlobalContext(resourceLoaderMock, Slf4jLogAppender::new);
     }
 
     @Test
     void createTaskContext() {
-        assertNotNull(globalContext.createTaskContext(Mockito.mock(TaskLog.class), Ranking.PIPELINE_DEFINITION, "my-task", ExternalResourceType.ANY, Collections.emptyMap()));
+        assertNotNull(globalContext.createTaskContext(Mockito.mock(TaskLogger.class), Ranking.PIPELINE_DEFINITION, "my-task", ExternalResourceType.ANY, Collections.emptyMap()));
     }
 
     @Test

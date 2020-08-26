@@ -2,8 +2,9 @@ package com.alexanderberndt.appintegration.pipeline.builder;
 
 import com.alexanderberndt.appintegration.core.CoreTestGlobalContext;
 import com.alexanderberndt.appintegration.engine.loader.SystemResourceLoader;
-import com.alexanderberndt.appintegration.engine.logging.ResourceLog;
-import com.alexanderberndt.appintegration.engine.logging.TaskLog;
+import com.alexanderberndt.appintegration.engine.logging.ResourceLogger;
+import com.alexanderberndt.appintegration.engine.logging.TaskLogger;
+import com.alexanderberndt.appintegration.engine.logging.appender.Slf4jLogAppender;
 import com.alexanderberndt.appintegration.pipeline.ProcessingPipeline;
 import com.alexanderberndt.appintegration.pipeline.builder.definition.PipelineDefinition;
 import com.alexanderberndt.appintegration.pipeline.task.GenericTask;
@@ -26,11 +27,11 @@ class YamlPipelineBuilderTest {
         PipelineDefinition pipelineDef = YamlPipelineBuilder.parsePipelineDefinitionYaml(inputStream);
         assertNotNull(pipelineDef);
 
-        CoreTestGlobalContext context = new CoreTestGlobalContext(new SystemResourceLoader());
+        CoreTestGlobalContext context = new CoreTestGlobalContext(new SystemResourceLoader(), Slf4jLogAppender::new);
         CoreTaskFactory taskFactory = new CoreTaskFactory();
-        ResourceLog pipelineLogMock = Mockito.mock(ResourceLog.class);
-        TaskLog taskLogMock = Mockito.mock(TaskLog.class);
-        Mockito.when(pipelineLogMock.createTaskEntry(Mockito.any(GenericTask.class), Mockito.any())).thenReturn(taskLogMock);
+        ResourceLogger pipelineLogMock = Mockito.mock(ResourceLogger.class);
+        TaskLogger taskLoggerMock = Mockito.mock(TaskLogger.class);
+        Mockito.when(pipelineLogMock.createTaskLogger(Mockito.any(GenericTask.class), Mockito.any())).thenReturn(taskLoggerMock);
 
         ProcessingPipeline pipeline = YamlPipelineBuilder.build(context, taskFactory, pipelineLogMock, pipelineDef);
         assertNotNull(pipeline);

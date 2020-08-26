@@ -1,8 +1,9 @@
 package com.alexanderberndt.appintegration.pipeline.context;
 
 import com.alexanderberndt.appintegration.engine.ResourceLoader;
-import com.alexanderberndt.appintegration.engine.logging.IntegrationLog;
-import com.alexanderberndt.appintegration.engine.logging.TaskLog;
+import com.alexanderberndt.appintegration.engine.logging.IntegrationLogAppender;
+import com.alexanderberndt.appintegration.engine.logging.IntegrationLogger;
+import com.alexanderberndt.appintegration.engine.logging.TaskLogger;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
 import com.alexanderberndt.appintegration.pipeline.configuration.PipelineConfiguration;
 import com.alexanderberndt.appintegration.pipeline.configuration.Ranking;
@@ -10,11 +11,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.io.Closeable;
+import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.Map;
+import java.util.function.Supplier;
 
-public abstract class GlobalContext {
+public abstract class GlobalContext implements Closeable {
 
     private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -25,20 +28,24 @@ public abstract class GlobalContext {
     private final PipelineConfiguration processingParams = new PipelineConfiguration();
 
     @Nonnull
-    private final IntegrationLog integrationLog = new IntegrationLog();
+    private final IntegrationLogAppender logAppender;
 
+    @Nonnull
+    private final IntegrationLogger logger;
 
-    protected GlobalContext(@Nonnull ResourceLoader resourceLoader) {
+    protected GlobalContext(@Nonnull ResourceLoader resourceLoader, @Nonnull Supplier<IntegrationLogAppender> appenderSupplier) {
         this.resourceLoader = resourceLoader;
+        this.logAppender = appenderSupplier.get();
+        this.logger = new IntegrationLogger(logAppender);
     }
 
     @Nonnull
     public abstract TaskContext createTaskContext(
-            @Nonnull TaskLog taskLog,
+            @Nonnull TaskLogger taskLogger,
             @Nonnull Ranking rank,
             @Nonnull String taskNamespace,
             @Nonnull ExternalResourceType resourceType,
-            @Nullable Map<String, Object> processingData);
+            @Nonnull Map<String, Object> processingData);
 
     @Nonnull
     public final ResourceLoader getResourceLoader() {
@@ -51,8 +58,8 @@ public abstract class GlobalContext {
     }
 
     @Nonnull
-    public IntegrationLog getIntegrationLog() {
-        return integrationLog;
+    public IntegrationLogger getIntegrationLog() {
+        return logger;
     }
 
     @Deprecated
@@ -65,4 +72,8 @@ public abstract class GlobalContext {
         LOG.error("{}", message);
     }
 
+    @Override
+    public void close() throws IOException {
+        logAppender.close();
+    }
 }

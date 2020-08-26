@@ -1,7 +1,7 @@
 package com.alexanderberndt.appintegration.engine;
 
-import com.alexanderberndt.appintegration.engine.logging.ResourceLog;
-import com.alexanderberndt.appintegration.engine.logging.TaskLog;
+import com.alexanderberndt.appintegration.engine.logging.ResourceLogger;
+import com.alexanderberndt.appintegration.engine.logging.TaskLogger;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
@@ -20,10 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Writer;
 import java.lang.invoke.MethodHandles;
 import java.lang.ref.SoftReference;
 import java.util.*;
@@ -39,7 +37,7 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance> {
 
     protected abstract AppIntegrationFactory<I> getFactory();
 
-    protected abstract GlobalContext createGlobalContext(@Nonnull final Application application);
+    protected abstract GlobalContext createGlobalContext(@Nonnull final String applicationId, @Nonnull final Application application);
 
 
     /* Runtime methods */
@@ -97,7 +95,7 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance> {
                 continue;
             }
 
-            final GlobalContext context = this.createGlobalContext(application);
+            final GlobalContext context = this.createGlobalContext(applicationId, application);
 
             // build processing pipeline
             final String pipelineName = application.getProcessingPipelineName();
@@ -110,10 +108,10 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance> {
             // add global properties
             final Map<String, Object> globalProperties = application.getGlobalProperties();
             if (globalProperties != null) {
-                ResourceLog resourceLog = context.getIntegrationLog().createResourceEntry(new ExternalResourceRef("global", ExternalResourceType.ANY));
-                final TaskLog taskLog = resourceLog.createTaskEntry("set-globals", "Set Global Properties Task");
+                ResourceLogger resourceLogger = context.getIntegrationLog().createResourceLogger(new ExternalResourceRef("global", ExternalResourceType.ANY));
+                final TaskLogger taskLogger = resourceLogger.createTaskLogger("set-globals", "Set Global Properties Task");
                 final TaskContext taskContext = context.createTaskContext(
-                        taskLog, Ranking.GLOBAL, "global", ExternalResourceType.ANY, Collections.emptyMap());
+                        taskLogger, Ranking.GLOBAL, "global", ExternalResourceType.ANY, Collections.emptyMap());
                 for (final Map.Entry<String, Object> propEntry : globalProperties.entrySet()) {
                     taskContext.setValue(propEntry.getKey(), propEntry.getValue());
                 }
@@ -154,9 +152,9 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance> {
 
             // ToDo: Error handling or logging
 
-            try (final Writer writer = new FileWriter(String.format("../logviewer/public/%s-log.json", applicationId))) {
-                context.getIntegrationLog().writeJson(writer);
-            }
+
+            context.close();
+
 
         }
     }
@@ -169,7 +167,7 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance> {
     /* Internal methods */
 
     protected ExternalResource createExternalResource(InputStream inputStream, ExternalResourceRef resourceRef, ResourceLoader loader) {
-        return new ExternalResource(loader, resourceRef, () -> getFactory().getAllTextParsers());
+        return new ExternalResource(inputStream, loader, resourceRef, () -> getFactory().getAllTextParsers());
     }
 
     protected ApplicationInfoJson loadApplicationInfoJson(@Nonnull Application application) throws IOException {

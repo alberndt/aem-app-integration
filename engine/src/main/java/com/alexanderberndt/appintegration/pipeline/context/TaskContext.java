@@ -1,9 +1,8 @@
 package com.alexanderberndt.appintegration.pipeline.context;
 
 import com.alexanderberndt.appintegration.engine.ResourceLoader;
-import com.alexanderberndt.appintegration.engine.logging.LogEntry;
-import com.alexanderberndt.appintegration.engine.logging.LogStatus;
-import com.alexanderberndt.appintegration.engine.logging.TaskLog;
+import com.alexanderberndt.appintegration.engine.logging.AbstractLogger;
+import com.alexanderberndt.appintegration.engine.logging.TaskLogger;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
 import com.alexanderberndt.appintegration.pipeline.configuration.ConfigurationException;
 import com.alexanderberndt.appintegration.pipeline.configuration.Ranking;
@@ -47,25 +46,25 @@ public class TaskContext {
     private final Map<String, Object> executionDataMap;
 
     @Nonnull
-    private final TaskLog taskLog;
+    private final TaskLogger taskLogger;
 
-    private final LogEntry readConfigurationLog;
+    private final AbstractLogger readConfigurationLog;
 
 
     protected TaskContext(
             @Nonnull GlobalContext globalContext,
-            @Nonnull TaskLog taskLog,
+            @Nonnull TaskLogger taskLogger,
             @Nonnull Ranking rank,
             @Nonnull String taskNamespace,
             @Nonnull ExternalResourceType resourceType,
             @Nonnull Map<String, Object> executionDataMap) {
-        this.globalContext = globalContext;
-        this.taskLog = taskLog;
-        this.readConfigurationLog = taskLog.addSubMessage(LogStatus.INFO, "Effective configuration...");
-        this.rank = rank;
-        this.taskNamespace = taskNamespace;
-        this.resourceType = resourceType;
-        this.executionDataMap = executionDataMap;
+        this.globalContext = Objects.requireNonNull(globalContext, "GlobalContext MUST NOT NULL!");
+        this.taskLogger = Objects.requireNonNull(taskLogger, "TaskLogger MUST NOT NULL!");
+        this.readConfigurationLog = taskLogger.createDetailsLogger("Effective configuration...");
+        this.rank = Objects.requireNonNull(rank, "Ranking MUST NOT NULL!");
+        this.taskNamespace = Objects.requireNonNull(taskNamespace, "TaskNamespace MUST NOT NULL!");
+        this.resourceType = Objects.requireNonNull(resourceType, "ExternalResourceType MUST NOT NULL!");
+        this.executionDataMap = Objects.requireNonNull(executionDataMap, "ExecutionDataMap MUST NOT NULL!");
     }
 
     public void addWarning(@Nonnull String message, Object... args) {
@@ -123,7 +122,7 @@ public class TaskContext {
 
         if (!globalContext.getProcessingParams().isValidType(nk.getNamespace(), nk.getKey(), defaultValue)) {
             addWarning("Type of default-value %s (%s) is not valid for key %s!", defaultValue, defaultValue.getClass(), key);
-            readConfigurationLog.addSubMessage(LogStatus.WARNING, "%s = %s (default, wrong type)", nk.getPlainKey(), defaultValue);
+            readConfigurationLog.addWarning("%s = %s (default, wrong type)", nk.getPlainKey(), defaultValue);
             return defaultValue;
         }
 
@@ -144,7 +143,7 @@ public class TaskContext {
         } else {
             returnValue = globalContext.getProcessingParams().getValue(nk.getNamespace(), nk.getKey(), resourceType);
         }
-        readConfigurationLog.addSubMessage(LogStatus.INFO, "%s = %s", nk.getPlainKey(), returnValue);
+        readConfigurationLog.addInfo("%s = %s", nk.getPlainKey(), returnValue);
         return returnValue;
     }
 

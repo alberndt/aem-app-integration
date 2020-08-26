@@ -24,7 +24,7 @@ public class HttpResourceLoader implements ResourceLoader {
     private static final int READ_TIMEOUT = 20000;
 
     @Override
-    public ExternalResource load(ExternalResourceRef resourceRef, @Nonnull ExternalResourceFactory factory) {
+    public ExternalResource load(@Nonnull ExternalResourceRef resourceRef, @Nonnull ExternalResourceFactory factory) {
 
         try {
             final URL url = new URL(resourceRef.getUrl());

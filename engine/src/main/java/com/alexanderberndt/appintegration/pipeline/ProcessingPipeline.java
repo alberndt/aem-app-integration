@@ -1,7 +1,7 @@
 package com.alexanderberndt.appintegration.pipeline;
 
-import com.alexanderberndt.appintegration.engine.logging.ResourceLog;
-import com.alexanderberndt.appintegration.engine.logging.TaskLog;
+import com.alexanderberndt.appintegration.engine.logging.ResourceLogger;
+import com.alexanderberndt.appintegration.engine.logging.TaskLogger;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceFactory;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
@@ -54,12 +54,12 @@ public class ProcessingPipeline {
 
 
     @Deprecated
-    public static BasicPipelineBuilder createPipelineInstance(@Nonnull GlobalContext context, @Nonnull ResourceLog pipelineLog) {
+    public static BasicPipelineBuilder createPipelineInstance(@Nonnull GlobalContext context, @Nonnull ResourceLogger pipelineLog) {
         return new BasicPipelineBuilder(context, pipelineLog);
     }
 
     @Deprecated
-    public static PipelineBuilder createPipelineInstance(@Nonnull GlobalContext context, @Nonnull TaskFactory taskFactory, @Nonnull ResourceLog pipelineLog) {
+    public static PipelineBuilder createPipelineInstance(@Nonnull GlobalContext context, @Nonnull TaskFactory taskFactory, @Nonnull ResourceLogger pipelineLog) {
         return new PipelineBuilder(context, taskFactory, pipelineLog);
     }
 
@@ -68,7 +68,7 @@ public class ProcessingPipeline {
 
         validatePipeline();
 
-        final ResourceLog log = context.getIntegrationLog().createResourceEntry(resourceRef);
+        final ResourceLogger log = context.getIntegrationLog().createResourceLogger(resourceRef);
         final Map<String, Object> processingData = new HashMap<>();
 
         final StopWatch stopWatch = new StopWatch();
@@ -77,22 +77,22 @@ public class ProcessingPipeline {
         // preparation tasks
         for (TaskInstance<PreparationTask> taskInstance : preparationTasks) {
             LOG.debug("{}::prepare", taskInstance.getTaskNamespace());
-            final TaskLog taskLog = log.createTaskEntry(taskInstance.getTask(), taskInstance.getTaskNamespace());
-            TaskContext taskContext = context.createTaskContext(taskLog, PIPELINE_EXECUTION, taskInstance.getTaskNamespace(), resourceRef.getExpectedType(), processingData);
+            final TaskLogger taskLogger = log.createTaskLogger(taskInstance.getTask(), taskInstance.getTaskNamespace());
+            TaskContext taskContext = context.createTaskContext(taskLogger, PIPELINE_EXECUTION, taskInstance.getTaskNamespace(), resourceRef.getExpectedType(), processingData);
             taskInstance.getTask().prepare(taskContext, resourceRef);
         }
 
         // loading task
         LOG.debug("{}::load", loadingTask.getTaskNamespace());
-        final TaskLog loadTaskLog = log.createTaskEntry(loadingTask.getTask(), loadingTask.getTaskNamespace());
-        TaskContext loadContext = context.createTaskContext(loadTaskLog, PIPELINE_EXECUTION, loadingTask.getTaskNamespace(), resourceRef.getExpectedType(), processingData);
+        final TaskLogger loadTaskLogger = log.createTaskLogger(loadingTask.getTask(), loadingTask.getTaskNamespace());
+        TaskContext loadContext = context.createTaskContext(loadTaskLogger, PIPELINE_EXECUTION, loadingTask.getTaskNamespace(), resourceRef.getExpectedType(), processingData);
         ExternalResource resource = loadingTask.getTask().load(loadContext, resourceRef, factory);
 
         // processing tasks
         for (TaskInstance<ProcessingTask> taskInstance : processingTasks) {
             LOG.debug("{}::prepare", taskInstance.getTaskNamespace());
-            final TaskLog taskLog = log.createTaskEntry(taskInstance.getTask(), taskInstance.getTaskNamespace());
-            TaskContext taskContext = context.createTaskContext(taskLog, PIPELINE_EXECUTION, taskInstance.getTaskNamespace(), resource.getType(), processingData);
+            final TaskLogger taskLogger = log.createTaskLogger(taskInstance.getTask(), taskInstance.getTaskNamespace());
+            TaskContext taskContext = context.createTaskContext(taskLogger, PIPELINE_EXECUTION, taskInstance.getTaskNamespace(), resource.getType(), processingData);
             taskInstance.getTask().process(taskContext, resource);
         }
 

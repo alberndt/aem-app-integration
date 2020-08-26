@@ -1,7 +1,7 @@
 package com.alexanderberndt.appintegration.pipeline.builder;
 
-import com.alexanderberndt.appintegration.engine.logging.ResourceLog;
-import com.alexanderberndt.appintegration.engine.logging.TaskLog;
+import com.alexanderberndt.appintegration.engine.logging.ResourceLogger;
+import com.alexanderberndt.appintegration.engine.logging.TaskLogger;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
 import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
 import com.alexanderberndt.appintegration.pipeline.ProcessingPipeline;
@@ -17,6 +17,7 @@ import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import static com.alexanderberndt.appintegration.pipeline.configuration.Ranking.PIPELINE_DEFINITION;
 import static com.alexanderberndt.appintegration.pipeline.configuration.Ranking.TASK_DEFAULT;
@@ -32,17 +33,17 @@ public class BasicPipelineBuilder {
     private final List<TaskInstance<ProcessingTask>> processingTasks = new ArrayList<>();
 
     @Nonnull
-    private final ResourceLog pipelineLog;
+    private final ResourceLogger pipelineLog;
 
     private String currentNamespace = null;
 
     private TaskContext currentTaskContext;
 
-    private TaskLog currentTaskLog;
+    private TaskLogger currentTaskLogger;
 
-    public BasicPipelineBuilder(@Nonnull GlobalContext context, @Nonnull ResourceLog pipelineLog) {
-        this.context = context;
-        this.pipelineLog = pipelineLog;
+    public BasicPipelineBuilder(@Nonnull GlobalContext context, @Nonnull ResourceLogger pipelineLog) {
+        this.context = Objects.requireNonNull(context, "GlobalContext MUST NOT be null!");
+        this.pipelineLog = Objects.requireNonNull(pipelineLog, "PipelineLog MUST NOT be null!");
     }
 
     public BasicPipelineBuilder addTask(@Nonnull GenericTask task) {
@@ -56,8 +57,8 @@ public class BasicPipelineBuilder {
         this.currentTaskContext = null;
 
         // define defaults
-        currentTaskLog = pipelineLog.createTaskEntry(task, uniqueTaskNamespace);
-        TaskContext taskContext = context.createTaskContext(currentTaskLog, TASK_DEFAULT, uniqueTaskNamespace, ExternalResourceType.ANY, Collections.emptyMap());
+        currentTaskLogger = pipelineLog.createTaskLogger(task, uniqueTaskNamespace);
+        TaskContext taskContext = context.createTaskContext(currentTaskLogger, TASK_DEFAULT, uniqueTaskNamespace, ExternalResourceType.ANY, Collections.emptyMap());
         task.declareTaskPropertiesAndDefaults(taskContext);
 
         int type = ((task instanceof PreparationTask) ? 1 : 0)
@@ -118,7 +119,7 @@ public class BasicPipelineBuilder {
 
     public BasicPipelineBuilder withTaskParam(String param, Object value) {
         if (currentTaskContext == null) {
-            currentTaskContext = context.createTaskContext(currentTaskLog, PIPELINE_DEFINITION, currentNamespace, ExternalResourceType.ANY, Collections.emptyMap());
+            currentTaskContext = context.createTaskContext(currentTaskLogger, PIPELINE_DEFINITION, currentNamespace, ExternalResourceType.ANY, Collections.emptyMap());
         }
         currentTaskContext.setValue(param, value);
         return this;
