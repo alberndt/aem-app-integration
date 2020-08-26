@@ -52,8 +52,8 @@
 
 		<dependency>
 			<groupId>com.alexanderberndt.appintegration</groupId>
-			<artifactId>aem-appintegration-core</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<artifactId>aem-appintegration-engine</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 
 	</dependencies>
