@@ -118,13 +118,7 @@
 
             <dependency>
                 <groupId>com.alexanderberndt.appintegration</groupId>
-                <artifactId>aem-appintegration-api</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.alexanderberndt.appintegration</groupId>
-                <artifactId>aem-appintegration-core</artifactId>
+                <artifactId>aem-appintegration-engine</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -203,7 +197,7 @@
             <dependency>
                 <groupId>org.jsoup</groupId>
                 <artifactId>jsoup</artifactId>
-                <version>1.8.3</version>
+                <version>1.13.1</version>
             </dependency>
 
             <dependency>
