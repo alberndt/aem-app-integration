@@ -66,6 +66,11 @@
                     <embeddeds>
                         <embedded>
                             <groupId>com.alexanderberndt.appintegration</groupId>
+                            <artifactId>aem-appintegration-engine</artifactId>
+                            <target>/apps/aem-app-integration/install</target>
+                        </embedded>
+                        <embedded>
+                            <groupId>com.alexanderberndt.appintegration</groupId>
                             <artifactId>aem.core</artifactId>
                             <target>/apps/aem-app-integration/install</target>
                         </embedded>

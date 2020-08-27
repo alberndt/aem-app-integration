@@ -44,12 +44,16 @@
                         <configuration>
                             <bnd><![CDATA[
 Import-Package: javax.annotation;version=0.0.0,*
-Export-Package: !*.internal,!*.internal.*,!*.impl,!*.impl.*,com.alexanderberndt.appintegration.*;version=${project.version}
+                                ]]></bnd>
+
+                            <!--
+                            Export-Package: !*.internal,!*.internal.*,!*.impl,!*.impl.*,com.alexanderberndt.appintegration.*;version=${project.version}
 -includeresource.engine: lib/aem-appintegration-engine.jar=aem-appintegration-engine-*.jar;recursive:=true;lib:=true
 -includeresource.jackson: lib/jackson-*.jar=jackson-*.jar;lib:=true
 -includeresource.snakeyaml: lib/snakeyaml-*.jar=snakeyaml-*.jar;lib:=true
 -includeresource.commonstext: lib/commons-text-*.jar=commons-text-*.jar;lib:=true
-                                ]]></bnd>
+Service-Component=com.alexanderberndt.appintegration.engine.loader.HttpResourceLoader;provide:=com.alexanderberndt.appintegration.engine.ResourceLoader;implementation:=com.alexanderberndt.appintegration.engine.loader.HttpResourceLoader
+-->
                         </configuration>
                     </execution>
                 </executions>
