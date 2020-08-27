@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workspaceFilter version="1.0">
+    <filter root="/conf/aem4" mode="merge"/>
+    <filter root="/content/aem4" mode="merge"/>
+    <filter root="/content/dam/aem4" mode="merge"/>
+    <filter root="/content/experience-fragments/aem4" mode="merge"/>
+</workspaceFilter>
