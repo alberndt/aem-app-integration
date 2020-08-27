@@ -55,31 +55,13 @@
                             <groupId>com.alexanderberndt.appintegration</groupId>
                             <artifactId>aem.ui.apps</artifactId>
                             <type>zip</type>
-                            <target>/apps/aem-packages/application/install</target>
+                            <target>/apps/aem-app-integration-packages/application/install</target>
                         </embedded>
                         <embedded>
                             <groupId>com.alexanderberndt.appintegration</groupId>
                             <artifactId>aem.ui.content</artifactId>
                             <type>zip</type>
-                            <target>/apps/aem-packages/content/install</target>
-                        </embedded>
-                        <embedded>
-                            <groupId>com.adobe.cq</groupId>
-                            <artifactId>core.wcm.components.content</artifactId>
-                            <type>zip</type>
-                            <target>/apps/aem-vendor-packages/application/install</target>
-                        </embedded>
-                        <embedded>
-                            <groupId>com.adobe.cq</groupId>
-                            <artifactId>core.wcm.components.config</artifactId>
-                            <type>zip</type>
-                            <target>/apps/aem-vendor-packages/application/install</target>
-                        </embedded>
-                        <embedded>
-                            <groupId>com.adobe.cq</groupId>
-                            <artifactId>core.wcm.components.examples</artifactId>
-                            <type>zip</type>
-                            <target>/apps/aem-vendor-packages/content/install</target>
+                            <target>/apps/aem-app-integration-packages/content/install</target>
                         </embedded>
                     </embeddeds>
                     <subPackages>
@@ -184,23 +166,6 @@
             <groupId>com.alexanderberndt.appintegration</groupId>
             <artifactId>aem.ui.content</artifactId>
             <version>${project.version}</version>
-            <type>zip</type>
-        </dependency>
-
-
-        <dependency>
-            <groupId>com.adobe.cq</groupId>
-            <artifactId>core.wcm.components.content</artifactId>
-            <type>zip</type>
-        </dependency>
-        <dependency>
-            <groupId>com.adobe.cq</groupId>
-            <artifactId>core.wcm.components.config</artifactId>
-            <type>zip</type>
-        </dependency>
-        <dependency>
-            <groupId>com.adobe.cq</groupId>
-            <artifactId>core.wcm.components.examples</artifactId>
             <type>zip</type>
         </dependency>
     </dependencies>

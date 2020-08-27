@@ -38,9 +38,9 @@ import java.io.IOException;
  */
 @Component(service = { Servlet.class })
 @SlingServletResourceTypes(
-        resourceTypes="aem4/components/page",
-        methods=HttpConstants.METHOD_GET,
-        extensions="txt")
+        resourceTypes = "aem-app-integration/components/page",
+        methods = HttpConstants.METHOD_GET,
+        extensions = "txt")
 @ServiceDescription("Simple Demo Servlet")
 public class SimpleServlet extends SlingSafeMethodsServlet {
 

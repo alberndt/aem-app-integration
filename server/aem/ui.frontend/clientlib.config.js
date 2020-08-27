@@ -26,7 +26,7 @@ const CLIENTLIB_DIR = path.join(
     'content',
     'jcr_root',
     'apps',
-    'aem4',
+    'aem-app-integration',
     'clientlibs'
 );
 
@@ -45,7 +45,7 @@ module.exports = {
         {
             ...libsBaseConfig,
             name: 'clientlib-dependencies',
-            categories: ['aem4.dependencies'],
+            categories: ['aem-app-integration.dependencies'],
             assets: {
                 // Copy entrypoint scripts and stylesheets into the respective ClientLib
                 // directories
@@ -64,8 +64,8 @@ module.exports = {
         {
             ...libsBaseConfig,
             name: 'clientlib-site',
-            categories: ['aem4.site'],
-            dependencies: ['aem4.dependencies'],
+            categories: ['aem-app-integration.site'],
+            dependencies: ['aem-app-integration.dependencies'],
             assets: {
                 // Copy entrypoint scripts and stylesheets into the respective ClientLib
                 // directories
