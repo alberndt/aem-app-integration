@@ -124,14 +124,6 @@
 
         <dependency>
             <groupId>com.alexanderberndt.appintegration</groupId>
-            <artifactId>aem.ui.frontend</artifactId>
-            <version>${project.version}</version>
-            <type>zip</type>
-        </dependency>
-
-
-        <dependency>
-            <groupId>com.alexanderberndt.appintegration</groupId>
             <artifactId>aem.ui.apps.structure</artifactId>
             <version>${project.version}</version>
             <type>zip</type>
