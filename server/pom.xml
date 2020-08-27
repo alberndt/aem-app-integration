@@ -17,7 +17,7 @@
     <modules>
         <module>jetty</module>
         <module>standalone</module>
-        <module>aem-appintegration-aem</module>
+        <module>aem</module>
     </modules>
 
 </project>

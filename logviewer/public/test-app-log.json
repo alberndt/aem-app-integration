@@ -70,7 +70,7 @@
         "properties": {
           "path": null,
           "name": "simple-app1/server/subscribe.product-news.de.html",
-          "time": "9 ms",
+          "time": "6 ms",
           "url": "simple-app1/server/subscribe.product-news.de.html"
         },
         "entries": [
@@ -137,7 +137,7 @@
         "properties": {
           "path": null,
           "name": "simple-app1/server/subscribe.product-news.en.html",
-          "time": "3 ms",
+          "time": "1 ms",
           "url": "simple-app1/server/subscribe.product-news.en.html"
         },
         "entries": [
