@@ -261,6 +261,7 @@ Bundle-DocURL:
                     <version>1.0.3</version>
                     <configuration>
                         <filterSource>src/main/content/META-INF/vault/filter.xml</filterSource>
+                        <showImportPackageReport>false</showImportPackageReport>
                     </configuration>
                 </plugin>
                 <!-- Content Package Plugin -->
