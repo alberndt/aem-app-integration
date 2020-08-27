@@ -2,8 +2,7 @@
 1 Setup Phase
 ============================
 
-lkilik
-
+![Prefetch Process](Prefetch%20Process.svg){:class="img-responsive"}
 
 1.1 Define External Application
 ---------------------------------
