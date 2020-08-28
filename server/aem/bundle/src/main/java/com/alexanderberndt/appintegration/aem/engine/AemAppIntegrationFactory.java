@@ -62,7 +62,12 @@ public class AemAppIntegrationFactory implements AppIntegrationFactory<SlingAppl
     @Nullable
     @Override
     public ResourceLoader getResourceLoader(String id) {
-        return null;
+        return resourceLoaderMap.get(id);
+    }
+
+    @Override
+    public Map<String, ResourceLoader> getAllResourceLoaders() {
+        return Collections.unmodifiableMap(resourceLoaderMap);
     }
 
     @Nonnull

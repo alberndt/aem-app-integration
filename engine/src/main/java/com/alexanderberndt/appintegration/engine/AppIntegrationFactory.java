@@ -19,6 +19,9 @@ public interface AppIntegrationFactory<I extends ApplicationInstance> {
     ResourceLoader getResourceLoader(String id);
 
     @Nonnull
+    Map<String, ResourceLoader> getAllResourceLoaders();
+
+    @Nonnull
     ProcessingPipelineFactory getProcessingPipelineFactory();
 
     @Nullable

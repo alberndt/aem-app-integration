@@ -2,12 +2,26 @@
 title: AEM Application Integration
 ---
 
+Purpose / Problem
+==================
+
+
+|                  | AEM Team                         | App Developers                        |
+| ---------------- | :------------------------------- | :------------------------------------ |
+| **Knowledge**    | Maven, Sling/AEM, Java, OSGi     | HTML, CSS, JS, Browser                |
+| **Release**      | Test- & release-cycles           | Independent (frequent) deliveries     |
+| **Operating**    | 24x7, global scale, harding, CDN | Zip-file via e-mail, Node.js server   |
+| **Organisation** | often deeply internally linked   | often external, indirectly contracted |
+
+
+
 Home
 =====================
 
 Design
 ---------------------
 
+- [Design/Design](./design/design.md)
 - [Pipeline](./design/pipeline.md)
 - [User Guide](userguide.md)
 

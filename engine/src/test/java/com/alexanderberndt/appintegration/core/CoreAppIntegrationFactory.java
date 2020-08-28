@@ -65,6 +65,12 @@ public class CoreAppIntegrationFactory implements AppIntegrationFactory<CoreTest
 
     @Nonnull
     @Override
+    public Map<String, ResourceLoader> getAllResourceLoaders() {
+        return Collections.unmodifiableMap(resourceLoaderMap);
+    }
+
+    @Nonnull
+    @Override
     public ProcessingPipelineFactory getProcessingPipelineFactory() {
         return processingPipelineFactory;
     }

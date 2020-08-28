@@ -140,7 +140,7 @@ Sling-Test-Regexp: .*Test
 
         <dependency>
             <groupId>com.alexanderberndt.appintegration</groupId>
-            <artifactId>aem.core</artifactId>
+            <artifactId>aem-appintegration-bundle</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>

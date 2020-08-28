@@ -239,7 +239,7 @@
                                 <sling.additional.bundle.1>org.apache.sling.junit.core</sling.additional.bundle.1>
                                 <sling.additional.bundle.2>org.apache.sling.junit.scriptable</sling.additional.bundle.2>
                                 <sling.additional.bundle.3>aem.it.tests</sling.additional.bundle.3>
-                                <sling.additional.bundle.4>aem.core</sling.additional.bundle.4>
+                                <sling.additional.bundle.4>aem-appintegration-bundle</sling.additional.bundle.4>
                                 <sling.additional.bundle.5>org.apache.sling.junit.remote</sling.additional.bundle.5>
                                 <sling.additional.bundle.6>org.apache.sling.testing.tools</sling.additional.bundle.6>
                             </systemPropertyVariables>
@@ -334,7 +334,7 @@
         </dependency>
         <dependency>
             <groupId>com.alexanderberndt.appintegration</groupId>
-            <artifactId>aem.core</artifactId>
+            <artifactId>aem-appintegration-bundle</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

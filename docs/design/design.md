@@ -2,7 +2,7 @@
 1 Setup Phase
 ============================
 
-![Prefetch Process](img/Prefetch%20Process.svg){:class="img-responsive"}
+![Prefetch Process](img/Prefetch%20Process.svg){:style="display:none"}
 
 1.1 Define External Application
 ---------------------------------

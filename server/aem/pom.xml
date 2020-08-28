@@ -30,7 +30,7 @@
 
     <modules>
         <module>all</module>
-        <module>core</module>
+        <module>bundle</module>
         <module>ui.apps</module>
         <module>ui.apps.structure</module>
         <module>ui.content</module>
@@ -582,7 +582,7 @@ Bundle-DocURL:
             <dependency>
                 <groupId>org.osgi</groupId>
                 <artifactId>org.osgi.framework</artifactId>
-                <version>1.9.0</version>
+                <version>1.8.0</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>

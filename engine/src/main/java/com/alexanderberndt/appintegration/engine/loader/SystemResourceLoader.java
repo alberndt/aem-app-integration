@@ -6,13 +6,11 @@ import com.alexanderberndt.appintegration.engine.resources.ExternalResourceFacto
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
 import org.apache.commons.lang3.StringUtils;
-import org.osgi.service.component.annotations.Component;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.InputStream;
 
-@Component
 public class SystemResourceLoader implements ResourceLoader {
 
     @Override
