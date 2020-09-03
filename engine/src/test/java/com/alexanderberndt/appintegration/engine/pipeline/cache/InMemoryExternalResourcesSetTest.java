@@ -1,23 +1,15 @@
 package com.alexanderberndt.appintegration.engine.pipeline.cache;
 
-import com.alexanderberndt.appintegration.engine.ResourceLoader;
-import com.alexanderberndt.appintegration.engine.loader.SystemResourceLoader;
-import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourcesSet;
 import com.alexanderberndt.appintegration.tasks.cache.InMemoryExternalResourcesSet;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class InMemoryExternalResourcesSetTest {
 
-    private ResourceLoader resourceLoader;
 
     private ExternalResourcesSet resourcesSet;
 
@@ -26,9 +18,7 @@ class InMemoryExternalResourcesSetTest {
 
     @BeforeEach
     void setup() {
-        resourceLoader = new SystemResourceLoader();
-        resourcesSet = new InMemoryExternalResourcesSet(resourceLoader, "simple-app1/server/application-info.json");
-
+        resourcesSet = new InMemoryExternalResourcesSet();
         resourcesSet.addResourceReference("resources/text1.txt", ExternalResourceType.PLAIN_TEXT);
     }
 
@@ -39,24 +29,5 @@ class InMemoryExternalResourcesSetTest {
         assertNotNull(ClassLoader.getSystemResourceAsStream("simple-app1/server/resources/text1.txt"));
     }
 
-    @Test
-    @Disabled
-    void prefetch() throws IOException {
-        resourcesSet.prefetchAll();
-        ExternalResource text1Res = resourcesSet.getResource("resources/text1.txt");
 
-        assertNotNull(text1Res);
-        assertNotNull(text1Res.getContentAsInputStream());
-        assertEquals(TEST_DATA, text1Res.getContentAsParsedObject(String.class));
-    }
-
-    @Test
-    @Disabled
-    void getResource() throws IOException {
-        ExternalResource text1Res = resourcesSet.getResource("resources/text1.txt");
-
-        assertNotNull(text1Res);
-        assertNotNull(text1Res.getContentAsInputStream());
-        assertEquals(TEST_DATA, text1Res.getContentAsParsedObject(String.class));
-    }
 }

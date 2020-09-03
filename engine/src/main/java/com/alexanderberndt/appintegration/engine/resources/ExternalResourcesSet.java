@@ -9,10 +9,5 @@ public interface ExternalResourcesSet {
 
     void addResourceReference(ExternalResourceRef resourceRef);
 
-    ExternalResource getResource(String relativeUrl);
-
-    void prefetch(ExternalResourceType... types);
-
-    void prefetchAll();
 
 }
