@@ -6,8 +6,11 @@ import com.alexanderberndt.appintegration.engine.Application;
 import com.alexanderberndt.appintegration.engine.ResourceLoader;
 import com.alexanderberndt.appintegration.engine.logging.LogAppender;
 import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
+import com.alexanderberndt.appintegration.pipeline.context.GlobalContext;
 
 import javax.annotation.Nonnull;
+import java.io.IOException;
+import java.util.List;
 import java.util.function.Supplier;
 
 public class CoreTestAppIntegrationEngine extends AppIntegrationEngine<CoreTestAppInstance, CoreTestGlobalContext> {
@@ -29,14 +32,17 @@ public class CoreTestAppIntegrationEngine extends AppIntegrationEngine<CoreTestA
         return factory;
     }
 
+    /**
+     * Implementation of this method shall create a {@link GlobalContext} and call {@link #prefetch(CoreTestGlobalContext, String, List)}
+     * to do the actual prefetch.
+     *
+     * @param applicationId           Application ID
+     * @param applicationInstanceList List of application instances, with all instances linking the application id of the 1st parameter
+     */
     @Override
-    protected CoreTestGlobalContext createGlobalContext(@Nonnull final String applicationId, @Nonnull final Application application) {
-        final String resourceLoaderName = application.getResourceLoaderName();
-        final ResourceLoader resourceLoader = factory.getResourceLoader(resourceLoaderName);
-        if (resourceLoader != null) {
-            return new CoreTestGlobalContext(resourceLoader, appenderSupplier.get());
-        } else {
-            throw new AppIntegrationException(String.format("ResourceLoader %s not found. Cannot create context", resourceLoaderName));
-        }
+    protected void createContextAndPrefetch(String applicationId, List<CoreTestAppInstance> applicationInstanceList) throws IOException {
+        prefetch(new CoreTestGlobalContext(appenderSupplier.get()), applicationId, applicationInstanceList);
     }
+
+
 }

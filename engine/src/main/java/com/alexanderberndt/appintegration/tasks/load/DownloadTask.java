@@ -7,10 +7,12 @@ import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
 import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
 import com.alexanderberndt.appintegration.pipeline.context.TaskContext;
 import com.alexanderberndt.appintegration.pipeline.task.LoadingTask;
+import org.osgi.service.component.annotations.Component;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
 
+@Component
 public class DownloadTask implements LoadingTask {
 
     @Override

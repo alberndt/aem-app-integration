@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.Closeable;
 import java.lang.invoke.MethodHandles;
 import java.util.Map;
@@ -19,8 +20,8 @@ public abstract class GlobalContext implements Closeable {
 
     private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    @Nonnull
-    private final ResourceLoader resourceLoader;
+    @Nullable
+    private ResourceLoader resourceLoader;
 
     @Nonnull
     private final PipelineConfiguration processingParams = new PipelineConfiguration();
@@ -28,8 +29,7 @@ public abstract class GlobalContext implements Closeable {
     @Nonnull
     private final IntegrationLogger logger;
 
-    protected GlobalContext(@Nonnull ResourceLoader resourceLoader, @Nonnull LogAppender logAppender) {
-        this.resourceLoader = resourceLoader;
+    protected GlobalContext(@Nonnull LogAppender logAppender) {
         this.logger = new IntegrationLogger(logAppender);
     }
 
@@ -41,9 +41,13 @@ public abstract class GlobalContext implements Closeable {
             @Nonnull ExternalResourceType resourceType,
             @Nonnull Map<String, Object> processingData);
 
-    @Nonnull
-    public final ResourceLoader getResourceLoader() {
+    @Nullable
+    public ResourceLoader getResourceLoader() {
         return resourceLoader;
+    }
+
+    public void setResourceLoader(@Nullable ResourceLoader resourceLoader) {
+        this.resourceLoader = resourceLoader;
     }
 
     @Nonnull

@@ -14,8 +14,8 @@ import java.util.Map;
 
 public class CoreTestGlobalContext extends GlobalContext {
 
-    public CoreTestGlobalContext(ResourceLoader resourceLoader, @Nonnull final LogAppender logAppender) {
-        super(resourceLoader, logAppender);
+    public CoreTestGlobalContext(@Nonnull final LogAppender logAppender) {
+        super(logAppender);
     }
 
     @Nonnull

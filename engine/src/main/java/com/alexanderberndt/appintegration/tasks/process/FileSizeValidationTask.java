@@ -3,12 +3,14 @@ package com.alexanderberndt.appintegration.tasks.process;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.pipeline.context.TaskContext;
 import com.alexanderberndt.appintegration.pipeline.task.ProcessingTask;
+import org.osgi.service.component.annotations.Component;
 
 import javax.annotation.Nonnull;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+@Component
 public class FileSizeValidationTask implements ProcessingTask {
 
 

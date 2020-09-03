@@ -4,11 +4,13 @@ import com.alexanderberndt.appintegration.engine.resources.conversion.Conversion
 import com.alexanderberndt.appintegration.engine.resources.conversion.TextParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.osgi.service.component.annotations.Component;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.Reader;
 
+@Component
 public class ApplicationInfoJsonParser implements TextParser {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();

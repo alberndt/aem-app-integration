@@ -42,7 +42,9 @@ class TaskContextTest {
     void beforeEach() {
         assertNotNull(resourceLoaderMock);
         logAppenderMock = Mockito.spy(new Slf4jLogAppender());
-        globalContext = Mockito.spy(new CoreTestGlobalContext(resourceLoaderMock, logAppenderMock));
+        GlobalContext tmpCtx = new CoreTestGlobalContext(logAppenderMock);
+        tmpCtx.setResourceLoader(resourceLoaderMock);
+        globalContext = Mockito.spy(tmpCtx);
         taskLogger = new TaskLogger(logAppenderMock, "test task", "test");
         this.taskContext = Mockito.spy(new TaskContext(globalContext, taskLogger, Ranking.TASK_DEFAULT, MY_NAMESPACE, ExternalResourceType.ANY, Collections.emptyMap()));
     }

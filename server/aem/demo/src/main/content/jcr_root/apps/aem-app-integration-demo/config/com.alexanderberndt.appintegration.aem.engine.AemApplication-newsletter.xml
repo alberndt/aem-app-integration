@@ -2,8 +2,8 @@
 <jcr:root xmlns:sling="http://sling.apache.org/jcr/sling/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0"
     jcr:primaryType="sling:OsgiConfig"
     applicationId="newsletter-demo"
-    applicationInfoUrl="https://www.alexanderberndt.com/"
-    contextProviderNames="[locale,tenant]"
+    applicationInfoUrl="http://www.alexanderberndt.com/app-integration-demo/simple-app1/application-info.json"
+    contextProviderNames="[locale,sling-tenant,properties]"
     globalProperties="[]"
     processingPipelineName="default"
     resourceLoaderName="http"/>

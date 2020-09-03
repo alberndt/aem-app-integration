@@ -36,7 +36,8 @@
                 jcr:primaryType="nt:unstructured"
                 sling:resourceType="aem-app-integration/components/component"
                 application="newsletter-demo"
-                component="register" />
+                component="subscribe"
+                newsletterId="product-news" />
         </par>
     </jcr:content>
 </jcr:root>

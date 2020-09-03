@@ -4,10 +4,12 @@ import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.pipeline.context.TaskContext;
 import com.alexanderberndt.appintegration.pipeline.task.ProcessingTask;
 import com.alexanderberndt.appintegration.tasks.utils.LineFilterReader;
+import org.osgi.service.component.annotations.Component;
 
 import java.io.IOException;
 import java.io.Reader;
 
+@Component
 public class TextSnippetExtractor implements ProcessingTask {
 
     @Override

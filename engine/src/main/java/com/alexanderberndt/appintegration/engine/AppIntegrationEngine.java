@@ -33,8 +33,6 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
 
     protected abstract AppIntegrationFactory<I, C> getFactory();
 
-    protected abstract C createGlobalContext(@Nonnull final String applicationId, @Nonnull final Application application);
-
 
     /* Runtime methods */
 
@@ -61,12 +59,6 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
 
         LOG.info("prefetch {} instances in total", instanceList.size());
 
-//        // verify instance and get referenced objects from the factory
-//        List<VerifiedInstance<I>> verifiedInstanceList = new ArrayList<>();
-//        for (I instance : instanceList) {
-//            verifiedInstanceList.add(VerifiedInstance.verify(instance, getFactory()));
-//        }
-
         // group instances by application-id
         final Map<String, List<I>> instanceMap = new HashMap<>();
         for (I instance : instanceList) {
@@ -86,75 +78,92 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
             final List<I> applicationInstanceList = applicationEntry.getValue();
             LOG.info("prefetch {} instances for application {}", applicationInstanceList.size(), applicationId);
 
-            final Application application = this.getFactory().getApplication(applicationId);
-            if (application == null) {
-                LOG.error("Application {} is undefined", applicationId);
-                // ToDo: Log in integration log
-                continue;
-            }
-
-            final C context = this.createGlobalContext(applicationId, application);
-
-            // build processing pipeline
-            final String pipelineName = application.getProcessingPipelineName();
-            final ProcessingPipeline pipeline = createProcessingPipeline(context, pipelineName);
-            if (pipeline == null) {
-                context.addError(String.format("Cannot create pipeline %s for application %s", pipelineName, applicationId));
-                continue;
-            }
-
-            // add global properties
-            final Map<String, Object> globalProperties = application.getGlobalProperties();
-            if (globalProperties != null) {
-                ResourceLogger resourceLogger = context.getIntegrationLog().createResourceLogger(new ExternalResourceRef("global", ExternalResourceType.ANY));
-                final TaskLogger taskLogger = resourceLogger.createTaskLogger("set-globals", "Set Global Properties Task");
-                final TaskContext taskContext = context.createTaskContext(
-                        taskLogger, Ranking.GLOBAL, "global", ExternalResourceType.ANY, Collections.emptyMap());
-                for (final Map.Entry<String, Object> propEntry : globalProperties.entrySet()) {
-                    taskContext.setValue(propEntry.getKey(), propEntry.getValue());
-                }
-            }
-
-            // set global context read-only - values are only written to
-            context.getProcessingParams().setReadOnly();
-
-            // load application-properties.json
-            final ApplicationInfoJson applicationInfo = loadApplicationInfoJson(application);
-
-            // resolve url for all instances (some may resolve to the same url)
-            final Set<ExternalResourceRef> resolvedSnippetsSet = new LinkedHashSet<>();
-            for (I instance : applicationInstanceList) {
-                final VerifiedInstance<I> verifiedInstance = VerifiedInstance.verify(instance, Objects.requireNonNull(getFactory()));
-                final ExternalResourceRef snippetRef = resolveSnippetResource(verifiedInstance, applicationInfo);
-                resolvedSnippetsSet.add(snippetRef);
-            }
-
-
-            // Load all resolved snippets
-            // ToDo: Replace with ExternalResourceSet
-            final Set<ExternalResourceRef> referencedResourcesSet = new LinkedHashSet<>();
-            for (ExternalResourceRef snippetRef : resolvedSnippetsSet) {
-                final ExternalResource snippet = pipeline.loadAndProcessResourceRef(snippetRef, this::createExternalResource);
-                referencedResourcesSet.addAll(snippet.getReferencedResources());
-            }
-
-
-            // load all referenced resources (which may could load more)
-            for (ExternalResourceRef resourceRef : referencedResourcesSet) {
-                final ExternalResource resource = pipeline.loadAndProcessResourceRef(resourceRef, this::createExternalResource);
-                referencedResourcesSet.addAll(resource.getReferencedResources());
-            }
-
-
-            // ToDo: Implement Cache Provider
-
-            // ToDo: Error handling or logging
-
-
-
-
-
+            createContextAndPrefetch(applicationId, applicationInstanceList);
         }
+    }
+
+    /**
+     * Implementation of this method shall create a {@link GlobalContext} and call {@link #prefetch(C, String, List)}
+     * to do the actual prefetch.
+     *
+     * @param applicationId           Application ID
+     * @param applicationInstanceList List of application instances, with all instances linking the application id of the 1st parameter
+     */
+    protected abstract void createContextAndPrefetch(String applicationId, List<I> applicationInstanceList) throws IOException;
+
+    protected void prefetch(C context, String applicationId, List<I> applicationInstanceList) throws IOException {
+
+        final Application application = this.getFactory().getApplication(applicationId);
+        if (application == null) {
+            LOG.error("Application {} is undefined", applicationId);
+            // ToDo: Log in integration log
+            return;
+        }
+
+        // inject the resource-loader
+        final String resourceLoaderName = application.getResourceLoaderName();
+        final ResourceLoader resourceLoader = getFactory().getResourceLoader(resourceLoaderName);
+        context.setResourceLoader(resourceLoader);
+        if (resourceLoader == null) {
+            // ToDo: Nice logging
+            throw new AppIntegrationException(String.format("ResourceLoader %s not found. Cannot create context", resourceLoaderName));
+        }
+
+
+        // build processing pipeline
+        final String pipelineName = application.getProcessingPipelineName();
+        final ProcessingPipeline pipeline = createProcessingPipeline(context, pipelineName);
+        if (pipeline == null) {
+            context.addError(String.format("Cannot create pipeline %s for application %s", pipelineName, applicationId));
+            return;
+        }
+
+        // add global properties
+        final Map<String, Object> globalProperties = application.getGlobalProperties();
+        if (globalProperties != null) {
+            ResourceLogger resourceLogger = context.getIntegrationLog().createResourceLogger(new ExternalResourceRef("global", ExternalResourceType.ANY));
+            final TaskLogger taskLogger = resourceLogger.createTaskLogger("set-globals", "Set Global Properties Task");
+            final TaskContext taskContext = context.createTaskContext(
+                    taskLogger, Ranking.GLOBAL, "global", ExternalResourceType.ANY, Collections.emptyMap());
+            for (final Map.Entry<String, Object> propEntry : globalProperties.entrySet()) {
+                taskContext.setValue(propEntry.getKey(), propEntry.getValue());
+            }
+        }
+
+        // set global context read-only - values are only written to
+        context.getProcessingParams().setReadOnly();
+
+        // load application-properties.json
+        final ApplicationInfoJson applicationInfo = loadApplicationInfoJson(application);
+
+        // resolve url for all instances (some may resolve to the same url)
+        final Set<ExternalResourceRef> resolvedSnippetsSet = new LinkedHashSet<>();
+        for (I instance : applicationInstanceList) {
+            final VerifiedInstance<I> verifiedInstance = VerifiedInstance.verify(instance, Objects.requireNonNull(getFactory()));
+            final ExternalResourceRef snippetRef = resolveSnippetResource(verifiedInstance, applicationInfo);
+            resolvedSnippetsSet.add(snippetRef);
+        }
+
+
+        // Load all resolved snippets
+        // ToDo: Replace with ExternalResourceSet
+        final Set<ExternalResourceRef> referencedResourcesSet = new LinkedHashSet<>();
+        for (ExternalResourceRef snippetRef : resolvedSnippetsSet) {
+            final ExternalResource snippet = pipeline.loadAndProcessResourceRef(snippetRef, this::createExternalResource);
+            referencedResourcesSet.addAll(snippet.getReferencedResources());
+        }
+
+
+        // load all referenced resources (which may could load more)
+        for (ExternalResourceRef resourceRef : referencedResourcesSet) {
+            final ExternalResource resource = pipeline.loadAndProcessResourceRef(resourceRef, this::createExternalResource);
+            referencedResourcesSet.addAll(resource.getReferencedResources());
+        }
+
+
+        // ToDo: Implement Cache Provider
+
+        // ToDo: Error handling or logging
     }
 
 

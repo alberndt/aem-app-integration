@@ -8,16 +8,17 @@ import com.alexanderberndt.appintegration.engine.ResourceLoader;
 import com.alexanderberndt.appintegration.engine.logging.LogAppender;
 import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
 import org.apache.sling.api.resource.*;
-import org.eclipse.jetty.util.log.Log;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import static org.apache.sling.api.resource.ResourceResolverFactory.SUBSERVICE;
 
@@ -39,16 +40,27 @@ public class AemAppIntegrationEngine extends AppIntegrationEngine<SlingApplicati
         return factory;
     }
 
+    /**
+     * Implementation of this method shall create a {@link AemGlobalContext} and call {@link #prefetch(AemGlobalContext, String, List)}
+     * to do the actual prefetch.
+     *
+     * @param applicationId           Application ID
+     * @param applicationInstanceList List of application instances, with all instances linking the application id of the 1st parameter
+     */
     @Override
-    protected AemGlobalContext createGlobalContext(@Nonnull String applicationId, @Nonnull Application application) {
+    protected void createContextAndPrefetch(String applicationId, List<SlingApplicationInstance> applicationInstanceList) throws IOException {
         try (ResourceResolver resolver = resolverFactory.getServiceResourceResolver(Collections.singletonMap(SUBSERVICE, SUB_SERVICE_ID))) {
-            // ToDo: Re-factor to handle resource-loader loading in super-class
-            final ResourceLoader resourceLoader = factory.getResourceLoader(application.getResourceLoaderName());
-            return new AemGlobalContext(resolver, resourceLoader, createLogAppender(resolver, applicationId));
+
+            final AemGlobalContext context = new AemGlobalContext(resolver, createLogAppender(resolver, applicationId));
+            prefetch(context, applicationId, applicationInstanceList);
+
+            resolver.commit();
+
         } catch (LoginException | PersistenceException e) {
             throw new AppIntegrationException("Cannot login to service user session!", e);
         }
     }
+
 
     public LogAppender createLogAppender(@Nonnull ResourceResolver resolver, @Nonnull String applicationId) throws PersistenceException {
 

@@ -18,8 +18,8 @@ public class AemGlobalContext extends GlobalContext {
     @Nonnull
     private final ResourceResolver resourceResolver;
 
-    protected AemGlobalContext(@Nonnull ResourceResolver resourceResolver, @Nonnull ResourceLoader resourceLoader, @Nonnull LogAppender logAppender) {
-        super(resourceLoader, logAppender);
+    protected AemGlobalContext(@Nonnull ResourceResolver resourceResolver, @Nonnull LogAppender logAppender) {
+        super(logAppender);
         this.resourceResolver = resourceResolver;
     }
 

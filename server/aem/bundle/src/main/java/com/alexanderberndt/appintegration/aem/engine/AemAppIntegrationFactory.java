@@ -2,6 +2,7 @@ package com.alexanderberndt.appintegration.aem.engine;
 
 import com.alexanderberndt.appintegration.engine.*;
 import com.alexanderberndt.appintegration.engine.resources.conversion.TextParser;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +11,9 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.invoke.MethodHandles;
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static org.osgi.service.component.ComponentConstants.COMPONENT_NAME;
 
 @Component(service = AemAppIntegrationFactory.class)
 public class AemAppIntegrationFactory implements AppIntegrationFactory<SlingApplicationInstance, AemGlobalContext> {
@@ -25,7 +29,7 @@ public class AemAppIntegrationFactory implements AppIntegrationFactory<SlingAppl
     @Reference
     private AemProcessingPipelineFactory processingPipelineFactory;
 
-    private final List<TextParser> textParserList= new ArrayList<>();
+    private final List<TextParser> textParserList = new ArrayList<>();
 
 
     @Nonnull
@@ -79,7 +83,7 @@ public class AemAppIntegrationFactory implements AppIntegrationFactory<SlingAppl
 
     @Reference(name = "application", cardinality = ReferenceCardinality.MULTIPLE,
             policy = ReferencePolicy.DYNAMIC, policyOption = ReferencePolicyOption.GREEDY)
-    protected void bindApplication(final AemApplication application, Map<String,?> ref) {
+    protected void bindApplication(final AemApplication application, Map<String, ?> ref) {
         LOG.info("bindApplication {} with ref {}", application, ref);
         applicationMap.put(application.getApplicationId(), application);
     }
@@ -90,22 +94,22 @@ public class AemAppIntegrationFactory implements AppIntegrationFactory<SlingAppl
 
     @Reference(name = "resourceLoader", cardinality = ReferenceCardinality.AT_LEAST_ONE,
             policy = ReferencePolicy.DYNAMIC, policyOption = ReferencePolicyOption.GREEDY)
-    protected void bindResourceLoader(final ResourceLoader resourceLoader) {
-        resourceLoaderMap.put(resourceLoader.getClass().getSimpleName(), resourceLoader);
+    protected void bindResourceLoader(final ResourceLoader resourceLoader, final Map<String, Object> properties) {
+        resourceLoaderMap.put(getKebabComponentName(resourceLoader, properties, "ResourceLoader"), resourceLoader);
     }
 
     protected void unbindResourceLoader(final ResourceLoader resourceLoader) {
-        resourceLoaderMap.remove(resourceLoader.getClass().getSimpleName());
+        removeValueFromMap(resourceLoaderMap, resourceLoader);
     }
 
     @Reference(name = "contextProvider", cardinality = ReferenceCardinality.MULTIPLE,
             policy = ReferencePolicy.DYNAMIC, policyOption = ReferencePolicyOption.GREEDY)
-    protected void bindContextProvider(final AemContextProvider contextProvider) {
-        contextProviderMap.put(contextProvider.getClass().getSimpleName(), contextProvider);
+    protected void bindContextProvider(final AemContextProvider contextProvider, final Map<String, Object> properties) {
+        contextProviderMap.put(getKebabComponentName(contextProvider, properties, "ContextProvider"), contextProvider);
     }
 
     protected void unbindContextProvider(final AemContextProvider contextProvider) {
-        contextProviderMap.remove(contextProvider.getClass().getSimpleName());
+        removeValueFromMap(contextProviderMap, contextProvider);
     }
 
     @Reference(name = "textParser", cardinality = ReferenceCardinality.MULTIPLE,
@@ -116,5 +120,24 @@ public class AemAppIntegrationFactory implements AppIntegrationFactory<SlingAppl
 
     protected void unbindTextParser(final TextParser textParser) {
         textParserList.remove(textParser);
+    }
+
+    @Nonnull
+    private static String getKebabComponentName(@Nonnull Object component, @Nonnull Map<String, Object> properties, @Nullable String ignorableSuffix) {
+        final Object nameObj = properties.get(COMPONENT_NAME);
+        final String fullName = (nameObj != null) ? nameObj.toString() : component.getClass().getName();
+        final String name = StringUtils.substringAfterLast(fullName, ".");
+        final String shortedName = StringUtils.removeEnd(name, ignorableSuffix);
+        final String kebabCaseName = shortedName.replaceAll("([a-z])([A-Z])", "$1-$2").toLowerCase();
+        return kebabCaseName;
+    }
+
+    private static <T> void removeValueFromMap(Map<String, T> map, T value) {
+        final List<String> removeKeys = map.entrySet().stream()
+                .filter(entry -> entry.getValue() == value)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+        removeKeys.forEach(map::remove);
+
     }
 }
