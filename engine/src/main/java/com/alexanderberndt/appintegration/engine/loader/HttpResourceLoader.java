@@ -6,6 +6,7 @@ import com.alexanderberndt.appintegration.engine.resources.ExternalResourceFacto
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
 import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,6 +14,7 @@ import javax.annotation.Nonnull;
 import java.lang.invoke.MethodHandles;
 import java.net.*;
 
+@Component
 public class HttpResourceLoader implements ResourceLoader {
 
     private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());

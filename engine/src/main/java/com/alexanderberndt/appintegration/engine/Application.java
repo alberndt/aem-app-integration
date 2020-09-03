@@ -9,34 +9,34 @@ import java.util.Map;
  * Data-record that defines an external application. It provides the location of the <code>application-info.json</code>
  * file and defines the used integration tools (loader, context providers, cache providers, ...).
  */
-public class Application {
+public interface Application {
 
-    @Nonnull
-    private final String applicationInfoUrl;
-
-    @Nonnull
-    private final String resourceLoaderName;
-
-    @Nonnull
-    private final String processingPipelineName;
-
-    @Nullable
-    private final List<String> contextProviderNames;
-
-    @Nullable
-    private final Map<String, Object> globalProperties;
-
-    public Application(@Nonnull String applicationInfoUrl,
-                       @Nonnull String resourceLoaderName,
-                       @Nonnull String processingPipelineName,
-                       @Nullable List<String> contextProviderNames,
-                       @Nullable Map<String, Object> globalProperties) {
-        this.applicationInfoUrl = applicationInfoUrl;
-        this.resourceLoaderName = resourceLoaderName;
-        this.processingPipelineName = processingPipelineName;
-        this.contextProviderNames = contextProviderNames;
-        this.globalProperties = globalProperties;
-    }
+//    @Nonnull
+//    private final String applicationInfoUrl;
+//
+//    @Nonnull
+//    private final String resourceLoaderName;
+//
+//    @Nonnull
+//    private final String processingPipelineName;
+//
+//    @Nullable
+//    private final List<String> contextProviderNames;
+//
+//    @Nullable
+//    private final Map<String, Object> globalProperties;
+//
+//    public Application(@Nonnull String applicationInfoUrl,
+//                       @Nonnull String resourceLoaderName,
+//                       @Nonnull String processingPipelineName,
+//                       @Nullable List<String> contextProviderNames,
+//                       @Nullable Map<String, Object> globalProperties) {
+//        this.applicationInfoUrl = applicationInfoUrl;
+//        this.resourceLoaderName = resourceLoaderName;
+//        this.processingPipelineName = processingPipelineName;
+//        this.contextProviderNames = contextProviderNames;
+//        this.globalProperties = globalProperties;
+//    }
 
     /**
      * Location of the <code>application-info.json</code> file. This url must be understood by used
@@ -45,9 +45,7 @@ public class Application {
      * @return url of <code>application-info.json</code> file
      */
     @Nonnull
-    public String getApplicationInfoUrl() {
-        return applicationInfoUrl;
-    }
+    String getApplicationInfoUrl();
 
     /**
      * Id of the resource-loader, where the predefined ones are <code>http</code>, <code>classloader</code>
@@ -56,9 +54,7 @@ public class Application {
      * @return resource-loader id
      */
     @Nonnull
-    public String getResourceLoaderName() {
-        return resourceLoaderName;
-    }
+    String getResourceLoaderName();
 
     /**
      * List of context-providers - which must be available in the current environment.
@@ -66,17 +62,12 @@ public class Application {
      * @return list of context-providers
      */
     @Nullable
-    public List<String> getContextProviderNames() {
-        return contextProviderNames;
-    }
+    List<String> getContextProviderNames();
 
     @Nonnull
-    public String getProcessingPipelineName() {
-        return processingPipelineName;
-    }
+    String getProcessingPipelineName();
 
     @Nullable
-    public Map<String, Object> getGlobalProperties() {
-        return globalProperties;
-    }
+    Map<String, Object> getGlobalProperties();
+
 }

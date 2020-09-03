@@ -1,5 +1,7 @@
 package com.alexanderberndt.appintegration.engine;
 
+import com.alexanderberndt.appintegration.pipeline.context.GlobalContext;
+
 import javax.annotation.Nonnull;
 
 import static com.alexanderberndt.appintegration.helper.ValidationUtil.requireNotNull;
@@ -21,7 +23,7 @@ public class VerifiedInstance<I extends ApplicationInstance> {
         this.resourceLoader = resourceLoader;
     }
 
-    public static <I extends ApplicationInstance> VerifiedInstance<I> verify(@Nonnull I instance, @Nonnull AppIntegrationFactory<I> factory) {
+    public static <I extends ApplicationInstance, C extends GlobalContext> VerifiedInstance<I> verify(@Nonnull I instance, @Nonnull AppIntegrationFactory<I, C> factory) {
         final String applicationId = instance.getApplicationId();
         final Application application = requireNotNull(factory.getApplication(applicationId),
                 () -> String.format("Application %s is undefined", applicationId));

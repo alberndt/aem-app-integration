@@ -28,7 +28,7 @@ class GlobalContextTest {
     @BeforeEach
     void setUp() {
         assertNotNull(resourceLoaderMock);
-        globalContext = new CoreTestGlobalContext(resourceLoaderMock, Slf4jLogAppender::new);
+        globalContext = new CoreTestGlobalContext(resourceLoaderMock, new Slf4jLogAppender());
     }
 
     @Test

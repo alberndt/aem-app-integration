@@ -1,7 +1,7 @@
 package com.alexanderberndt.appintegration.pipeline.context;
 
 import com.alexanderberndt.appintegration.engine.ResourceLoader;
-import com.alexanderberndt.appintegration.engine.logging.IntegrationLogAppender;
+import com.alexanderberndt.appintegration.engine.logging.LogAppender;
 import com.alexanderberndt.appintegration.engine.logging.IntegrationLogger;
 import com.alexanderberndt.appintegration.engine.logging.TaskLogger;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
@@ -12,10 +12,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import java.io.Closeable;
-import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.Map;
-import java.util.function.Supplier;
 
 public abstract class GlobalContext implements Closeable {
 
@@ -28,14 +26,10 @@ public abstract class GlobalContext implements Closeable {
     private final PipelineConfiguration processingParams = new PipelineConfiguration();
 
     @Nonnull
-    private final IntegrationLogAppender logAppender;
-
-    @Nonnull
     private final IntegrationLogger logger;
 
-    protected GlobalContext(@Nonnull ResourceLoader resourceLoader, @Nonnull Supplier<IntegrationLogAppender> appenderSupplier) {
+    protected GlobalContext(@Nonnull ResourceLoader resourceLoader, @Nonnull LogAppender logAppender) {
         this.resourceLoader = resourceLoader;
-        this.logAppender = appenderSupplier.get();
         this.logger = new IntegrationLogger(logAppender);
     }
 
@@ -72,8 +66,4 @@ public abstract class GlobalContext implements Closeable {
         LOG.error("{}", message);
     }
 
-    @Override
-    public void close() throws IOException {
-        logAppender.close();
-    }
 }

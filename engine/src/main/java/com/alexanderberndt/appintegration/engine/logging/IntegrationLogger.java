@@ -10,7 +10,7 @@ public class IntegrationLogger extends AbstractLogger {
         super(parentLogger);
     }
 
-    public IntegrationLogger(@Nonnull IntegrationLogAppender appender) {
+    public IntegrationLogger(@Nonnull LogAppender appender) {
         super(appender);
     }
 

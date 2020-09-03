@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workspaceFilter version="1.0">
+    <filter root="/apps/aem-app-integration-demo"/>
+    <filter root="/apps/settings/wcm/designs/aem-app-integration-demo"/>
+    <filter root="/content/aem-app-integration-demo" mode="merge"/>
+    <filter root="/content/dam/aem-app-integration-demo" mode="merge"/>
+</workspaceFilter>

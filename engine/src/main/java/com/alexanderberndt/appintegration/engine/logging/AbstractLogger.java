@@ -16,12 +16,12 @@ public abstract class AbstractLogger {
     protected final AbstractLogger parentLogger;
 
     @Nonnull
-    protected final IntegrationLogAppender appender;
+    protected final LogAppender appender;
 
     @Nullable
     protected String loggerInstanceName;
 
-    private AbstractLogger(@Nullable AbstractLogger parentLogger, @Nonnull IntegrationLogAppender appender) {
+    private AbstractLogger(@Nullable AbstractLogger parentLogger, @Nonnull LogAppender appender) {
         this.parentLogger = parentLogger;
         this.appender = appender;
         this.appender.appendLogger(this);
@@ -32,7 +32,7 @@ public abstract class AbstractLogger {
     }
 
 
-    protected AbstractLogger(@Nonnull IntegrationLogAppender appender) {
+    protected AbstractLogger(@Nonnull LogAppender appender) {
         this(null, appender);
     }
 

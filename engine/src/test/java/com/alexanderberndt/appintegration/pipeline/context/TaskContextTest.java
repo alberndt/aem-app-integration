@@ -2,7 +2,7 @@ package com.alexanderberndt.appintegration.pipeline.context;
 
 import com.alexanderberndt.appintegration.core.CoreTestGlobalContext;
 import com.alexanderberndt.appintegration.engine.ResourceLoader;
-import com.alexanderberndt.appintegration.engine.logging.IntegrationLogAppender;
+import com.alexanderberndt.appintegration.engine.logging.LogAppender;
 import com.alexanderberndt.appintegration.engine.logging.TaskLogger;
 import com.alexanderberndt.appintegration.engine.logging.appender.Slf4jLogAppender;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
@@ -35,14 +35,14 @@ class TaskContextTest {
 
     private TaskLogger taskLogger;
 
-    private IntegrationLogAppender logAppenderMock;
+    private LogAppender logAppenderMock;
 
 
     @BeforeEach
     void beforeEach() {
         assertNotNull(resourceLoaderMock);
         logAppenderMock = Mockito.spy(new Slf4jLogAppender());
-        globalContext = Mockito.spy(new CoreTestGlobalContext(resourceLoaderMock, () -> logAppenderMock));
+        globalContext = Mockito.spy(new CoreTestGlobalContext(resourceLoaderMock, logAppenderMock));
         taskLogger = new TaskLogger(logAppenderMock, "test task", "test");
         this.taskContext = Mockito.spy(new TaskContext(globalContext, taskLogger, Ranking.TASK_DEFAULT, MY_NAMESPACE, ExternalResourceType.ANY, Collections.emptyMap()));
     }

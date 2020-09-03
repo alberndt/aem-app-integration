@@ -24,16 +24,16 @@ import java.lang.invoke.MethodHandles;
 import java.lang.ref.SoftReference;
 import java.util.*;
 
-public abstract class AppIntegrationEngine<I extends ApplicationInstance> {
+public abstract class AppIntegrationEngine<I extends ApplicationInstance, C extends GlobalContext> {
 
     private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     // Cache for application-infos.json objects
     private final Map<String, SoftReference<ApplicationInfoJson>> applicationInfoCache = new HashMap<>();
 
-    protected abstract AppIntegrationFactory<I> getFactory();
+    protected abstract AppIntegrationFactory<I, C> getFactory();
 
-    protected abstract GlobalContext createGlobalContext(@Nonnull final String applicationId, @Nonnull final Application application);
+    protected abstract C createGlobalContext(@Nonnull final String applicationId, @Nonnull final Application application);
 
 
     /* Runtime methods */
@@ -93,7 +93,7 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance> {
                 continue;
             }
 
-            final GlobalContext context = this.createGlobalContext(applicationId, application);
+            final C context = this.createGlobalContext(applicationId, application);
 
             // build processing pipeline
             final String pipelineName = application.getProcessingPipelineName();
@@ -151,7 +151,7 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance> {
             // ToDo: Error handling or logging
 
 
-            context.close();
+
 
 
         }
@@ -219,9 +219,9 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance> {
     }
 
 
-    protected ProcessingPipeline createProcessingPipeline(@Nonnull GlobalContext context, @Nonnull String pipelineName) {
-        final ProcessingPipelineFactory pipelineFactory = getFactory().getProcessingPipelineFactory();
-        return pipelineFactory.createProcessingPipeline(context, pipelineName);
+    protected ProcessingPipeline createProcessingPipeline(@Nonnull C context, @Nonnull String pipelineName) {
+        final ProcessingPipelineFactory<C> pipelineFactory = getFactory().getProcessingPipelineFactory();
+        return Objects.requireNonNull(pipelineFactory).createProcessingPipeline(context, pipelineName);
     }
 
     @Nonnull

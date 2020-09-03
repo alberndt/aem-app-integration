@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:sling="http://sling.apache.org/jcr/sling/1.0" xmlns:cq="http://www.day.com/jcr/cq/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
+    jcr:primaryType="cq:Page">
+    <jcr:content
+        cq:lastModified="{Date}2020-09-03T11:20:00.509+02:00"
+        cq:lastModifiedBy="admin"
+        cq:template="/apps/aem-app-integration-demo/templates/page"
+        jcr:primaryType="cq:PageContent"
+        jcr:title="Newsletter"
+        sling:resourceType="aem-app-integration-demo/components/page">
+        <par
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="wcm/foundation/components/parsys">
+            <image
+                jcr:created="{Date}2020-09-03T10:55:02.346+02:00"
+                jcr:createdBy="admin"
+                jcr:lastModified="{Date}2020-09-03T10:55:04.878+02:00"
+                jcr:lastModifiedBy="admin"
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="wcm/foundation/components/image"
+                fileReference="/content/dam/we-retail/en/experiences/steelhead-and-spines-in-alaska/steelhead-and-spines-in-alaska-1.jpg"/>
+            <text
+                jcr:created="{Date}2020-09-03T10:55:08.194+02:00"
+                jcr:createdBy="admin"
+                jcr:lastModified="{Date}2020-09-03T10:55:42.988+02:00"
+                jcr:lastModifiedBy="admin"
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="wcm/foundation/components/text"
+                text="&lt;p>asdfasdfa fasd &lt;b>jfjasdölfajsdölkj &lt;/b>öldk sadöjsaldjfadsf fasf&lt;/p>&#xa;&lt;ol>&#xa;&lt;li>asdfasdfasd&lt;/li>&#xa;&lt;li>asdasdf&lt;/li>&#xa;&lt;li>ds&lt;/li>&#xa;&lt;/ol>&#xa;&lt;p>adfdsa&lt;/p>&#xa;"
+                textIsRich="true"/>
+            <component
+                jcr:created="{Date}2020-09-03T11:16:17.280+02:00"
+                jcr:createdBy="admin"
+                jcr:lastModified="{Date}2020-09-03T11:20:00.506+02:00"
+                jcr:lastModifiedBy="admin"
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="aem-app-integration/components/component"
+                application="newsletter-demo"
+                component="register" />
+        </par>
+    </jcr:content>
+</jcr:root>

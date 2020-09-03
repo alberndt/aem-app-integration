@@ -30,7 +30,7 @@ class ProcessingPipelineTest {
     @Test
     void simpleProcessingPipeline() throws IOException {
 
-        CoreTestGlobalContext context = new CoreTestGlobalContext(new SystemResourceLoader(), Slf4jLogAppender::new);
+        CoreTestGlobalContext context = new CoreTestGlobalContext(new SystemResourceLoader(), new Slf4jLogAppender());
         ResourceLogger resourceLogger = context.getIntegrationLog().createResourceLogger("simple-processing-pipeline");
 
         ProcessingPipeline pipeline = ProcessingPipeline.createPipelineInstance(context, resourceLogger)

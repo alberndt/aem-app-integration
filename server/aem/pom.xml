@@ -29,11 +29,10 @@
     </parent>
 
     <modules>
-        <module>all</module>
         <module>bundle</module>
-        <module>ui.apps</module>
-        <module>ui.apps.structure</module>
-        <module>ui.content</module>
+        <module>structure</module>
+        <module>package</module>
+        <module>demo</module>
         <module>it.tests</module>
         <module>it.launcher</module>
         <module>dispatcher</module>

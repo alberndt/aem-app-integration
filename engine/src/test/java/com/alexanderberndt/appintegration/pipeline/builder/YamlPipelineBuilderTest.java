@@ -27,7 +27,7 @@ class YamlPipelineBuilderTest {
         PipelineDefinition pipelineDef = YamlPipelineBuilder.parsePipelineDefinitionYaml(inputStream);
         assertNotNull(pipelineDef);
 
-        CoreTestGlobalContext context = new CoreTestGlobalContext(new SystemResourceLoader(), Slf4jLogAppender::new);
+        CoreTestGlobalContext context = new CoreTestGlobalContext(new SystemResourceLoader(), new Slf4jLogAppender());
         CoreTaskFactory taskFactory = new CoreTaskFactory();
         ResourceLogger pipelineLogMock = Mockito.mock(ResourceLogger.class);
         TaskLogger taskLoggerMock = Mockito.mock(TaskLogger.class);

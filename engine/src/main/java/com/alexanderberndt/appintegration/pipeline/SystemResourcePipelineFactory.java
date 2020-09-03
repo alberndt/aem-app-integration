@@ -24,7 +24,7 @@ import java.util.Map;
  *
  * @see YamlPipelineBuilder
  */
-public class SystemResourcePipelineFactory implements ProcessingPipelineFactory {
+public class SystemResourcePipelineFactory<C extends GlobalContext> implements ProcessingPipelineFactory<C> {
 
     @Nonnull
     private final String rootPath;
@@ -51,7 +51,7 @@ public class SystemResourcePipelineFactory implements ProcessingPipelineFactory 
      */
     @Override
     @Nonnull
-    public ProcessingPipeline createProcessingPipeline(@Nonnull final GlobalContext context, @Nonnull final String name) {
+    public ProcessingPipeline createProcessingPipeline(@Nonnull final C context, @Nonnull final String name) {
         final URL pipelineDefUrl = ClassLoader.getSystemResource(rootPath + StringUtils.appendIfMissing(name, ".yaml"));
         final ResourceLogger pipelineLog = context.getIntegrationLog().createResourceLogger(new ExternalResourceRef(pipelineDefUrl.toExternalForm(), ExternalResourceType.ANY));
         return YamlPipelineBuilder.build(context, taskFactory, pipelineLog, getPipelineDefinition(pipelineLog, pipelineDefUrl, name));

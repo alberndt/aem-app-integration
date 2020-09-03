@@ -22,12 +22,12 @@ public class TaskLogger extends AbstractLogger {
     }
 
 
-    public TaskLogger(@Nonnull IntegrationLogAppender appender, @Nonnull GenericTask task, @Nonnull String taskNamespace) {
+    public TaskLogger(@Nonnull LogAppender appender, @Nonnull GenericTask task, @Nonnull String taskNamespace) {
         super(appender);
         initProperties(task, taskNamespace);
     }
 
-    public TaskLogger(@Nonnull IntegrationLogAppender appender, @Nonnull String taskName, @Nonnull String taskNamespace) {
+    public TaskLogger(@Nonnull LogAppender appender, @Nonnull String taskName, @Nonnull String taskNamespace) {
         super(appender);
         initProperties(taskName, taskNamespace);
     }

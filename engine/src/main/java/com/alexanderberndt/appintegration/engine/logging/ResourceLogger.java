@@ -10,7 +10,7 @@ import java.net.URL;
 
 public class ResourceLogger extends AbstractLogger {
 
-    public ResourceLogger(@Nonnull IntegrationLogAppender appender, @Nonnull String url) {
+    public ResourceLogger(@Nonnull LogAppender appender, @Nonnull String url) {
         super(appender);
         this.setUrl(url);
     }
@@ -20,7 +20,7 @@ public class ResourceLogger extends AbstractLogger {
         this.setUrl(url);
     }
 
-    public ResourceLogger(@Nonnull IntegrationLogAppender appender, @Nonnull ExternalResourceRef resourceRef) {
+    public ResourceLogger(@Nonnull LogAppender appender, @Nonnull ExternalResourceRef resourceRef) {
         this(appender, resourceRef.getUrl());
     }
 

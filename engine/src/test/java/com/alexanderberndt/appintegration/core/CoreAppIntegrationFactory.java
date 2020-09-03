@@ -13,7 +13,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 
-public class CoreAppIntegrationFactory implements AppIntegrationFactory<CoreTestAppInstance> {
+public class CoreAppIntegrationFactory implements AppIntegrationFactory<CoreTestAppInstance, CoreTestGlobalContext> {
 
     public static final String SYSTEM_RESOURCE_LOADER_NAME = "classpath";
     public static final String HTTP_RESOURCE_LOADER_NAME = "http";
@@ -24,7 +24,7 @@ public class CoreAppIntegrationFactory implements AppIntegrationFactory<CoreTest
 
     private final Map<String, ResourceLoader> resourceLoaderMap;
 
-    private final ProcessingPipelineFactory processingPipelineFactory;
+    private final ProcessingPipelineFactory<CoreTestGlobalContext> processingPipelineFactory;
 
     private final Map<String, ContextProvider<CoreTestAppInstance>> contextProviderMap;
 
@@ -35,7 +35,7 @@ public class CoreAppIntegrationFactory implements AppIntegrationFactory<CoreTest
         resourceLoaderMap.put(SYSTEM_RESOURCE_LOADER_NAME, new SystemResourceLoader());
         resourceLoaderMap.put(HTTP_RESOURCE_LOADER_NAME, new HttpResourceLoader());
 
-        processingPipelineFactory = new SystemResourcePipelineFactory(new CoreTaskFactory(), "local/pipelines");
+        processingPipelineFactory = new SystemResourcePipelineFactory<>(new CoreTaskFactory(), "local/pipelines");
 
         contextProviderMap = new HashMap<>();
         contextProviderMap.put("instance", CoreTestAppInstance::getContextMap);
@@ -71,7 +71,7 @@ public class CoreAppIntegrationFactory implements AppIntegrationFactory<CoreTest
 
     @Nonnull
     @Override
-    public ProcessingPipelineFactory getProcessingPipelineFactory() {
+    public ProcessingPipelineFactory<CoreTestGlobalContext> getProcessingPipelineFactory() {
         return processingPipelineFactory;
     }
 
@@ -79,6 +79,12 @@ public class CoreAppIntegrationFactory implements AppIntegrationFactory<CoreTest
     public @Nullable
     ContextProvider<CoreTestAppInstance> getContextProvider(@Nonnull String providerName) {
         return contextProviderMap.get(providerName);
+    }
+
+    @Nonnull
+    @Override
+    public Map<String, ContextProvider<CoreTestAppInstance>> getAllContextProvider() {
+        return Collections.unmodifiableMap(contextProviderMap);
     }
 
     @Nonnull

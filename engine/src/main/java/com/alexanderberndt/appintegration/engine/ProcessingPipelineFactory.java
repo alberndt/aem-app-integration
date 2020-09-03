@@ -12,7 +12,7 @@ import javax.annotation.Nonnull;
  * @see AppIntegrationFactory
  * @see AppIntegrationEngine
  */
-public interface ProcessingPipelineFactory {
+public interface ProcessingPipelineFactory<C extends GlobalContext> {
 
     /**
      * Create a new instance of an processing pipeline, and updates the context with the default task configuration
@@ -25,6 +25,6 @@ public interface ProcessingPipelineFactory {
      *                                 Otherwise the method shall always create a valid pipeline.
      */
     @Nonnull
-    ProcessingPipeline createProcessingPipeline(@Nonnull final GlobalContext context, @Nonnull final String name);
+    ProcessingPipeline createProcessingPipeline(@Nonnull final C context, @Nonnull final String name);
 
 }

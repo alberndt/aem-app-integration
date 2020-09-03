@@ -2,6 +2,7 @@ package com.alexanderberndt.appintegration.core;
 
 import com.alexanderberndt.appintegration.engine.ApplicationInstance;
 
+import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,11 +26,13 @@ public class CoreTestAppInstance implements ApplicationInstance {
         this.contextMap.putAll(contextMap);
     }
 
+    @Nonnull
     @Override
     public String getApplicationId() {
         return applicationId;
     }
 
+    @Nonnull
     @Override
     public String getComponentId() {
         return componentId;

@@ -14,7 +14,7 @@ class IntegrationLoggerTest {
     @Test
     void createSubLogger() throws IOException {
 
-        IntegrationLogAppender appenderMock = Mockito.spy(new Slf4jLogAppender());
+        LogAppender appenderMock = Mockito.spy(new Slf4jLogAppender());
 
         IntegrationLogger integrationLogger = new IntegrationLogger(appenderMock);
         integrationLogger.addWarning("start something");

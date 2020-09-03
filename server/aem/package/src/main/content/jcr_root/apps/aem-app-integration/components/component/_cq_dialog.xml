@@ -1,0 +1,46 @@
+<jcr:root xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+          xmlns:granite="http://www.adobe.com/jcr/granite/1.0"
+          xmlns:cq="http://www.day.com/jcr/cq/1.0"
+          xmlns:jcr="http://www.jcp.org/jcr/1.0"
+          xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
+          jcr:primaryType="nt:unstructured"
+          sling:resourceType="cq/gui/components/authoring/dialog"
+          jcr:title="Product Display"
+          extraClientlibs="[cq.authoring.editor]">
+    <content
+          granite:class="cq-dialog-content-page"
+          jcr:primaryType="nt:unstructured"
+          sling:resourceType="granite/ui/components/coral/foundation/container">
+      <items jcr:primaryType="nt:unstructured">
+          <tabs jcr:primaryType="nt:unstructured"
+                sling:resourceType="granite/ui/components/coral/foundation/tabs"
+                size="M">
+              <items jcr:primaryType="nt:unstructured">
+                  <settings jcr:primaryType="nt:unstructured"
+                            cq:hideOnEdit="false"
+                            cq:showOnCreate="true"
+                            jcr:title="Settings"
+                            margin="{Boolean}true"
+                            sling:resourceType="granite/ui/components/coral/foundation/container">
+                      <items jcr:primaryType="nt:unstructured">
+                          <column
+                                  jcr:primaryType="nt:unstructured"
+                                  sling:resourceType="granite/ui/components/coral/foundation/container">
+                              <items jcr:primaryType="nt:unstructured">                               
+                                   <application jcr:primaryType="nt:unstructured"
+                                               fieldLabel="Application Id"
+                                               name="./application"
+                                               sling:resourceType="granite/ui/components/coral/foundation/form/textfield"/>
+                                    <component jcr:primaryType="nt:unstructured"
+                                               fieldLabel="Component Id"
+                                               name="./component"
+                                               sling:resourceType="granite/ui/components/coral/foundation/form/textfield"/>
+                                </items>
+                            </column>
+                        </items>
+                    </settings>
+                </items>
+            </tabs>
+        </items>
+    </content>
+</jcr:root>

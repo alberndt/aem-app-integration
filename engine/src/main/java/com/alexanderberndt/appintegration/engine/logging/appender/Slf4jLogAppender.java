@@ -1,7 +1,7 @@
 package com.alexanderberndt.appintegration.engine.logging.appender;
 
 import com.alexanderberndt.appintegration.engine.logging.AbstractLogger;
-import com.alexanderberndt.appintegration.engine.logging.IntegrationLogAppender;
+import com.alexanderberndt.appintegration.engine.logging.LogAppender;
 import com.alexanderberndt.appintegration.engine.logging.LogStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import java.lang.invoke.MethodHandles;
 
-public class Slf4jLogAppender implements IntegrationLogAppender {
+public class Slf4jLogAppender implements LogAppender {
 
     private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 

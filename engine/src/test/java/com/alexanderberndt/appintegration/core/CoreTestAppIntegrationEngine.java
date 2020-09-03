@@ -4,38 +4,37 @@ import com.alexanderberndt.appintegration.engine.AppIntegrationEngine;
 import com.alexanderberndt.appintegration.engine.AppIntegrationFactory;
 import com.alexanderberndt.appintegration.engine.Application;
 import com.alexanderberndt.appintegration.engine.ResourceLoader;
-import com.alexanderberndt.appintegration.engine.logging.IntegrationLogAppender;
+import com.alexanderberndt.appintegration.engine.logging.LogAppender;
 import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
-import com.alexanderberndt.appintegration.pipeline.context.GlobalContext;
 
 import javax.annotation.Nonnull;
 import java.util.function.Supplier;
 
-public class CoreTestAppIntegrationEngine extends AppIntegrationEngine<CoreTestAppInstance> {
+public class CoreTestAppIntegrationEngine extends AppIntegrationEngine<CoreTestAppInstance, CoreTestGlobalContext> {
 
     @Nonnull
-    private final AppIntegrationFactory<CoreTestAppInstance> factory;
+    private final CoreAppIntegrationFactory factory;
 
     @Nonnull
-    private final Supplier<IntegrationLogAppender> appenderSupplier;
+    private final Supplier<LogAppender> appenderSupplier;
 
-    public CoreTestAppIntegrationEngine(@Nonnull AppIntegrationFactory<CoreTestAppInstance> factory, @Nonnull final Supplier<IntegrationLogAppender> appenderSupplier) {
+    public CoreTestAppIntegrationEngine(@Nonnull CoreAppIntegrationFactory factory, @Nonnull final Supplier<LogAppender> appenderSupplier) {
         this.factory = factory;
         this.appenderSupplier = appenderSupplier;
     }
 
     @Nonnull
     @Override
-    protected AppIntegrationFactory<CoreTestAppInstance> getFactory() {
+    protected AppIntegrationFactory<CoreTestAppInstance, CoreTestGlobalContext> getFactory() {
         return factory;
     }
 
     @Override
-    protected GlobalContext createGlobalContext(@Nonnull final String applicationId, @Nonnull final Application application) {
+    protected CoreTestGlobalContext createGlobalContext(@Nonnull final String applicationId, @Nonnull final Application application) {
         final String resourceLoaderName = application.getResourceLoaderName();
         final ResourceLoader resourceLoader = factory.getResourceLoader(resourceLoaderName);
         if (resourceLoader != null) {
-            return new CoreTestGlobalContext(resourceLoader, appenderSupplier);
+            return new CoreTestGlobalContext(resourceLoader, appenderSupplier.get());
         } else {
             throw new AppIntegrationException(String.format("ResourceLoader %s not found. Cannot create context", resourceLoaderName));
         }

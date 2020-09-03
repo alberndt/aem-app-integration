@@ -1,7 +1,6 @@
 package com.alexanderberndt.appintegration.engine.logging.appender;
 
 import com.alexanderberndt.appintegration.engine.logging.AbstractLogger;
-import com.alexanderberndt.appintegration.engine.logging.IntegrationLogAppender;
 import com.alexanderberndt.appintegration.engine.logging.LogStatus;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -12,12 +11,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.Writer;
 import java.lang.invoke.MethodHandles;
 import java.util.*;
 
-public class JsonLogAppender implements IntegrationLogAppender {
+public class JsonLogAppender extends AbstractLogAppender<JsonLogAppender.JsonLogEntry> {
 
     private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -26,17 +26,27 @@ public class JsonLogAppender implements IntegrationLogAppender {
     @Nonnull
     private final WriterSupplier writerSupplier;
 
-    private final List<JsonLogEntry> rootLoggersList = new ArrayList<>();
-
-    private final Map<AbstractLogger, JsonLogEntry> loggerJsonLoggerMap = new WeakHashMap<>();
-
-    private AbstractLogger lastLogger;
-
-    private JsonLogEntry lastLogEntry;
-
     public JsonLogAppender(@Nonnull WriterSupplier writerSupplier) {
         LOG.info("New JsonLogAppender created...");
         this.writerSupplier = writerSupplier;
+    }
+
+    @Nonnull
+    @Override
+    protected JsonLogEntry createNewLogEntry(@Nullable JsonLogEntry parentEntry, @Nonnull AbstractLogger logger) {
+        final JsonLogEntry newLogEntry = new JsonLogEntry(logger.getType());
+        if (parentEntry != null) {
+            parentEntry.registerSubEntry(newLogEntry);
+        }
+        return newLogEntry;
+    }
+
+    @Override
+    protected void createNewLogMessage(@Nullable JsonLogEntry parentEntry, @Nullable LogStatus status, @Nullable String message) {
+        final JsonLogEntry newLogEntry = new JsonLogEntry("message", status, message);
+        if (parentEntry != null) {
+            parentEntry.registerSubEntry(newLogEntry);
+        }
     }
 
     @Override
@@ -47,89 +57,6 @@ public class JsonLogAppender implements IntegrationLogAppender {
         }
     }
 
-    private JsonLogEntry getJsonLogEntry(@Nonnull AbstractLogger logger) {
-        if (logger == lastLogger) {
-            return lastLogEntry;
-        } else {
-            final JsonLogEntry logEntry = loggerJsonLoggerMap.get(logger);
-            if (logEntry != null) {
-                lastLogger = logger;
-                lastLogEntry = logEntry;
-            }
-            return logEntry;
-        }
-    }
-
-
-    @Override
-    public synchronized void appendLogger(@Nonnull AbstractLogger logger) {
-        if (!loggerJsonLoggerMap.containsKey(logger)) {
-            LOG.debug("appendLogger({})", logger.getLoggerName());
-            final JsonLogEntry jsonLogEntry = new JsonLogEntry(logger.getType());
-            loggerJsonLoggerMap.put(logger, jsonLogEntry);
-            final AbstractLogger parentLogger = logger.getParentLogger();
-            if (parentLogger == null) {
-                rootLoggersList.add(jsonLogEntry);
-            } else {
-                final JsonLogEntry parentEntry = getJsonLogEntry(parentLogger);
-                if (parentEntry != null) {
-                    parentEntry.addSubEntry(jsonLogEntry);
-                } else {
-                    LOG.warn("Parent-Logger {} of {} was not appended before! Logger will be ignored in output!",
-                            parentLogger.getLoggerName(), logger.getLoggerName());
-                }
-            }
-            lastLogger = logger;
-            lastLogEntry = jsonLogEntry;
-        } else {
-            LOG.warn("appendLogger({}) failed, logger was already appended!", logger.getLoggerName());
-        }
-    }
-
-    @Override
-    public synchronized void setLoggerSummary(@Nonnull AbstractLogger logger, LogStatus status, String message) {
-        LOG.debug("setLoggerSummary({}, {}, {})", logger.getLoggerName(), status, message);
-        final JsonLogEntry logEntry = getJsonLogEntry(logger);
-        if (logEntry != null) {
-            logEntry.setSummary(status, message);
-        } else {
-            LOG.error("Can't write summery for unknown logger (logger: {}, status: {}, message: {})", logger, status, message);
-        }
-    }
-
-    @Override
-    public void setLoggerStatus(@Nonnull AbstractLogger logger, LogStatus status) {
-        LOG.debug("setLoggerStatus({}, {})", logger.getLoggerName(), status);
-        final JsonLogEntry logEntry = getJsonLogEntry(logger);
-        if (logEntry != null) {
-            logEntry.setStatus(status);
-        } else {
-            LOG.error("Can't set status for unknown logger (logger: {}, status: {})", logger, status);
-        }
-    }
-
-    @Override
-    public synchronized void setLoggerProperty(@Nonnull AbstractLogger logger, @Nonnull String key, String value) {
-        LOG.debug("setLoggerProperty({}, {} = {})", logger.getLoggerName(), key, value);
-        final JsonLogEntry logEntry = getJsonLogEntry(logger);
-        if (logEntry != null) {
-            logEntry.setProperty(key, value);
-        } else {
-            LOG.error("Can't set logger property for unknown logger (logger: {}, key: {}, value: {})", logger, key, value);
-        }
-    }
-
-    @Override
-    public synchronized void appendLogEntry(@Nonnull AbstractLogger logger, LogStatus status, String message) {
-        LOG.debug("appendLogEntry({}, {}, {})", logger.getLoggerName(), status, message);
-        final JsonLogEntry logEntry = getJsonLogEntry(logger);
-        if (logEntry != null) {
-            logEntry.addSubEntry(new JsonLogEntry(logger.getType(), status, message));
-        } else {
-            LOG.error("Can't append log-entry for unknown logger (logger: {}, status: {}, message: {})", logger, status, message);
-        }
-    }
-
     public interface WriterSupplier {
         Writer createWriter() throws IOException;
     }
@@ -137,7 +64,7 @@ public class JsonLogAppender implements IntegrationLogAppender {
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     @JsonPropertyOrder({"type", "status", "message", "properties", "entries"})
-    private static class JsonLogEntry {
+    protected static class JsonLogEntry implements AbstractLogAppender.LogEntry<JsonLogEntry> {
 
         @JsonProperty
         private final String type;
@@ -179,7 +106,7 @@ public class JsonLogAppender implements IntegrationLogAppender {
             this.propertyMap.put(key, value);
         }
 
-        public void addSubEntry(@Nonnull JsonLogEntry subEntry) {
+        public void registerSubEntry(@Nonnull JsonLogEntry subEntry) {
             if (this.subEntries == null) {
                 this.subEntries = new ArrayList<>();
             }

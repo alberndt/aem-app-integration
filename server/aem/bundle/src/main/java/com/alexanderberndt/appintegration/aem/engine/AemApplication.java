@@ -11,13 +11,11 @@ import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Component(service = AemApplication.class, configurationPolicy = ConfigurationPolicy.REQUIRE)
 @Designate(ocd = AemApplication.Configuration.class, factory = true)
-public class AemApplication extends Application {
+public class AemApplication implements Application {
 
     @ObjectClassDefinition(name = "AEM App-Integration - Application")
     @interface Configuration {
@@ -28,7 +26,6 @@ public class AemApplication extends Application {
         )
         @Nonnull
         String applicationId();
-
 
         @AttributeDefinition(
                 name = "Application-Info URL",
@@ -69,15 +66,75 @@ public class AemApplication extends Application {
 
     private final String applicationId;
 
+    private final String applicationInfoUrl;
+
+    private final String resourceLoaderName;
+
+    private final String processingPipelineName;
+
+    private final List<String> contextProviderNames;
+
+    private final Map<String, Object> globalProperties;
+
     @Activate
     public AemApplication(@Nonnull Configuration configuration) {
-        super(configuration.applicationInfoUrl(), configuration.resourceLoaderName(), configuration.processingPipelineName(),
-                Arrays.asList(configuration.contextProviderNames()), convertToMap(configuration.globalProperties()));
         this.applicationId = configuration.applicationId();
+        this.applicationInfoUrl = configuration.applicationInfoUrl();
+        this.resourceLoaderName = configuration.resourceLoaderName();
+        this.processingPipelineName = configuration.processingPipelineName();
+        this.contextProviderNames = Collections.unmodifiableList(Arrays.asList(configuration.contextProviderNames()));
+        this.globalProperties = Collections.unmodifiableMap(convertToMap(configuration.globalProperties()));
     }
 
     public String getApplicationId() {
         return applicationId;
+    }
+
+    /**
+     * Location of the <code>application-info.json</code> file. This url must be understood by used
+     * resource-loader and cannot contain any placeholders.
+     *
+     * @return url of <code>application-info.json</code> file
+     */
+    @Nonnull
+    @Override
+    public String getApplicationInfoUrl() {
+        return applicationInfoUrl;
+    }
+
+    /**
+     * Id of the resource-loader, where the predefined ones are <code>http</code>, <code>classloader</code>
+     * and <code>file</code>. But additional resource-loaders could be available too.
+     *
+     * @return resource-loader id
+     */
+    @Nonnull
+    @Override
+    public String getResourceLoaderName() {
+        return resourceLoaderName;
+    }
+
+    /**
+     * List of context-providers - which must be available in the current environment.
+     *
+     * @return list of context-providers
+     */
+    @Nullable
+    @Override
+    public List<String> getContextProviderNames() {
+        return contextProviderNames;
+    }
+
+    @Nonnull
+    @Override
+    public String getProcessingPipelineName() {
+        return processingPipelineName;
+    }
+
+    @Nullable
+    @Override
+    public Map<String, Object> getGlobalProperties() {
+        return globalProperties;
     }
 
     @Override

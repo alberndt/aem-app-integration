@@ -9,18 +9,73 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.invoke.MethodHandles;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
-@SuppressWarnings("unused")
 @Component(service = AemAppIntegrationFactory.class)
-public class AemAppIntegrationFactory implements AppIntegrationFactory<SlingApplicationInstance> {
+public class AemAppIntegrationFactory implements AppIntegrationFactory<SlingApplicationInstance, AemGlobalContext> {
 
     private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final Map<String, AemApplication> applicationMap = new HashMap<>();
+
+    private final Map<String, ResourceLoader> resourceLoaderMap = new HashMap<>();
+
+    private final Map<String, AemContextProvider> contextProviderMap = new HashMap<>();
+
+    @Reference
+    private AemProcessingPipelineFactory processingPipelineFactory;
+
+    private final List<TextParser> textParserList= new ArrayList<>();
+
+
+    @Nonnull
+    @Override
+    public Map<String, Application> getAllApplications() {
+        return Collections.unmodifiableMap(applicationMap);
+    }
+
+    @Nonnull
+    @Override
+    public Map<String, ResourceLoader> getAllResourceLoaders() {
+        return Collections.unmodifiableMap(resourceLoaderMap);
+    }
+
+    @Nonnull
+    @Override
+    public Map<String, ContextProvider<SlingApplicationInstance>> getAllContextProvider() {
+        return Collections.unmodifiableMap(contextProviderMap);
+    }
+
+    @Nonnull
+    @Override
+    public ProcessingPipelineFactory<AemGlobalContext> getProcessingPipelineFactory() {
+        return processingPipelineFactory;
+    }
+
+    @Nonnull
+    @Override
+    public Collection<TextParser> getAllTextParsers() {
+        return textParserList;
+    }
+
+
+    @Nullable
+    @Override
+    public Application getApplication(@Nonnull String id) {
+        return applicationMap.get(id);
+    }
+
+    @Nullable
+    @Override
+    public ResourceLoader getResourceLoader(String id) {
+        return resourceLoaderMap.get(id);
+    }
+
+    @Nullable
+    @Override
+    public ContextProvider<SlingApplicationInstance> getContextProvider(@Nonnull String providerName) {
+        return contextProviderMap.get(providerName);
+    }
 
     @Reference(name = "application", cardinality = ReferenceCardinality.MULTIPLE,
             policy = ReferencePolicy.DYNAMIC, policyOption = ReferencePolicyOption.GREEDY)
@@ -33,21 +88,7 @@ public class AemAppIntegrationFactory implements AppIntegrationFactory<SlingAppl
         applicationMap.remove(application.getApplicationId());
     }
 
-    @Nonnull
-    @Override
-    public Map<String, Application> getAllApplications() {
-        return Collections.unmodifiableMap(applicationMap);
-    }
-
-    @Nullable
-    @Override
-    public Application getApplication(@Nonnull String id) {
-        return applicationMap.get(id);
-    }
-
-    private final Map<String, ResourceLoader> resourceLoaderMap = new HashMap<>();
-
-    @Reference(name = "resourceLoader", cardinality = ReferenceCardinality.MULTIPLE,
+    @Reference(name = "resourceLoader", cardinality = ReferenceCardinality.AT_LEAST_ONE,
             policy = ReferencePolicy.DYNAMIC, policyOption = ReferencePolicyOption.GREEDY)
     protected void bindResourceLoader(final ResourceLoader resourceLoader) {
         resourceLoaderMap.put(resourceLoader.getClass().getSimpleName(), resourceLoader);
@@ -57,34 +98,23 @@ public class AemAppIntegrationFactory implements AppIntegrationFactory<SlingAppl
         resourceLoaderMap.remove(resourceLoader.getClass().getSimpleName());
     }
 
-
-
-    @Nullable
-    @Override
-    public ResourceLoader getResourceLoader(String id) {
-        return resourceLoaderMap.get(id);
+    @Reference(name = "contextProvider", cardinality = ReferenceCardinality.MULTIPLE,
+            policy = ReferencePolicy.DYNAMIC, policyOption = ReferencePolicyOption.GREEDY)
+    protected void bindContextProvider(final AemContextProvider contextProvider) {
+        contextProviderMap.put(contextProvider.getClass().getSimpleName(), contextProvider);
     }
 
-    @Override
-    public Map<String, ResourceLoader> getAllResourceLoaders() {
-        return Collections.unmodifiableMap(resourceLoaderMap);
+    protected void unbindContextProvider(final AemContextProvider contextProvider) {
+        contextProviderMap.remove(contextProvider.getClass().getSimpleName());
     }
 
-    @Nonnull
-    @Override
-    public ProcessingPipelineFactory getProcessingPipelineFactory() {
-        return null;
+    @Reference(name = "textParser", cardinality = ReferenceCardinality.MULTIPLE,
+            policy = ReferencePolicy.DYNAMIC, policyOption = ReferencePolicyOption.GREEDY)
+    protected void bindTextParser(final TextParser textParser) {
+        textParserList.add(textParser);
     }
 
-    @Nullable
-    @Override
-    public ContextProvider<SlingApplicationInstance> getContextProvider(@Nonnull String providerName) {
-        return null;
-    }
-
-    @Nonnull
-    @Override
-    public Collection<TextParser> getAllTextParsers() {
-        return null;
+    protected void unbindTextParser(final TextParser textParser) {
+        textParserList.remove(textParser);
     }
 }
