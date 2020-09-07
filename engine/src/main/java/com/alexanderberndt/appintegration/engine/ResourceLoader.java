@@ -7,6 +7,8 @@ import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 public interface ResourceLoader {
 
@@ -14,23 +16,24 @@ public interface ResourceLoader {
 
     ExternalResource load(@Nonnull final ExternalResourceRef resourceRef, @Nonnull final ExternalResourceFactory factory) throws IOException;
 
-    default ExternalResourceRef resolveAbsoluteUrl(final String absoluteUrl) {
+    default ExternalResourceRef resolveAbsoluteUrl(final String absoluteUrl) throws URISyntaxException {
         return resolveAbsoluteUrl(absoluteUrl, ExternalResourceType.ANY);
     }
 
-    default ExternalResourceRef resolveAbsoluteUrl(final String absoluteUrl, ExternalResourceType expectedType) {
-        return new ExternalResourceRef(absoluteUrl, expectedType);
+    default ExternalResourceRef resolveAbsoluteUrl(final String absoluteUrl, ExternalResourceType expectedType) throws URISyntaxException {
+        final URI uri = new URI(absoluteUrl);
+        return new ExternalResourceRef(uri, expectedType);
     }
 
-    default ExternalResourceRef resolveRelativeUrl(final ExternalResource baseResource, final String relativeUrl) {
+    default ExternalResourceRef resolveRelativeUrl(final ExternalResource baseResource, final String relativeUrl) throws URISyntaxException {
         return resolveRelativeUrl(baseResource, relativeUrl, ExternalResourceType.ANY);
     }
 
-    default ExternalResourceRef resolveRelativeUrl(final ExternalResource baseResource, final String relativeUrl, ExternalResourceType expectedType) {
-        return resolveRelativeUrl(baseResource.getUrl(), relativeUrl, expectedType);
+    default ExternalResourceRef resolveRelativeUrl(final ExternalResource baseResource, final String relativeUrl, ExternalResourceType expectedType) throws URISyntaxException {
+        return resolveRelativeUrl(baseResource.getUri(), relativeUrl, expectedType);
     }
 
-    ExternalResourceRef resolveRelativeUrl(final String baseUrl, final String relativeUrl, ExternalResourceType expectedType);
+    ExternalResourceRef resolveRelativeUrl(final URI baseUri, final String relativeUrl, ExternalResourceType expectedType) throws URISyntaxException;
 
 
 }

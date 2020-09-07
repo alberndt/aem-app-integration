@@ -8,6 +8,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mockito;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -36,12 +39,12 @@ class SystemResourceLoaderTest {
             "any-app/server/application-info.json,/simple-app1/server/resources/text1.txt",
             "/any-app/server/application-info.json,/simple-app1/server/resources/text1.txt"
     })
-    void resolveRelativeUrl(String baseUrl, String relativeUrl) {
+    void resolveRelativeUrl(String baseUrl, String relativeUrl) throws URISyntaxException {
         ExternalResource baseResourceMock = Mockito.mock(ExternalResource.class);
-        Mockito.when(baseResourceMock.getUrl()).thenReturn(baseUrl);
+        Mockito.when(baseResourceMock.getUri()).thenReturn(new URI(baseUrl));
 
         ExternalResourceRef ref = resourceLoader.resolveRelativeUrl(baseResourceMock, relativeUrl);
         assertNotNull(ref);
-        assertEquals(RESOURCE_PATH, ref.getUrl());
+        assertEquals(new URI(RESOURCE_PATH), ref.getUri());
     }
 }

@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.*;
 
@@ -18,7 +20,7 @@ public class ExternalResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private final String url;
+    private final URI uri;
 
     private final ResourceLoader loader;
 
@@ -36,7 +38,7 @@ public class ExternalResource {
             @Nonnull ExternalResourceRef resourceRef,
             @Nonnull ConversionSupplier conversionSupplier) {
         this.loader = loader;
-        this.url = resourceRef.getUrl();
+        this.uri = resourceRef.getUri();
         this.type = resourceRef.getExpectedType();
         this.content = new ConvertibleValue<>(null, Charset.defaultCharset(), conversionSupplier);
     }
@@ -47,7 +49,7 @@ public class ExternalResource {
             @Nonnull ExternalResourceRef resourceRef,
             @Nonnull ConversionSupplier conversionSupplier) {
         this.loader = loader;
-        this.url = resourceRef.getUrl();
+        this.uri = resourceRef.getUri();
         this.type = resourceRef.getExpectedType();
         this.content = new ConvertibleValue<>(inputStream, Charset.defaultCharset(), conversionSupplier);
     }
@@ -101,12 +103,12 @@ public class ExternalResource {
     }
 
 
-    public void addReference(String relativeUrl) {
+    public void addReference(String relativeUrl) throws URISyntaxException {
         LOG.debug("addReference({})", relativeUrl);
         referencedResources.add(loader.resolveRelativeUrl(this, relativeUrl));
     }
 
-    public void addReference(String relativeUrl, ExternalResourceType expectedType) {
+    public void addReference(String relativeUrl, ExternalResourceType expectedType) throws URISyntaxException {
         LOG.debug("addReference({},{})", relativeUrl, expectedType);
         referencedResources.add(loader.resolveRelativeUrl(this, relativeUrl, expectedType));
     }
@@ -115,8 +117,8 @@ public class ExternalResource {
         return Collections.unmodifiableList(referencedResources);
     }
 
-    public String getUrl() {
-        return url;
+    public URI getUri() {
+        return uri;
     }
 
     public ExternalResourceType getType() {

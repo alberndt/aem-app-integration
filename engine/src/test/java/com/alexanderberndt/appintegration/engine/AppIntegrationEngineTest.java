@@ -16,6 +16,8 @@ import org.junit.jupiter.api.Test;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -84,14 +86,14 @@ class AppIntegrationEngineTest {
     }
 
     @Test
-    void resolveSnippetResource() throws IOException {
+    void resolveSnippetResource() throws IOException, URISyntaxException {
         ApplicationInfoJson applicationInfoJson = engine.loadApplicationInfoJson(verifiedInstance.getApplication());
 
         final ExternalResourceRef resourceRef = engine.resolveSnippetResource(verifiedInstance, applicationInfoJson);
 
         assertNotNull(resourceRef);
         assertEquals(ExternalResourceType.HTML_SNIPPET, resourceRef.getExpectedType());
-        assertEquals("simple-app1/server/subscribe.product-news.de.html", resourceRef.getUrl());
+        assertEquals(new URI("simple-app1/server/subscribe.product-news.de.html"), resourceRef.getUri());
     }
 
 

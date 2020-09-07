@@ -22,7 +22,7 @@ class ExternalResourceTest {
 
     @BeforeEach
     void beforeEach() {
-        resource = new ExternalResource(null, new ExternalResourceRef("test-data.txt"), Collections::emptyList);
+        resource = new ExternalResource(null, ExternalResourceRef.create("test-data.txt"), Collections::emptyList);
         resource.setCharset(StandardCharsets.UTF_8);
         resource.setContent(new ByteArrayInputStream(TEST_DATA.getBytes(StandardCharsets.UTF_8)));
     }

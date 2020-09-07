@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import javax.annotation.Nonnull;
 import java.io.*;
+import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.Collections;
 
@@ -22,7 +23,7 @@ class AbstractResourceLoaderTest {
 
     private static final TestResourceLoader resourceLoader1000 = new TestResourceLoader(TEST_STRING, 1000, null);
 
-    private static final ExternalResourceRef resourceRef = new ExternalResourceRef("xxx", ExternalResourceType.PLAIN_TEXT);
+    private static final ExternalResourceRef resourceRef = ExternalResourceRef.create("xxx", ExternalResourceType.PLAIN_TEXT);
 
     @Test
     void loadAsString() throws IOException {
@@ -94,7 +95,7 @@ class AbstractResourceLoaderTest {
         }
 
         @Override
-        public ExternalResourceRef resolveRelativeUrl(String baseUrl, String relativeUrl, ExternalResourceType expectedType) {
+        public ExternalResourceRef resolveRelativeUrl(URI baseUri, String relativeUrl, ExternalResourceType expectedType) {
             return null;
         }
     }

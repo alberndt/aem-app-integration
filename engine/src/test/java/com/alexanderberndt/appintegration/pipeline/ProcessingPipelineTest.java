@@ -16,6 +16,8 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -28,7 +30,7 @@ class ProcessingPipelineTest {
     }
 
     @Test
-    void simpleProcessingPipeline() throws IOException {
+    void simpleProcessingPipeline() throws IOException, URISyntaxException {
 
         CoreTestGlobalContext context = new CoreTestGlobalContext(new Slf4jLogAppender());
         context.setResourceLoader(new SystemResourceLoader());
@@ -47,13 +49,13 @@ class ProcessingPipelineTest {
                 .withTaskParam("expectedType", "TEXT")
                 .build();
 
-        ExternalResourceRef resourceRef = new ExternalResourceRef("simple-app1/server/application-info.json", ExternalResourceType.APPLICATION_PROPERTIES);
+        ExternalResourceRef resourceRef = ExternalResourceRef.create("simple-app1/server/application-info.json", ExternalResourceType.APPLICATION_PROPERTIES);
         ExternalResource resource = pipeline.loadAndProcessResourceRef(resourceRef, this::createExternalResource);
 
         assertNotNull(resource);
         assertNotNull(resource.getReferencedResources());
         assertEquals(2, resource.getReferencedResources().size());
-        assertEquals("simple-app1/server/resources/text1.txt", resource.getReferencedResources().get(0).getUrl());
-        assertEquals("simple-app1/server/resources/to-be-filtered1.txt", resource.getReferencedResources().get(1).getUrl());
+        assertEquals(new URI("simple-app1/server/resources/text1.txt"), resource.getReferencedResources().get(0).getUri());
+        assertEquals(new URI("simple-app1/server/resources/to-be-filtered1.txt"), resource.getReferencedResources().get(1).getUri());
     }
 }

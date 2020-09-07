@@ -17,15 +17,11 @@ public class DownloadTask implements LoadingTask {
 
     @Override
     public ExternalResource load(@Nonnull TaskContext context, ExternalResourceRef resourceRef, ExternalResourceFactory factory) {
-        String loaderName = context.getValue("loader", String.class);
         ResourceLoader resourceLoader = context.getResourceLoader();
-
         try {
-
             return resourceLoader.load(resourceRef, factory);
-
         } catch (IOException e) {
-            throw new AppIntegrationException("Failed to load resource " + resourceRef.getUrl(), e);
+            throw new AppIntegrationException("Failed to load resource " + resourceRef.getUri(), e);
         }
     }
 

@@ -4,7 +4,7 @@ public interface ExternalResourcesSet {
 
 
     default void addResourceReference(String relativeUrl, ExternalResourceType expectedType) {
-        addResourceReference(new ExternalResourceRef(relativeUrl, expectedType));
+        addResourceReference(ExternalResourceRef.create(relativeUrl, expectedType));
     }
 
     void addResourceReference(ExternalResourceRef resourceRef);

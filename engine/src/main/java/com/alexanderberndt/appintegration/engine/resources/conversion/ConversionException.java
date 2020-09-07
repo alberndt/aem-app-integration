@@ -3,6 +3,9 @@ package com.alexanderberndt.appintegration.engine.resources.conversion;
 import java.io.IOException;
 
 public class ConversionException extends IOException {
+
+    private static final long serialVersionUID = -9167778603371832027L;
+
     /**
      * Constructs a new exception with the specified detail message.  The
      * cause is not initialized, and may subsequently be initialized by

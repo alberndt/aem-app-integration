@@ -21,11 +21,11 @@ public class ResourceLogger extends AbstractLogger {
     }
 
     public ResourceLogger(@Nonnull LogAppender appender, @Nonnull ExternalResourceRef resourceRef) {
-        this(appender, resourceRef.getUrl());
+        this(appender, resourceRef.getUri().toString());
     }
 
     public ResourceLogger(@Nonnull IntegrationLogger parentLogger, @Nonnull ExternalResourceRef resourceRef) {
-        this(parentLogger, resourceRef.getUrl());
+        this(parentLogger, resourceRef.getUri().toString());
     }
 
     @Nonnull

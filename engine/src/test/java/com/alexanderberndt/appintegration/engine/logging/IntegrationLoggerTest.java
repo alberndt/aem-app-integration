@@ -21,7 +21,7 @@ class IntegrationLoggerTest {
 
         Mockito.verify(appenderMock).appendLogEntry(integrationLogger, LogStatus.WARNING, "start something");
 
-        ExternalResourceRef resourceRef = new ExternalResourceRef("http://www.example.com:8080/blog/2020/article.html?preview=full#summary", ExternalResourceType.HTML);
+        ExternalResourceRef resourceRef = ExternalResourceRef.create("http://www.example.com:8080/blog/2020/article.html?preview=full#summary", ExternalResourceType.HTML);
         ResourceLogger resourceLogger = integrationLogger.createResourceLogger(resourceRef);
 
 //        assertEquals("www.example.com/blog/2020", resourceLogger.getLoggerPath());

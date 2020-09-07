@@ -10,23 +10,26 @@ import org.apache.commons.lang3.StringUtils;
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 public class SystemResourceLoader implements ResourceLoader {
 
     @Override
     public ExternalResource load(@Nonnull ExternalResourceRef resourceRef, @Nonnull ExternalResourceFactory factory) throws IOException {
-        final InputStream inputStream = ClassLoader.getSystemResourceAsStream(resourceRef.getUrl());
+        final InputStream inputStream = ClassLoader.getSystemResourceAsStream(resourceRef.getUri().getPath());
 
         if (inputStream != null) {
             return factory.createExternalResource(inputStream, resourceRef, this);
         } else {
-            throw new IOException(String.format("Resource %s not found!", resourceRef.getUrl()));
+            throw new IOException(String.format("Resource %s not found!", resourceRef.getUri()));
         }
     }
 
     @Override
-    public ExternalResourceRef resolveRelativeUrl(String baseUrl, String relativeUrl, ExternalResourceType expectedType) {
+    public ExternalResourceRef resolveRelativeUrl(URI baseUri, String relativeUrl, ExternalResourceType expectedType) throws URISyntaxException {
         final String url;
+        final String baseUrl = baseUri.getPath();
         if (!StringUtils.contains(baseUrl, '/') || StringUtils.startsWith(relativeUrl, "/")) {
             url = trimSlashes(relativeUrl);
         } else {

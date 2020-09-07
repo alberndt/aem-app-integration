@@ -29,7 +29,7 @@ public class HttpResourceLoader implements ResourceLoader {
     public ExternalResource load(@Nonnull ExternalResourceRef resourceRef, @Nonnull ExternalResourceFactory factory) {
 
         try {
-            final URL url = new URL(resourceRef.getUrl());
+            final URL url = resourceRef.getUri().toURL();
 
             // ToDo: Use global proxy settings
 
@@ -54,28 +54,27 @@ public class HttpResourceLoader implements ResourceLoader {
                 // ToDo: verify mime type, get charset
                 final String mimeType = connection.getHeaderField("Content-Type");
                 System.out.println(mimeType);
-                LOG.info("Fetching content for {}", resource.getUrl());
+                LOG.info("Fetching content for {}", resource.getUri());
 
                 return resource;
 
             } else {
-                throw new AppIntegrationException("Failed to load resource " + resourceRef.getUrl()
+                throw new AppIntegrationException("Failed to load resource " + resourceRef.getUri()
                         + " - status: " + connection.getResponseCode()
                         + " - message: " + connection.getResponseMessage());
             }
         } catch (Exception e) {
-            throw new AppIntegrationException("Failed to load resource " + resourceRef.getUrl(), e);
+            throw new AppIntegrationException("Failed to load resource " + resourceRef.getUri(), e);
         }
     }
 
     @Override
-    public ExternalResourceRef resolveRelativeUrl(@Nonnull String baseUrl, @Nonnull String relativeUrl, @Nonnull ExternalResourceType expectedType) {
+    public ExternalResourceRef resolveRelativeUrl(@Nonnull URI baseUri, @Nonnull String relativeUrl, @Nonnull ExternalResourceType expectedType) {
         try {
-            final URI baseUri = new URI(baseUrl);
             final URL url = baseUri.resolve(relativeUrl).toURL();
             return resolveAbsoluteUrl(url.toString(), expectedType);
         } catch (URISyntaxException | MalformedURLException e) {
-            LOG.error(String.format("Cannot resolve relative-url %s from base-url %s", relativeUrl, baseUrl), e);
+            LOG.error(String.format("Cannot resolve relative-url %s from base-url %s", relativeUrl, baseUri), e);
             // ToDo: Add error message to any context object
             return null;
         }

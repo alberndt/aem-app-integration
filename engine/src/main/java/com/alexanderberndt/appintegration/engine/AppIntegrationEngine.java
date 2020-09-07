@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
 import java.lang.ref.SoftReference;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 
 public abstract class AppIntegrationEngine<I extends ApplicationInstance, C extends GlobalContext> {
@@ -121,7 +123,7 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
         // add global properties
         final Map<String, Object> globalProperties = application.getGlobalProperties();
         if (globalProperties != null) {
-            ResourceLogger resourceLogger = context.getIntegrationLog().createResourceLogger(new ExternalResourceRef("global", ExternalResourceType.ANY));
+            ResourceLogger resourceLogger = context.getIntegrationLog().createResourceLogger(ExternalResourceRef.create("global", ExternalResourceType.ANY));
             final TaskLogger taskLogger = resourceLogger.createTaskLogger("set-globals", "Set Global Properties Task");
             final TaskContext taskContext = context.createTaskContext(
                     taskLogger, Ranking.GLOBAL, "global", ExternalResourceType.ANY, Collections.emptyMap());
@@ -180,7 +182,7 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
     protected ApplicationInfoJson loadApplicationInfoJson(@Nonnull Application application) throws IOException {
         final ResourceLoader loader = requireResourceLoader(application);
         final String url = application.getApplicationInfoUrl();
-        ExternalResource res = loader.load(new ExternalResourceRef(url, ExternalResourceType.APPLICATION_PROPERTIES), this::createExternalResource);
+        ExternalResource res = loader.load(ExternalResourceRef.create(url, ExternalResourceType.APPLICATION_PROPERTIES), this::createExternalResource);
         return res.getContentAsParsedObject(ApplicationInfoJson.class);
     }
 
@@ -196,9 +198,20 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
         }
 
         final String baseUrl = instance.getApplication().getApplicationInfoUrl();
+        final URI baseUri;
+        try {
+            baseUri = new URI(baseUrl);
+        } catch (URISyntaxException e) {
+            throw new AppIntegrationException("Cannot create URI for " + baseUrl, e);
+        }
         final String relativeUrlTemplate = componentInfo.getUrl();
         final String relativeUrl = resolveStringWithContextVariables(instance, relativeUrlTemplate);
-        return instance.getResourceLoader().resolveRelativeUrl(baseUrl, relativeUrl, ExternalResourceType.HTML_SNIPPET);
+        try {
+            // ToDo: Re-work URI handling
+            return instance.getResourceLoader().resolveRelativeUrl(baseUri, relativeUrl, ExternalResourceType.HTML_SNIPPET);
+        } catch (URISyntaxException e) {
+            throw new AppIntegrationException("cannot resolve snippet - no valid URI", e);
+        }
     }
 
 

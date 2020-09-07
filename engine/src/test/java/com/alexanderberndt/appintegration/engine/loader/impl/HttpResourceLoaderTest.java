@@ -24,7 +24,7 @@ class HttpResourceLoaderTest {
 
     @Test
     void load() throws IOException {
-        ExternalResourceRef ref = new ExternalResourceRef("http://www.alexanderberndt.com", ExternalResourceType.HTML);
+        ExternalResourceRef ref = ExternalResourceRef.create("http://www.alexanderberndt.com", ExternalResourceType.HTML);
 
         ExternalResource resource = resourceLoader.load(ref, this::createExternalResource);
         System.out.println(resource.getContentAsParsedObject(String.class));
