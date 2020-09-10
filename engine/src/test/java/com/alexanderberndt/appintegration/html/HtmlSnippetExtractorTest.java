@@ -4,8 +4,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 class HtmlSnippetExtractorTest {
 
     @BeforeEach
@@ -18,7 +16,6 @@ class HtmlSnippetExtractorTest {
 
     @Test
     void verifyConfig() {
-        assertEquals(1, 1, "Eins sollte nicht Zwei sein");
     }
 
     @Test
