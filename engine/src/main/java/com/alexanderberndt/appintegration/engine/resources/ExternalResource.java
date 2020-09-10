@@ -21,6 +21,8 @@ public class ExternalResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
+    public enum LoadStatus {OK, CACHED}
+
     @Nonnull
     private final URI uri;
 
@@ -38,6 +40,10 @@ public class ExternalResource {
 
     @Nonnull
     private final List<ExternalResourceRef> referencedResources = new ArrayList<>();
+
+    private LoadStatus loadStatus;
+
+    private Map<String, Object> loadStatusDetails;
 
     public ExternalResource(
             @Nonnull URI uri,
@@ -129,30 +135,49 @@ public class ExternalResource {
 
 
     public void addReference(String relativeUrl) throws URISyntaxException {
-        LOG.debug("addReference({})", relativeUrl);
-        referencedResources.add(loader.resolveRelativeUrl(this, relativeUrl));
+        this.addReference(relativeUrl, ExternalResourceType.ANY);
     }
 
     public void addReference(String relativeUrl, ExternalResourceType expectedType) throws URISyntaxException {
         LOG.debug("addReference({},{})", relativeUrl, expectedType);
-        referencedResources.add(loader.resolveRelativeUrl(this, relativeUrl, expectedType));
+        // ToDo: Use ExternalResourceSet to identify duplicate resource references
+        final URI referenceUri = this.getUri().resolve(relativeUrl);
+        referencedResources.add(new ExternalResourceRef(referenceUri, expectedType));
     }
 
     public List<ExternalResourceRef> getReferencedResources() {
         return Collections.unmodifiableList(referencedResources);
     }
 
+    @Nonnull
     public URI getUri() {
         return uri;
     }
 
+    @Nonnull
     public ExternalResourceType getType() {
         return type;
     }
 
     public void setType(@Nonnull ExternalResourceType type) {
         LOG.debug("setType({})", type);
-        this.type = type;
+        // don't overwrite a more qualified type
+        if (!this.type.isMoreQualifiedThan(type)) {
+            this.type = type;
+        }
+    }
+
+    public void setLoadStatus(LoadStatus loadStatus, Map<String, Object> loadStatusDetails) {
+        this.loadStatus = loadStatus;
+        this.loadStatusDetails = loadStatusDetails;
+    }
+
+    public LoadStatus getLoadStatus() {
+        return loadStatus;
+    }
+
+    public Map<String, Object> getLoadStatusDetails() {
+        return loadStatusDetails;
     }
 
 }

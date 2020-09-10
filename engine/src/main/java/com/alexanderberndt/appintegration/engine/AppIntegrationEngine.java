@@ -177,15 +177,20 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
 
     /* Internal methods */
 
+    @Nonnull
     protected ExternalResource createExternalResource(@Nonnull URI uri, @Nullable ExternalResourceType type, @Nonnull InputStream content, Map<String, Object> metadataMap) {
         return new ExternalResource(uri, type, content, metadataMap, null, () -> Collections.singletonList(new StringConverter()));
     }
 
-    protected ApplicationInfoJson loadApplicationInfoJson(@Nonnull Application application) throws IOException {
+    protected ApplicationInfoJson loadApplicationInfoJson(@Nonnull Application application) {
         final ResourceLoader loader = requireResourceLoader(application);
         final String url = application.getApplicationInfoUrl();
-        ExternalResource res = loader.load(ExternalResourceRef.create(url, ExternalResourceType.APPLICATION_PROPERTIES), this::createExternalResource);
-        return res.getContentAsParsedObject(ApplicationInfoJson.class);
+        try {
+            ExternalResource loadedRes = loader.load(ExternalResourceRef.create(url, ExternalResourceType.APPLICATION_PROPERTIES), this::createExternalResource);
+            return loadedRes.getContentAsParsedObject(ApplicationInfoJson.class);
+        } catch (ResourceLoaderException | IOException e) {
+            throw new AppIntegrationException("Cannot load application-info.json", e);
+        }
     }
 
 
@@ -208,12 +213,12 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
         }
         final String relativeUrlTemplate = componentInfo.getUrl();
         final String relativeUrl = resolveStringWithContextVariables(instance, relativeUrlTemplate);
-        try {
-            // ToDo: Re-work URI handling
-            return instance.getResourceLoader().resolveRelativeUrl(baseUri, relativeUrl, ExternalResourceType.HTML_SNIPPET);
-        } catch (URISyntaxException e) {
-            throw new AppIntegrationException("cannot resolve snippet - no valid URI", e);
-        }
+//        try {
+        // ToDo: Re-work URI handling
+        return resolveRelativeUrl(baseUri, relativeUrl, ExternalResourceType.HTML_SNIPPET);
+//        } catch (URISyntaxException e) {
+//            throw new AppIntegrationException("cannot resolve snippet - no valid URI", e);
+//        }
     }
 
 
@@ -255,6 +260,18 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
             throw new AppIntegrationException(String.format("Application %s is not defined!", applicationId));
         }
         return application;
+    }
+
+    public ExternalResourceRef resolveRelativeUrl(@Nonnull URI baseUri, @Nonnull String relativeUrl, @Nonnull ExternalResourceType expectedType) {
+//        try {
+//            final URL url = baseUri.resolve(relativeUrl).toURL();
+//            // ToDo: Add handling of relative urls
+//            //return resolveAbsoluteUrl(url.toString(), expectedType);
+//        } catch (URISyntaxException | MalformedURLException e) {
+//            LOG.error(String.format("Cannot resolve relative-url %s from base-url %s", relativeUrl, baseUri), e);
+//            // ToDo: Add error message to any context object
+        return null;
+//        }
     }
 
     @Nonnull

@@ -1,6 +1,7 @@
 package com.alexanderberndt.appintegration.tasks.load;
 
 import com.alexanderberndt.appintegration.engine.ResourceLoader;
+import com.alexanderberndt.appintegration.engine.ResourceLoaderException;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceFactory;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
@@ -20,9 +21,8 @@ public class DownloadTask implements LoadingTask {
         ResourceLoader resourceLoader = context.getResourceLoader();
         try {
             return resourceLoader.load(resourceRef, factory);
-        } catch (IOException e) {
+        } catch (IOException | ResourceLoaderException e) {
             throw new AppIntegrationException("Failed to load resource " + resourceRef.getUri(), e);
         }
     }
-
 }

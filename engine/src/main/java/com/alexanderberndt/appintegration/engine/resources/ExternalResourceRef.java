@@ -1,31 +1,39 @@
 package com.alexanderberndt.appintegration.engine.resources;
 
 import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
-import com.alexanderberndt.appintegration.pipeline.configuration.PipelineConfiguration;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Supplier;
 
 public class ExternalResourceRef {
 
     @Nonnull
     private final URI uri;
 
+    @Nonnull
     private ExternalResourceType expectedType;
 
-    private final PipelineConfiguration properties = new PipelineConfiguration();
+    @Nonnull
+    private final Map<String, Object> metadataMap = new HashMap<>();
 
-    public ExternalResourceRef(@Nonnull URI uri) {
+    @Nullable
+    private Supplier<ExternalResource> cachedExternalRes;
+
+
+    public ExternalResourceRef(@Nonnull URI uri, @Nullable ExternalResourceType expectedType) {
         this.uri = uri;
-        this.expectedType = ExternalResourceType.ANY;
+        this.expectedType = (expectedType != null) ? expectedType : ExternalResourceType.ANY;
     }
 
-    public ExternalResourceRef(@Nonnull URI uri, @Nonnull ExternalResourceType expectedType) {
-        this.uri = uri;
-        this.expectedType = expectedType;
+    public ExternalResourceRef(@Nonnull URI uri) {
+        this(uri, null);
     }
 
     public static ExternalResourceRef create(@Nonnull String url) {
@@ -46,18 +54,45 @@ public class ExternalResourceRef {
         return uri;
     }
 
+    @Nonnull
     public ExternalResourceType getExpectedType() {
         return expectedType;
     }
 
-    public void setExpectedType(ExternalResourceType expectedType) {
-        this.expectedType = expectedType;
+    public void setExpectedType(@Nullable ExternalResourceType expectedType) {
+        this.expectedType = (expectedType != null) ? expectedType : ExternalResourceType.ANY;
     }
 
-    public PipelineConfiguration getProperties() {
-        return properties;
+    public Map<String, Object> getMetadataMap() {
+        return metadataMap;
     }
 
+    public void setMetadata(@Nonnull String name, @Nullable Object value) {
+        if (value != null) {
+            metadataMap.put(name, value);
+        } else {
+            metadataMap.remove(name);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T getMetadata(@Nonnull String name, @Nonnull Class<T> tClass) {
+        final Object value = metadataMap.get(name);
+        if (tClass.isInstance(value)) {
+            return (T) value;
+        } else {
+            return null;
+        }
+    }
+
+    @Nullable
+    public Supplier<ExternalResource> getCachedExternalRes() {
+        return cachedExternalRes;
+    }
+
+    public void setCachedExternalRes(@Nullable Supplier<ExternalResource> cachedExternalRes) {
+        this.cachedExternalRes = cachedExternalRes;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -83,4 +118,5 @@ public class ExternalResourceRef {
                 ", expectedType=" + expectedType +
                 '}';
     }
+
 }

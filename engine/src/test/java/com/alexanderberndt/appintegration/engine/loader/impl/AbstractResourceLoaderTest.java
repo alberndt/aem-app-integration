@@ -48,6 +48,7 @@ class AbstractResourceLoaderTest {
         assert1000Lines(new LineNumberReader(resource.getContentAsReader()));
     }
 
+    @Nonnull
     protected ExternalResource createExternalResource(@Nonnull URI uri, @Nullable ExternalResourceType type, @Nonnull InputStream content, Map<String, Object> metadataMap) {
         return new ExternalResource(uri, type, content, metadataMap, resourceLoader1000, () -> Collections.singletonList(new StringConverter()));
     }
@@ -87,6 +88,7 @@ class AbstractResourceLoaderTest {
             this.byteArray = byteArrayOutputStream.toByteArray();
         }
 
+        @Nonnull
         @Override
         public ExternalResource load(@Nonnull ExternalResourceRef resourceRef, @Nonnull ExternalResourceFactory factory) {
             ExternalResource externalResource = factory.createExternalResource(resourceRef, new ByteArrayInputStream(byteArray));
@@ -94,11 +96,6 @@ class AbstractResourceLoaderTest {
                 externalResource.setCharset(charset);
             }
             return externalResource;
-        }
-
-        @Override
-        public ExternalResourceRef resolveRelativeUrl(URI baseUri, String relativeUrl, ExternalResourceType expectedType) {
-            return null;
         }
     }
 
