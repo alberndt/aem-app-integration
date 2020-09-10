@@ -20,7 +20,7 @@ public class SystemResourceLoader implements ResourceLoader {
         final InputStream inputStream = ClassLoader.getSystemResourceAsStream(resourceRef.getUri().getPath());
 
         if (inputStream != null) {
-            return factory.createExternalResource(inputStream, resourceRef, this);
+            return factory.createExternalResource(resourceRef, inputStream);
         } else {
             throw new IOException(String.format("Resource %s not found!", resourceRef.getUri()));
         }

@@ -10,10 +10,12 @@ import com.alexanderberndt.appintegration.engine.resources.conversion.StringConv
 import org.junit.jupiter.api.Test;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.*;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.Collections;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -46,8 +48,8 @@ class AbstractResourceLoaderTest {
         assert1000Lines(new LineNumberReader(resource.getContentAsReader()));
     }
 
-    protected ExternalResource createExternalResource(InputStream inputStream, ExternalResourceRef resourceRef, ResourceLoader loader) {
-        return new ExternalResource(inputStream, loader, resourceRef, () -> Collections.singletonList(new StringConverter()));
+    protected ExternalResource createExternalResource(@Nonnull URI uri, @Nullable ExternalResourceType type, @Nonnull InputStream content, Map<String, Object> metadataMap) {
+        return new ExternalResource(uri, type, content, metadataMap, resourceLoader1000, () -> Collections.singletonList(new StringConverter()));
     }
 
 
@@ -87,7 +89,7 @@ class AbstractResourceLoaderTest {
 
         @Override
         public ExternalResource load(@Nonnull ExternalResourceRef resourceRef, @Nonnull ExternalResourceFactory factory) {
-            ExternalResource externalResource = factory.createExternalResource(new ByteArrayInputStream(byteArray), resourceRef, this);
+            ExternalResource externalResource = factory.createExternalResource(resourceRef, new ByteArrayInputStream(byteArray));
             if (charset != null) {
                 externalResource.setCharset(charset);
             }

@@ -1,5 +1,8 @@
 package com.alexanderberndt.appintegration.engine.resources;
 
+import org.apache.commons.lang3.StringUtils;
+
+import javax.annotation.Nullable;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
@@ -63,11 +66,21 @@ public enum ExternalResourceType {
         return true;
     }
 
-    public static ExternalResourceType parse(String str) {
+    @Nullable
+    public static ExternalResourceType parse(@Nullable String str) {
+        if (StringUtils.isBlank(str)) {
+            return null;
+        }
         try {
             return ExternalResourceType.valueOf(str.toUpperCase().replace('-', '_'));
         } catch (IllegalArgumentException e) {
             return null;
         }
+    }
+
+
+    @Override
+    public String toString() {
+        return super.toString().toLowerCase().replace('_', '-');
     }
 }

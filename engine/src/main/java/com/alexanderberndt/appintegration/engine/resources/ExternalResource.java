@@ -1,12 +1,13 @@
 package com.alexanderberndt.appintegration.engine.resources;
 
 import com.alexanderberndt.appintegration.engine.ResourceLoader;
-import com.alexanderberndt.appintegration.engine.resources.conversion.ConversionSupplier;
 import com.alexanderberndt.appintegration.engine.resources.conversion.ConvertibleValue;
+import com.alexanderberndt.appintegration.engine.resources.conversion.TextParserSupplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -20,47 +21,71 @@ public class ExternalResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
+    @Nonnull
     private final URI uri;
 
+    @Nullable
     private final ResourceLoader loader;
 
-    private final Map<String, String> metadataMap = new HashMap<>();
+    @Nonnull
+    private final Map<String, Object> metadataMap = new HashMap<>();
 
+    @Nonnull
     private ExternalResourceType type;
 
     @Nonnull
     private ConvertibleValue<?> content;
 
+    @Nonnull
     private final List<ExternalResourceRef> referencedResources = new ArrayList<>();
 
     public ExternalResource(
-            @Nonnull ResourceLoader loader,
-            @Nonnull ExternalResourceRef resourceRef,
-            @Nonnull ConversionSupplier conversionSupplier) {
+            @Nonnull URI uri,
+            @Nullable ExternalResourceType type,
+            @Nullable InputStream content,
+            @Nullable Map<String, Object> metadataMap,
+            @Nullable ResourceLoader loader,
+            @Nullable TextParserSupplier textParserSupplier) {
+        this.type = (type != null) ? type : ExternalResourceType.ANY;
+        this.uri = uri;
         this.loader = loader;
-        this.uri = resourceRef.getUri();
-        this.type = resourceRef.getExpectedType();
-        this.content = new ConvertibleValue<>(null, Charset.defaultCharset(), conversionSupplier);
+        this.content = new ConvertibleValue<>(content, this.type.getDefaultCharset(), textParserSupplier);
+        if (metadataMap != null) this.metadataMap.putAll(metadataMap);
+    }
+
+
+    public ExternalResource(
+            @Nullable ResourceLoader loader,
+            @Nonnull ExternalResourceRef resourceRef,
+            @Nonnull TextParserSupplier textParserSupplier) {
+        this(resourceRef.getUri(), resourceRef.getExpectedType(), null, null, loader, textParserSupplier);
     }
 
     public ExternalResource(
-            @Nonnull InputStream inputStream,
-            @Nonnull ResourceLoader loader,
+            @Nullable InputStream content,
+            @Nullable ResourceLoader loader,
             @Nonnull ExternalResourceRef resourceRef,
-            @Nonnull ConversionSupplier conversionSupplier) {
-        this.loader = loader;
-        this.uri = resourceRef.getUri();
-        this.type = resourceRef.getExpectedType();
-        this.content = new ConvertibleValue<>(inputStream, Charset.defaultCharset(), conversionSupplier);
+            @Nullable TextParserSupplier textParserSupplier) {
+        this(resourceRef.getUri(), resourceRef.getExpectedType(), content, null, loader, textParserSupplier);
     }
 
-    public void setMetadata(String name, String value) {
+    public void setMetadata(@Nonnull String name, @Nullable Object value) {
         LOG.debug("setMetadata({}, {})", name, value);
-        metadataMap.put(name, value);
+        if (value != null) {
+            metadataMap.put(name, value);
+        } else {
+            metadataMap.remove(name);
+        }
     }
 
-    public String getMetadata(String name) {
-        return metadataMap.get(name);
+    @SuppressWarnings("unchecked")
+    public <T> T getMetadata(@Nonnull String name, @Nonnull Class<T> tClass) {
+        final Object value = metadataMap.get(name);
+        if (tClass.isInstance(value)) {
+            return (T) value;
+        } else {
+            return null;
+        }
     }
 
     public InputStream getContentAsInputStream() throws IOException {

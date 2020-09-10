@@ -40,4 +40,7 @@ public interface AppIntegrationFactory<I extends ApplicationInstance, C extends 
         return getAllContextProvider().get(providerName);
     }
 
+
+
+
 }

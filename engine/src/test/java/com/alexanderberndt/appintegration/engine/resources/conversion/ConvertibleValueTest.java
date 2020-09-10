@@ -22,7 +22,7 @@ class ConvertibleValueTest {
 
     private static final List<TextParser> textParsers = Arrays.asList(new StringConverter(), new MyParser());
 
-    private static final ConversionSupplier CONVERSION_SUPPLIER = () -> textParsers;
+    private static final TextParserSupplier CONVERSION_SUPPLIER = () -> textParsers;
 
     private static Stream<Arguments> provideInputValues() {
         return Stream.of(
@@ -62,7 +62,7 @@ class ConvertibleValueTest {
 
     @ParameterizedTest(name = "{index} {0}")
     @MethodSource("provideInputValues")
-    void convertToString(String inputTypeName, ConvertibleValue<?> inputResource) throws IOException, ConversionException {
+    void convertToString(String inputTypeName, ConvertibleValue<?> inputResource) throws IOException {
         ConvertibleValue<String> resource = inputResource.convertTo(String.class);
         assertNotNull(resource, "conversion of " + inputTypeName + " should return something");
         assertEquals(TEST_DATA, resource.get(), "conversion of " + inputTypeName + " should return expected result");
@@ -70,7 +70,7 @@ class ConvertibleValueTest {
 
     @ParameterizedTest(name = "{index} {0}")
     @MethodSource("provideInputValues")
-    void convertToReader(String inputTypeName, ConvertibleValue<?> inputResource) throws IOException, ConversionException {
+    void convertToReader(String inputTypeName, ConvertibleValue<?> inputResource) throws IOException {
         ConvertibleValue<Reader> resource = inputResource.convertToReaderValue();
         assertNotNull(resource, "conversion of " + inputTypeName + " should return something");
 
@@ -80,7 +80,7 @@ class ConvertibleValueTest {
 
     @ParameterizedTest(name = "{index} {0}")
     @MethodSource("provideInputValues")
-    void convertToInputStream(String inputTypeName, ConvertibleValue<?> inputResource) throws IOException, ConversionException {
+    void convertToInputStream(String inputTypeName, ConvertibleValue<?> inputResource) throws IOException {
         ConvertibleValue<InputStream> resource = inputResource.convertToInputStreamValue();
         assertNotNull(resource, "conversion of " + inputTypeName + " should return something");
 
@@ -90,7 +90,7 @@ class ConvertibleValueTest {
 
     @ParameterizedTest(name = "{index} {0}")
     @MethodSource("provideInputValues")
-    void convertToParsedText(String inputTypeName, ConvertibleValue<?> inputResource) throws IOException, ConversionException {
+    void convertToParsedText(String inputTypeName, ConvertibleValue<?> inputResource) throws IOException {
         ConvertibleValue<ParsedText> resource = inputResource.convertTo(ParsedText.class);
         assertNotNull(resource, "conversion of " + inputTypeName + " should return something");
         assertEquals(TEST_DATA, resource.get().getText(), "conversion of " + inputTypeName + " should return expected result");
@@ -98,7 +98,7 @@ class ConvertibleValueTest {
 
     @ParameterizedTest(name = "{index} {0}")
     @MethodSource("provideInputValues")
-    void convertToParsedText2(String inputTypeName, ConvertibleValue<?> inputResource) throws IOException, ConversionException {
+    void convertToParsedText2(String inputTypeName, ConvertibleValue<?> inputResource) throws IOException {
         ConvertibleValue<ParsedText2> resource = inputResource.convertTo(ParsedText2.class);
         assertNotNull(resource, "conversion of " + inputTypeName + " should return something");
         assertEquals(TEST_DATA, resource.get().getText(), "conversion of " + inputTypeName + " should return expected result");
@@ -114,7 +114,7 @@ class ConvertibleValueTest {
 
     @ParameterizedTest(name = "{index} {0}")
     @MethodSource("provideNullValues")
-    void convertNullToReader(String inputTypeName, ConvertibleValue<?> inputResource) throws IOException, ConversionException {
+    void convertNullToReader(String inputTypeName, ConvertibleValue<?> inputResource) throws IOException {
         ConvertibleValue<Reader> resource = inputResource.convertToReaderValue();
         assertNotNull(resource, "conversion of " + inputTypeName + " should return something");
         assertNull(resource.get(), "conversion of " + inputTypeName + " should return a null-value");
@@ -130,7 +130,7 @@ class ConvertibleValueTest {
 
     @ParameterizedTest(name = "{index} {0}")
     @MethodSource("provideNullValues")
-    void convertNullToInputStream(String inputTypeName, ConvertibleValue<?> inputResource) throws IOException, ConversionException {
+    void convertNullToInputStream(String inputTypeName, ConvertibleValue<?> inputResource) throws IOException {
         ConvertibleValue<InputStream> resource = inputResource.convertToInputStreamValue();
         assertNotNull(resource, "conversion of " + inputTypeName + " should return something");
         assertNull(resource.get(), "conversion of " + inputTypeName + " should return a null-value");

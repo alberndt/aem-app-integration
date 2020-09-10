@@ -16,23 +16,28 @@ public interface ResourceLoader {
 
     ExternalResource load(@Nonnull final ExternalResourceRef resourceRef, @Nonnull final ExternalResourceFactory factory) throws IOException;
 
+    @Deprecated
     default ExternalResourceRef resolveAbsoluteUrl(final String absoluteUrl) throws URISyntaxException {
         return resolveAbsoluteUrl(absoluteUrl, ExternalResourceType.ANY);
     }
 
+    @Deprecated
     default ExternalResourceRef resolveAbsoluteUrl(final String absoluteUrl, ExternalResourceType expectedType) throws URISyntaxException {
         final URI uri = new URI(absoluteUrl);
         return new ExternalResourceRef(uri, expectedType);
     }
 
+    @Deprecated
     default ExternalResourceRef resolveRelativeUrl(final ExternalResource baseResource, final String relativeUrl) throws URISyntaxException {
         return resolveRelativeUrl(baseResource, relativeUrl, ExternalResourceType.ANY);
     }
 
+    @Deprecated
     default ExternalResourceRef resolveRelativeUrl(final ExternalResource baseResource, final String relativeUrl, ExternalResourceType expectedType) throws URISyntaxException {
         return resolveRelativeUrl(baseResource.getUri(), relativeUrl, expectedType);
     }
 
+    @Deprecated
     ExternalResourceRef resolveRelativeUrl(final URI baseUri, final String relativeUrl, ExternalResourceType expectedType) throws URISyntaxException;
 
 

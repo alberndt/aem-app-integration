@@ -49,7 +49,7 @@ public class HttpResourceLoader implements ResourceLoader {
 
             if (connection.getResponseCode() == 200) {
 
-                ExternalResource resource = factory.createExternalResource(connection.getInputStream(), resourceRef, this);
+                ExternalResource resource = factory.createExternalResource(resourceRef, connection.getInputStream());
 
                 // ToDo: verify mime type, get charset
                 final String mimeType = connection.getHeaderField("Content-Type");

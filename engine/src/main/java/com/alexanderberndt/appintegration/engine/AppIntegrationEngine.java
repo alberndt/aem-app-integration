@@ -5,6 +5,7 @@ import com.alexanderberndt.appintegration.engine.logging.TaskLogger;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
+import com.alexanderberndt.appintegration.engine.resources.conversion.StringConverter;
 import com.alexanderberndt.appintegration.engine.resourcetypes.appinfo.ApplicationInfoJson;
 import com.alexanderberndt.appintegration.engine.resourcetypes.appinfo.ComponentInfoJson;
 import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
@@ -18,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
@@ -175,8 +177,8 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
 
     /* Internal methods */
 
-    protected ExternalResource createExternalResource(InputStream inputStream, ExternalResourceRef resourceRef, ResourceLoader loader) {
-        return new ExternalResource(inputStream, loader, resourceRef, () -> getFactory().getAllTextParsers());
+    protected ExternalResource createExternalResource(@Nonnull URI uri, @Nullable ExternalResourceType type, @Nonnull InputStream content, Map<String, Object> metadataMap) {
+        return new ExternalResource(uri, type, content, metadataMap, null, () -> Collections.singletonList(new StringConverter()));
     }
 
     protected ApplicationInfoJson loadApplicationInfoJson(@Nonnull Application application) throws IOException {

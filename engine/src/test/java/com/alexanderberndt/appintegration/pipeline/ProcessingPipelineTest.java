@@ -14,26 +14,31 @@ import com.alexanderberndt.appintegration.tasks.prepare.PropertiesTask;
 import com.alexanderberndt.appintegration.tasks.process.AddReferencedResourceTask;
 import org.junit.jupiter.api.Test;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class ProcessingPipelineTest {
 
-    protected ExternalResource createExternalResource(InputStream inputStream, ExternalResourceRef resourceRef, ResourceLoader loader) {
-        return new ExternalResource(loader, resourceRef, () -> Collections.singletonList(new StringConverter()));
+    private final ResourceLoader resourceLoader = new SystemResourceLoader();
+
+    protected ExternalResource createExternalResource(@Nonnull URI uri, @Nullable ExternalResourceType type, @Nonnull InputStream content, Map<String, Object> metadataMap) {
+        return new ExternalResource(uri, type, content, metadataMap, resourceLoader, () -> Collections.singletonList(new StringConverter()));
     }
 
     @Test
     void simpleProcessingPipeline() throws IOException, URISyntaxException {
 
         CoreTestGlobalContext context = new CoreTestGlobalContext(new Slf4jLogAppender());
-        context.setResourceLoader(new SystemResourceLoader());
+        context.setResourceLoader(resourceLoader);
         ResourceLogger resourceLogger = context.getIntegrationLog().createResourceLogger("simple-processing-pipeline");
 
         ProcessingPipeline pipeline = ProcessingPipeline.createPipelineInstance(context, resourceLogger)

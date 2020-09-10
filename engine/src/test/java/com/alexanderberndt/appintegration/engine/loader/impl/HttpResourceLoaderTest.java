@@ -8,17 +8,21 @@ import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
 import com.alexanderberndt.appintegration.engine.resources.conversion.StringConverter;
 import org.junit.jupiter.api.Test;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.Collections;
+import java.util.Map;
 
 class HttpResourceLoaderTest {
 
 
-    private ResourceLoader resourceLoader = new HttpResourceLoader();
+    private final ResourceLoader resourceLoader = new HttpResourceLoader();
 
-    protected ExternalResource createExternalResource(InputStream inputStream, ExternalResourceRef resourceRef, ResourceLoader loader) {
-        return new ExternalResource(loader, resourceRef, () -> Collections.singletonList(new StringConverter()));
+    protected ExternalResource createExternalResource(@Nonnull URI uri, @Nullable ExternalResourceType type, @Nonnull InputStream content, Map<String, Object> metadataMap) {
+        return new ExternalResource(uri, type, content, metadataMap, resourceLoader, () -> Collections.singletonList(new StringConverter()));
     }
 
 

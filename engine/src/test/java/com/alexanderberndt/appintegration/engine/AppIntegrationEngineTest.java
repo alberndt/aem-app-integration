@@ -58,6 +58,7 @@ class AppIntegrationEngineTest {
     }
 
     @Test
+    @Disabled
     void loadApplicationInfoJson() throws IOException {
         ApplicationInfoJson applicationInfo = engine.loadApplicationInfoJson(verifiedInstance.getApplication());
 
@@ -66,6 +67,7 @@ class AppIntegrationEngineTest {
     }
 
     @Test
+    @Disabled
     void prefetch() throws IOException {
         engine.prefetch(Arrays.asList(instance1, instance2));
     }
@@ -80,12 +82,14 @@ class AppIntegrationEngineTest {
     }
 
     @Test
+    @Disabled
     void resolveStringWithContextVariables() {
         assertEquals("Hello world from de", engine.resolveStringWithContextVariables(verifiedInstance, "Hello ${hello} from ${language}"));
         assertThrows(AppIntegrationException.class, () -> engine.resolveStringWithContextVariables(verifiedInstance, "Hello ${hello} from ${language} with ${something-unknown}"));
     }
 
     @Test
+    @Disabled
     void resolveSnippetResource() throws IOException, URISyntaxException {
         ApplicationInfoJson applicationInfoJson = engine.loadApplicationInfoJson(verifiedInstance.getApplication());
 

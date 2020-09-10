@@ -19,12 +19,12 @@ public final class ConvertibleValue<T> {
     private final Charset charset;
 
     @Nonnull
-    private final ConversionSupplier textParsersSupplier;
+    private final TextParserSupplier textParsersSupplier;
 
-    public ConvertibleValue(@Nullable T value, @Nonnull Charset charset, @Nonnull ConversionSupplier textParsersSupplier) {
+    public ConvertibleValue(@Nullable T value, @Nonnull Charset charset, @Nullable TextParserSupplier textParsersSupplier) {
         this.value = value;
         this.charset = charset;
-        this.textParsersSupplier = textParsersSupplier;
+        this.textParsersSupplier = (textParsersSupplier != null) ? textParsersSupplier : () -> null;
     }
 
     @Nullable
