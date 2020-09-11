@@ -12,6 +12,4 @@ Currently, work in progress!!!
 # Table of Contents <!-- omit in toc -->
 
 - [AEM Application Integration](#aem-application-integration)
-- [Table](#table)
-
 
