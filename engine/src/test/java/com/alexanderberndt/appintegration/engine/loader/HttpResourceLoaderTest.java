@@ -1,8 +1,7 @@
-package com.alexanderberndt.appintegration.engine.loader.impl;
+package com.alexanderberndt.appintegration.engine.loader;
 
 import com.alexanderberndt.appintegration.engine.ResourceLoader;
 import com.alexanderberndt.appintegration.engine.ResourceLoaderException;
-import com.alexanderberndt.appintegration.engine.loader.HttpResourceLoader;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
@@ -82,7 +81,7 @@ class HttpResourceLoaderTest {
     }
 
     @Test
-    void notFound() throws IOException, ResourceLoaderException {
+    void notFound() {
         ExternalResourceRef ref = ExternalResourceRef.create("http://localhost:8089/not-found", ExternalResourceType.TEXT);
         assertThrows(AppIntegrationException.class, () -> resourceLoader.load(ref, this::createExternalResource));
     }

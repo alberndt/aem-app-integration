@@ -8,6 +8,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 
 public interface ResourceLoader {
 
@@ -17,6 +18,13 @@ public interface ResourceLoader {
     @Nullable
     default URI getDefaultBaseUri() {
         return null;
+    }
+
+    @Nonnull
+    default URI resolveBaseUri(String url) throws URISyntaxException {
+        final URI defaultBaseUri = this.getDefaultBaseUri();
+        final URI baseUri = (defaultBaseUri != null) ? defaultBaseUri.resolve(url) : new URI(url);
+        return baseUri.normalize();
     }
 
 }
