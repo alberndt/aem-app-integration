@@ -179,7 +179,7 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
 
     @Nonnull
     protected ExternalResource createExternalResource(@Nonnull URI uri, @Nullable ExternalResourceType type, @Nonnull InputStream content, Map<String, Object> metadataMap) {
-        return new ExternalResource(uri, type, content, metadataMap, null, () -> Collections.singletonList(new StringConverter()));
+        return new ExternalResource(uri, type, content, metadataMap, () -> Collections.singletonList(new StringConverter()));
     }
 
     protected ApplicationInfoJson loadApplicationInfoJson(@Nonnull Application application) {

@@ -37,7 +37,7 @@ class AemExternalResourceCacheTest {
 
     @Nonnull
     protected ExternalResource createExternalResource(@Nonnull URI uri, @Nullable ExternalResourceType type, @Nonnull InputStream content, Map<String, Object> metadataMap) {
-        return new ExternalResource(uri, type, content, metadataMap, resourceLoader, () -> Collections.singletonList(new StringConverter()));
+        return new ExternalResource(uri, type, content, metadataMap, () -> Collections.singletonList(new StringConverter()));
     }
 
 
@@ -51,8 +51,8 @@ class AemExternalResourceCacheTest {
         final InputStream inputStream = new ByteArrayInputStream("Hello World!".getBytes());
 
 
-        cache.storeResource(new ExternalResource(inputStream, null, resourceRef, () -> null), "v1");
-        cache.storeResource(new ExternalResource(inputStream, null, resourceRef, () -> null), "v2");
+        cache.storeResource(new ExternalResource(inputStream, resourceRef, () -> null), "v1");
+        cache.storeResource(new ExternalResource(inputStream, resourceRef, () -> null), "v2");
         dumpResource(rootRes);
 
         cache.setActiveVersion("v1");

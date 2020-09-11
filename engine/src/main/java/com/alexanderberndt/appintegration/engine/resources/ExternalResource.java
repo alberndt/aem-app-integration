@@ -1,8 +1,8 @@
 package com.alexanderberndt.appintegration.engine.resources;
 
-import com.alexanderberndt.appintegration.engine.ResourceLoader;
 import com.alexanderberndt.appintegration.engine.resources.conversion.ConvertibleValue;
 import com.alexanderberndt.appintegration.engine.resources.conversion.TextParserSupplier;
+import com.alexanderberndt.appintegration.utils.DataMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +15,10 @@ import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 public class ExternalResource {
 
@@ -26,11 +29,8 @@ public class ExternalResource {
     @Nonnull
     private final URI uri;
 
-    @Nullable
-    private final ResourceLoader loader;
-
     @Nonnull
-    private final Map<String, Object> metadataMap = new HashMap<>();
+    private final DataMap metadataMap = new DataMap();
 
     @Nonnull
     private ExternalResourceType type;
@@ -50,48 +50,38 @@ public class ExternalResource {
             @Nullable ExternalResourceType type,
             @Nullable InputStream content,
             @Nullable Map<String, Object> metadataMap,
-            @Nullable ResourceLoader loader,
             @Nullable TextParserSupplier textParserSupplier) {
         this.type = (type != null) ? type : ExternalResourceType.ANY;
         this.uri = uri;
-        this.loader = loader;
         this.content = new ConvertibleValue<>(content, this.type.getDefaultCharset(), textParserSupplier);
         if (metadataMap != null) this.metadataMap.putAll(metadataMap);
     }
 
-
     public ExternalResource(
-            @Nullable ResourceLoader loader,
             @Nonnull ExternalResourceRef resourceRef,
             @Nonnull TextParserSupplier textParserSupplier) {
-        this(resourceRef.getUri(), resourceRef.getExpectedType(), null, null, loader, textParserSupplier);
+        this(resourceRef.getUri(), resourceRef.getExpectedType(), null, null, textParserSupplier);
     }
 
     public ExternalResource(
             @Nullable InputStream content,
-            @Nullable ResourceLoader loader,
             @Nonnull ExternalResourceRef resourceRef,
             @Nullable TextParserSupplier textParserSupplier) {
-        this(resourceRef.getUri(), resourceRef.getExpectedType(), content, null, loader, textParserSupplier);
+        this(resourceRef.getUri(), resourceRef.getExpectedType(), content, null, textParserSupplier);
     }
 
     public void setMetadata(@Nonnull String name, @Nullable Object value) {
         LOG.debug("setMetadata({}, {})", name, value);
-        if (value != null) {
-            metadataMap.put(name, value);
-        } else {
-            metadataMap.remove(name);
-        }
+        metadataMap.setData(name, value);
     }
 
-    @SuppressWarnings("unchecked")
     public <T> T getMetadata(@Nonnull String name, @Nonnull Class<T> tClass) {
-        final Object value = metadataMap.get(name);
-        if (tClass.isInstance(value)) {
-            return (T) value;
-        } else {
-            return null;
-        }
+        return metadataMap.getData(name, tClass);
+    }
+
+    @Nonnull
+    public DataMap getMetadataMap() {
+        return metadataMap;
     }
 
     public InputStream getContentAsInputStream() throws IOException {

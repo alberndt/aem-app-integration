@@ -1,7 +1,6 @@
 package com.alexanderberndt.appintegration.core.servlets.impl;
 
 import com.alexanderberndt.appintegration.aem.engine.AemExternalResourceCache;
-import com.alexanderberndt.appintegration.engine.loader.SystemResourceLoader;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
@@ -50,7 +49,7 @@ public class TestServlet2 extends SlingSafeMethodsServlet {
 
             ExternalResourceRef resourceRef = ExternalResourceRef.create("https://admin:admin@www.example.com:8080/context/path1/path2/helloworld.html?lang=de&country=at&time=iojasdlladsfjalsdjf#fragment", ExternalResourceType.TEXT);
             InputStream inputStream = new ByteArrayInputStream("Hello World, my dear!".getBytes());
-            ExternalResource resource = new ExternalResource(inputStream, new SystemResourceLoader(), resourceRef, () -> null);
+            ExternalResource resource = new ExternalResource(inputStream, resourceRef, () -> null);
 
 
             cache.storeResource(resource, "alex");

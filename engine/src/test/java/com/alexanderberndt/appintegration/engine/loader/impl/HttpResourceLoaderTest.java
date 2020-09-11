@@ -25,7 +25,7 @@ class HttpResourceLoaderTest {
 
     @Nonnull
     protected ExternalResource createExternalResource(@Nonnull URI uri, @Nullable ExternalResourceType type, @Nonnull InputStream content, Map<String, Object> metadataMap) {
-        return new ExternalResource(uri, type, content, metadataMap, resourceLoader, () -> Collections.singletonList(new StringConverter()));
+        return new ExternalResource(uri, type, content, metadataMap, () -> Collections.singletonList(new StringConverter()));
     }
 
     @Test

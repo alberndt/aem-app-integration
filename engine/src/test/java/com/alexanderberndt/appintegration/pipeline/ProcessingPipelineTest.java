@@ -31,7 +31,7 @@ class ProcessingPipelineTest {
     private final ResourceLoader resourceLoader = new SystemResourceLoader();
 
     protected ExternalResource createExternalResource(@Nonnull URI uri, @Nullable ExternalResourceType type, @Nonnull InputStream content, Map<String, Object> metadataMap) {
-        return new ExternalResource(uri, type, content, metadataMap, resourceLoader, () -> Collections.singletonList(new StringConverter()));
+        return new ExternalResource(uri, type, content, metadataMap, () -> Collections.singletonList(new StringConverter()));
     }
 
     @Test
