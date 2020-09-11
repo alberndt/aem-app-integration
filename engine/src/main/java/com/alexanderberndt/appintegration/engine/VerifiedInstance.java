@@ -3,8 +3,7 @@ package com.alexanderberndt.appintegration.engine;
 import com.alexanderberndt.appintegration.pipeline.context.GlobalContext;
 
 import javax.annotation.Nonnull;
-
-import static com.alexanderberndt.appintegration.helper.ValidationUtil.requireNotNull;
+import java.util.Objects;
 
 public class VerifiedInstance<I extends ApplicationInstance> {
 
@@ -25,11 +24,11 @@ public class VerifiedInstance<I extends ApplicationInstance> {
 
     public static <I extends ApplicationInstance, C extends GlobalContext> VerifiedInstance<I> verify(@Nonnull I instance, @Nonnull AppIntegrationFactory<I, C> factory) {
         final String applicationId = instance.getApplicationId();
-        final Application application = requireNotNull(factory.getApplication(applicationId),
+        final Application application = Objects.requireNonNull(factory.getApplication(applicationId),
                 () -> String.format("Application %s is undefined", applicationId));
 
         final String resourceLoaderName = application.getResourceLoaderName();
-        final ResourceLoader resourceLoader = requireNotNull(factory.getResourceLoader(resourceLoaderName),
+        final ResourceLoader resourceLoader = Objects.requireNonNull(factory.getResourceLoader(resourceLoaderName),
                 () -> String.format("ResourceLoader %s for application %s is not available!",
                         resourceLoaderName, applicationId));
 
