@@ -13,4 +13,3 @@ Currently, work in progress!!!
 
 - [AEM Application Integration](#aem-application-integration)
 
-
