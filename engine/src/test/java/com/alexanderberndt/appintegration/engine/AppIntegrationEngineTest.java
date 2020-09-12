@@ -18,7 +18,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -69,7 +68,7 @@ class AppIntegrationEngineTest {
     @Test
     @Disabled
     void prefetch() throws IOException {
-        engine.prefetch(Arrays.asList(instance1, instance2));
+//        engine.prefetch(logger, context, applicationId, Arrays.asList(instance1, instance2));
     }
 
     @Test

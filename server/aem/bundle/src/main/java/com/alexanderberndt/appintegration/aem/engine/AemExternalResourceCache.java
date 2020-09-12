@@ -1,17 +1,18 @@
 package com.alexanderberndt.appintegration.aem.engine;
 
+import com.alexanderberndt.appintegration.engine.ExternalResourceCache;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceFactory;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
 import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
+import com.alexanderberndt.appintegration.utils.DataMap;
 import com.day.cq.commons.jcr.JcrUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.sling.api.resource.*;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.jcr.RepositoryException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
 
 import static org.apache.jackrabbit.JcrConstants.*;
 
-public class AemExternalResourceCache {
+public class AemExternalResourceCache implements ExternalResourceCache {
 
     public static final String CACHE_ROOT = "/var/aem-app-integration/%s/files";
 
@@ -45,7 +46,7 @@ public class AemExternalResourceCache {
 
     private final Random random = new Random();
 
-    private String lockId;
+    private String versionId;
 
 
     public AemExternalResourceCache(@Nonnull ResourceResolver resolver, @Nonnull String applicationId) {
@@ -53,43 +54,152 @@ public class AemExternalResourceCache {
         this.rootPath = String.format(CACHE_ROOT, applicationId);
     }
 
-
-    public void storeResource(@Nonnull ExternalResource resource, @Nullable String version) throws IOException {
-
-        // find existing entry
-        final Resource cachePathRes = getOrCreateResource(getCachePath(resource.getUri()));
-        final String hashCode = Integer.toHexString(resource.getUri().toString().hashCode());
-
-        // find new cache-entry name
-        String entryName;
-        int i = 0;
-        do {
-            if (i++ > 20) {
-                throw new AppIntegrationException("Could NOT create a unique file entry for " + cachePathRes.getPath());
+    @Override
+    public boolean startLongRunningWrite(@Nullable String nameHint) {
+        try {
+            this.versionId = null;
+            final Resource rootRes = getOrCreateResource(rootPath);
+            if (canBeLocked(rootRes)) {
+                final String tempVersionId = StringUtils.defaultIfBlank(nameHint, Long.toHexString((long) Math.floor(Math.random() * 0x100000000L)));
+                final ModifiableValueMap valueMap = Objects.requireNonNull(rootRes.adaptTo(ModifiableValueMap.class));
+                valueMap.put(LOCK_ATTR, nameHint);
+                valueMap.put(LOCKED_SINCE_ATTR, LocalDateTime.now());
+                resolver.commit();
+                this.versionId = tempVersionId;
+                return true;
+            } else {
+                return false;
             }
-            entryName = hashCode + "_" + Integer.toHexString(random.nextInt(0x1000));
-        } while (cachePathRes.getChild(entryName) != null);
+        } catch (PersistenceException e) {
+            return false;
+        }
+    }
 
-
-        final Resource targetCacheRes = resolver.create(cachePathRes, entryName, null);
-        final ModifiableValueMap modifiableValueMap = Objects.requireNonNull(targetCacheRes.adaptTo(ModifiableValueMap.class));
-        modifiableValueMap.put(URI_ATTR, resource.getUri().toString());
-        if (StringUtils.isNotBlank(version)) {
-            modifiableValueMap.put(VERSION_ATTR, version);
+    @Override
+    public void continueLongRunningWrite() {
+        if (versionId == null) {
+            throw new AppIntegrationException("Cannot refresh lock, as cache is not locked yet!");
         }
 
-        Resource res = resolver.create(targetCacheRes, "data", Collections.singletonMap(JCR_PRIMARYTYPE, NT_FILE));
+        final Resource rootRes = resolver.getResource(rootPath);
+        if (rootRes == null) {
+            throw new AppIntegrationException("Cannot refresh lock on " + rootPath + ", because path not found!");
+        }
 
-        Map<String, Object> propertiesMap = new HashMap<>();
-        propertiesMap.put(JCR_PRIMARYTYPE, NT_RESOURCE);
-        propertiesMap.put(JCR_MIMETYPE, "text/plain");
-        propertiesMap.put(JCR_DATA, resource.getContentAsInputStream());
-        resolver.create(res, JCR_CONTENT, propertiesMap);
+        final ModifiableValueMap valueMap = Objects.requireNonNull(rootRes.adaptTo(ModifiableValueMap.class));
+        if (versionId.equals(valueMap.get(LOCK_ATTR, String.class))) {
+            valueMap.put(LOCKED_SINCE_ATTR, LocalDateTime.now());
+            try {
+                resolver.commit();
+            } catch (PersistenceException e) {
+                throw new AppIntegrationException("Cannot refresh lock on " + rootPath, e);
+            }
+        }
+    }
+
+    @Override
+    public void commitLongRunningWrite() {
+        final Resource rootRes = resolver.getResource(rootPath);
+        if (rootRes == null) {
+            throw new AppIntegrationException("cannot find root-path " + rootPath + " to set active version");
+        }
+        final String curVersion = rootRes.getValueMap().get(VERSION_ATTR, String.class);
+        if (!StringUtils.equals(curVersion, versionId)) {
+            final ModifiableValueMap modifiableValueMap = Objects.requireNonNull(rootRes.adaptTo(ModifiableValueMap.class));
+            if (StringUtils.isNotBlank(versionId)) {
+                modifiableValueMap.put(VERSION_ATTR, versionId);
+            } else {
+                modifiableValueMap.remove(VERSION_ATTR);
+            }
+        }
+    }
+
+    @Override
+    public void rollbackLongRunningWrite() {
+
+        if (versionId == null) {
+            throw new AppIntegrationException("Cannot rollback long-running write, as long-running write was not started yet!");
+        }
+
+        final Resource rootRes = resolver.getResource(rootPath);
+        if (rootRes != null) {
+            final ModifiableValueMap valueMap = Objects.requireNonNull(rootRes.adaptTo(ModifiableValueMap.class));
+            if (this.versionId.equals(valueMap.get(LOCK_ATTR, String.class))) {
+                valueMap.remove(LOCK_ATTR);
+                valueMap.remove(LOCKED_SINCE_ATTR);
+                try {
+                    resolver.commit();
+                } catch (PersistenceException e) {
+                    throw new AppIntegrationException("Cannot rollback long-running write", e);
+                }
+            }
+        }
+    }
+
+    private boolean canBeLocked(Resource resource) {
+        final ValueMap valueMap = resource.getValueMap();
+        final String currentLockId = valueMap.get(LOCK_ATTR, String.class);
+
+        // is resource not locked yet?
+        if (StringUtils.isBlank(currentLockId)) {
+            return true;
+        }
+
+        // is resource locked by ourselves
+        if (this.versionId.equals(currentLockId)) {
+            return true;
+        }
+
+        // is lock expired?
+        final LocalDateTime now = LocalDateTime.now();
+        final LocalDateTime lockedSince = valueMap.get(LOCKED_SINCE_ATTR, LocalDateTime.class);
+        return (lockedSince == null) || Duration.between(lockedSince, now).toMinutes() >= MINUTES_UNTIL_LOCKS_EXPIRE;
     }
 
 
+    @Override
+    public void storeResource(@Nonnull ExternalResource resource) {
+
+        try {
+            // find existing entry
+            final Resource cachePathRes = getOrCreateResource(getCachePath(resource.getUri()));
+            final String hashCode = Integer.toHexString(resource.getUri().toString().hashCode());
+
+            // find new cache-entry name
+            String entryName;
+            int i = 0;
+            do {
+                if (i++ > 20) {
+                    throw new AppIntegrationException("Could NOT create a unique file entry for " + cachePathRes.getPath());
+                }
+                entryName = hashCode + "_" + Integer.toHexString(random.nextInt(0x1000));
+            } while (cachePathRes.getChild(entryName) != null);
+
+
+            final Resource targetCacheRes = resolver.create(cachePathRes, entryName, null);
+            final ModifiableValueMap modifiableValueMap = Objects.requireNonNull(targetCacheRes.adaptTo(ModifiableValueMap.class));
+            modifiableValueMap.put(URI_ATTR, resource.getUri().toString());
+            if (StringUtils.isNotBlank(versionId)) {
+                modifiableValueMap.put(VERSION_ATTR, versionId);
+            }
+
+            Resource res = resolver.create(targetCacheRes, "data", Collections.singletonMap(JCR_PRIMARYTYPE, NT_FILE));
+
+            Map<String, Object> propertiesMap = new HashMap<>();
+            propertiesMap.put(JCR_PRIMARYTYPE, NT_RESOURCE);
+            propertiesMap.put(JCR_MIMETYPE, "text/plain");
+            propertiesMap.put(JCR_DATA, resource.getContentAsInputStream());
+            resolver.create(res, JCR_CONTENT, propertiesMap);
+
+        } catch (IOException e) {
+            throw new AppIntegrationException("Cannot store resource " + resource.getUri(), e);
+        }
+    }
+
+
+    @Override
     @Nullable
-    public ExternalResource getCachedResource(ExternalResourceRef resourceRef, @Nonnull ExternalResourceFactory resourceFactory) {
+    public ExternalResource getCachedResource(@Nonnull ExternalResourceRef resourceRef, @Nonnull ExternalResourceFactory resourceFactory) {
 
         final Resource rootRes = resolver.getResource(rootPath);
         if (rootRes == null) {
@@ -120,14 +230,15 @@ public class AemExternalResourceCache {
 
                     // ToDo: Implement futures for actual content
                     final InputStream content = Objects.requireNonNull(dataRes.adaptTo(InputStream.class));
-                    final Map<String, Object> metadataMap = Optional.of(res)
+                    final DataMap metadataMap = Optional.of(res)
                             .map(r -> r.getChild("metadata"))
                             .map(Resource::getValueMap)
                             .map(vm ->
-                                vm.entrySet().stream()
-                                        .filter(entry -> !StringUtils.startsWith(entry.getKey(), "jcr:"))
-                                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
-                            ).orElse(null);
+                                    vm.entrySet().stream()
+                                            .filter(entry -> !StringUtils.startsWith(entry.getKey(), "jcr:"))
+                                            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)))
+                            .map(DataMap::new)
+                            .orElse(null);
 
                     return resourceFactory.createExternalResource(uri, type, content, metadataMap);
 
@@ -141,100 +252,11 @@ public class AemExternalResourceCache {
         return null;
     }
 
-    public void markResourceRefreshed(ExternalResource resource) {
-
+    @Override
+    public void markResourceRefreshed(@Nonnull ExternalResource resource) {
+        // ToDo: add implementation
     }
 
-
-    public boolean lock() throws RepositoryException, PersistenceException {
-        this.lockId = null;
-        final Resource rootRes = getOrCreateResource(rootPath);
-        if (canBeLocked(rootRes)) {
-            final String tempLockId = Long.toHexString((long) Math.floor(Math.random() * 0x100000000L));
-            final ModifiableValueMap valueMap = Objects.requireNonNull(rootRes.adaptTo(ModifiableValueMap.class));
-            valueMap.put(LOCK_ATTR, tempLockId);
-            valueMap.put(LOCKED_SINCE_ATTR, LocalDateTime.now());
-            resolver.commit();
-            this.lockId = tempLockId;
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public boolean refreshLock() throws PersistenceException {
-        if (lockId == null) {
-            throw new AppIntegrationException("Cannot refresh lock, as cache is not locked yet!");
-        }
-
-        final Resource rootRes = resolver.getResource(rootPath);
-        if (rootRes == null) {
-            throw new AppIntegrationException("Cannot refresh lock on " + rootPath + ", because path not found!");
-        }
-
-        final ModifiableValueMap valueMap = Objects.requireNonNull(rootRes.adaptTo(ModifiableValueMap.class));
-        if (lockId.equals(valueMap.get(LOCK_ATTR, String.class))) {
-            valueMap.put(LOCKED_SINCE_ATTR, LocalDateTime.now());
-            resolver.commit();
-            return true;
-        }
-
-        return false;
-    }
-
-
-    public void releaseLock() throws PersistenceException {
-
-        if (lockId == null) {
-            throw new AppIntegrationException("Cannot refresh lock, as cache is not locked yet!");
-        }
-
-        final Resource rootRes = resolver.getResource(rootPath);
-        if (rootRes != null) {
-            final ModifiableValueMap valueMap = Objects.requireNonNull(rootRes.adaptTo(ModifiableValueMap.class));
-            if (this.lockId.equals(valueMap.get(LOCK_ATTR, String.class))) {
-                valueMap.remove(LOCK_ATTR);
-                valueMap.remove(LOCKED_SINCE_ATTR);
-                resolver.commit();
-            }
-        }
-    }
-
-    public void setActiveVersion(@Nullable String version) {
-        final Resource rootRes = resolver.getResource(rootPath);
-        if (rootRes == null) {
-            throw new AppIntegrationException("cannot find root-path " + rootPath + " to set active version");
-        }
-        final String curVersion = rootRes.getValueMap().get(VERSION_ATTR, String.class);
-        if (!StringUtils.equals(curVersion, version)) {
-            final ModifiableValueMap modifiableValueMap = Objects.requireNonNull(rootRes.adaptTo(ModifiableValueMap.class));
-            if (StringUtils.isNotBlank(version)) {
-                modifiableValueMap.put(VERSION_ATTR, version);
-            } else {
-                modifiableValueMap.remove(VERSION_ATTR);
-            }
-        }
-    }
-
-    private boolean canBeLocked(Resource resource) {
-        final ValueMap valueMap = resource.getValueMap();
-        final String currentLockId = valueMap.get(LOCK_ATTR, String.class);
-
-        // is resource not locked yet?
-        if (StringUtils.isBlank(currentLockId)) {
-            return true;
-        }
-
-        // is resource locked by ourselves
-        if (this.lockId.equals(currentLockId)) {
-            return true;
-        }
-
-        // is lock expired?
-        final LocalDateTime now = LocalDateTime.now();
-        final LocalDateTime lockedSince = valueMap.get(LOCKED_SINCE_ATTR, LocalDateTime.class);
-        return (lockedSince == null) || Duration.between(lockedSince, now).toMinutes() >= MINUTES_UNTIL_LOCKS_EXPIRE;
-    }
 
     @Nonnull
     protected Resource getOrCreateResource(String path) throws PersistenceException {

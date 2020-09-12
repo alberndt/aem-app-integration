@@ -1,6 +1,7 @@
 package com.alexanderberndt.appintegration.engine.resources;
 
 import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
+import com.alexanderberndt.appintegration.utils.DataMap;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -8,8 +9,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Supplier;
 
 public class ExternalResourceRef {
@@ -21,7 +20,7 @@ public class ExternalResourceRef {
     private ExternalResourceType expectedType;
 
     @Nonnull
-    private final Map<String, Object> metadataMap = new HashMap<>();
+    private final DataMap metadataMap = new DataMap();
 
     @Nullable
     private Supplier<ExternalResource> cachedExternalRes;
@@ -63,26 +62,17 @@ public class ExternalResourceRef {
         this.expectedType = (expectedType != null) ? expectedType : ExternalResourceType.ANY;
     }
 
-    public Map<String, Object> getMetadataMap() {
+    @Nonnull
+    public DataMap getMetadataMap() {
         return metadataMap;
     }
 
     public void setMetadata(@Nonnull String name, @Nullable Object value) {
-        if (value != null) {
-            metadataMap.put(name, value);
-        } else {
-            metadataMap.remove(name);
-        }
+        metadataMap.setData(name, value);
     }
 
-    @SuppressWarnings("unchecked")
     public <T> T getMetadata(@Nonnull String name, @Nonnull Class<T> tClass) {
-        final Object value = metadataMap.get(name);
-        if (tClass.isInstance(value)) {
-            return (T) value;
-        } else {
-            return null;
-        }
+        return metadataMap.getData(name, tClass);
     }
 
     @Nullable

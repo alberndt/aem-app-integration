@@ -27,6 +27,7 @@ import java.lang.ref.SoftReference;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
+import java.util.function.Consumer;
 
 public abstract class AppIntegrationEngine<I extends ApplicationInstance, C extends GlobalContext> {
 
@@ -59,7 +60,7 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
 
     /* Prefetch methods */
 
-    public void prefetch(@Nonnull final List<I> instanceList) throws IOException {
+    public void prefetch(@Nonnull final List<I> instanceList) {
 
         LOG.info("prefetch {} instances in total", instanceList.size());
 
@@ -82,25 +83,18 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
             final List<I> applicationInstanceList = applicationEntry.getValue();
             LOG.info("prefetch {} instances for application {}", applicationInstanceList.size(), applicationId);
 
-            createContextAndPrefetch(applicationId, applicationInstanceList);
+            callWithGlobalContext(applicationId, (context -> prefetch(context, applicationId, applicationInstanceList)));
         }
     }
 
-    /**
-     * Implementation of this method shall create a {@link GlobalContext} and call {@link #prefetch(C, String, List)}
-     * to do the actual prefetch.
-     *
-     * @param applicationId           Application ID
-     * @param applicationInstanceList List of application instances, with all instances linking the application id of the 1st parameter
-     */
-    protected abstract void createContextAndPrefetch(String applicationId, List<I> applicationInstanceList) throws IOException;
+    protected abstract void callWithGlobalContext(String applicationId, Consumer<C> consumer);
 
-    protected void prefetch(C context, String applicationId, List<I> applicationInstanceList) throws IOException {
+
+    protected void prefetch(C context, String applicationId, List<I> applicationInstanceList) {
 
         final Application application = this.getFactory().getApplication(applicationId);
         if (application == null) {
-            LOG.error("Application {} is undefined", applicationId);
-            // ToDo: Log in integration log
+            context.getIntegrationLog().addError("Application %s is undefined", applicationId);
             return;
         }
 
@@ -118,7 +112,7 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
         final String pipelineName = application.getProcessingPipelineName();
         final ProcessingPipeline pipeline = createProcessingPipeline(context, pipelineName);
         if (pipeline == null) {
-            context.addError(String.format("Cannot create pipeline %s for application %s", pipelineName, applicationId));
+            context.getIntegrationLog().addError("Cannot create pipeline %s for application %s", pipelineName, applicationId);
             return;
         }
 
@@ -148,20 +142,29 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
             resolvedSnippetsSet.add(snippetRef);
         }
 
-
         // Load all resolved snippets
         // ToDo: Replace with ExternalResourceSet
         final Set<ExternalResourceRef> referencedResourcesSet = new LinkedHashSet<>();
         for (ExternalResourceRef snippetRef : resolvedSnippetsSet) {
-            final ExternalResource snippet = pipeline.loadAndProcessResourceRef(snippetRef, this::createExternalResource);
-            referencedResourcesSet.addAll(snippet.getReferencedResources());
+            final ExternalResource snippet;
+            try {
+                snippet = pipeline.loadAndProcessResourceRef(snippetRef, this::createExternalResource);
+                referencedResourcesSet.addAll(snippet.getReferencedResources());
+            } catch (IOException e) {
+                LOG.error("cannot load", e);
+            }
         }
 
 
         // load all referenced resources (which may could load more)
         for (ExternalResourceRef resourceRef : referencedResourcesSet) {
-            final ExternalResource resource = pipeline.loadAndProcessResourceRef(resourceRef, this::createExternalResource);
-            referencedResourcesSet.addAll(resource.getReferencedResources());
+            final ExternalResource resource;
+            try {
+                resource = pipeline.loadAndProcessResourceRef(resourceRef, this::createExternalResource);
+                referencedResourcesSet.addAll(resource.getReferencedResources());            } catch (IOException e) {
+                LOG.error("cannot load", e);
+            }
+
         }
 
 

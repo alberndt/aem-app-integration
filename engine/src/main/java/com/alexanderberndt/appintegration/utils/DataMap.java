@@ -3,8 +3,18 @@ package com.alexanderberndt.appintegration.utils;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.HashMap;
+import java.util.Map;
 
 public class DataMap extends HashMap<String, Object> {
+
+    private static final long serialVersionUID = -615425898867657848L;
+
+    public DataMap() {
+    }
+
+    public DataMap(Map<? extends String, ?> m) {
+        super(m);
+    }
 
     public void setData(@Nonnull String name, @Nullable Object value) {
         if (value != null) {

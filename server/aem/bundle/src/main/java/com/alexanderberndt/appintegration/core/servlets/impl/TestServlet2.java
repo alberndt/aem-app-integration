@@ -18,7 +18,6 @@ import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.nodetype.NodeType;
 import javax.servlet.Servlet;
-import javax.servlet.ServletException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,7 +32,7 @@ public class TestServlet2 extends SlingSafeMethodsServlet {
 
     @Override
     protected void doGet(final SlingHttpServletRequest req,
-                         final SlingHttpServletResponse resp) throws ServletException, IOException {
+                         final SlingHttpServletResponse resp) throws IOException {
         resp.setContentType("text/plain");
 
         PrintWriter out = resp.getWriter();
@@ -52,7 +51,7 @@ public class TestServlet2 extends SlingSafeMethodsServlet {
             ExternalResource resource = new ExternalResource(inputStream, resourceRef, () -> null);
 
 
-            cache.storeResource(resource, "alex");
+            cache.storeResource(resource);
 
             resolver.commit();
 
