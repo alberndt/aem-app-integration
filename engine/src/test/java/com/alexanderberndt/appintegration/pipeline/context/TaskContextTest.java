@@ -1,12 +1,13 @@
 package com.alexanderberndt.appintegration.pipeline.context;
 
-import com.alexanderberndt.appintegration.core.CoreTestGlobalContext;
 import com.alexanderberndt.appintegration.engine.ResourceLoader;
 import com.alexanderberndt.appintegration.engine.logging.LogAppender;
 import com.alexanderberndt.appintegration.engine.logging.TaskLogger;
 import com.alexanderberndt.appintegration.engine.logging.appender.Slf4jLogAppender;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
+import com.alexanderberndt.appintegration.engine.testsupport.TestGlobalContext;
 import com.alexanderberndt.appintegration.pipeline.configuration.Ranking;
+import com.alexanderberndt.appintegration.utils.DataMap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,9 +16,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -42,11 +40,11 @@ class TaskContextTest {
     void beforeEach() {
         assertNotNull(resourceLoaderMock);
         logAppenderMock = Mockito.spy(new Slf4jLogAppender());
-        GlobalContext tmpCtx = new CoreTestGlobalContext(logAppenderMock);
+        GlobalContext tmpCtx = new TestGlobalContext(logAppenderMock);
         tmpCtx.setResourceLoader(resourceLoaderMock);
         globalContext = Mockito.spy(tmpCtx);
-        taskLogger = new TaskLogger(logAppenderMock, "test task", "test");
-        this.taskContext = Mockito.spy(new TaskContext(globalContext, taskLogger, Ranking.TASK_DEFAULT, MY_NAMESPACE, ExternalResourceType.ANY, Collections.emptyMap()));
+        taskLogger = new TaskLogger(logAppenderMock, "test", "test task");
+        this.taskContext = Mockito.spy(new TaskContext(globalContext, taskLogger, Ranking.TASK_DEFAULT, MY_NAMESPACE, ExternalResourceType.ANY, new DataMap()));
     }
 
     @Test
@@ -249,7 +247,7 @@ class TaskContextTest {
 
     @Test
     void getAndSetValueDuringExecution() {
-        final Map<String, Object> executionDataMap = new HashMap<>();
+        final DataMap executionDataMap = new DataMap();
         final TaskContext executionTaskContext = Mockito.spy(new TaskContext(globalContext, taskLogger, Ranking.PIPELINE_EXECUTION, MY_NAMESPACE, ExternalResourceType.HTML, executionDataMap));
 
         taskContext.setValue("test", "Hello World!");
@@ -269,7 +267,7 @@ class TaskContextTest {
 
     @Test
     void getAndSetValueDuringExecutionWithTypeConflicts() {
-        final Map<String, Object> executionDataMap = new HashMap<>();
+        final DataMap executionDataMap = new DataMap();
         final TaskContext executionTaskContext = Mockito.spy(new TaskContext(globalContext, taskLogger, Ranking.PIPELINE_EXECUTION, MY_NAMESPACE, ExternalResourceType.HTML, executionDataMap));
 
         executionTaskContext.setValue("test", 10);
@@ -282,7 +280,7 @@ class TaskContextTest {
 
     @Test
     void setValueDuringExecutionWithTypeConflicts() {
-        final Map<String, Object> executionDataMap = new HashMap<>();
+        final DataMap executionDataMap = new DataMap();
         final TaskContext executionTaskContext = Mockito.spy(new TaskContext(globalContext, taskLogger, Ranking.PIPELINE_EXECUTION, MY_NAMESPACE, ExternalResourceType.HTML, executionDataMap));
 
         taskContext.setValue("test", "Hello World!");

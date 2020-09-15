@@ -2,6 +2,7 @@ package com.alexanderberndt.appintegration.engine.resources;
 
 import com.alexanderberndt.appintegration.engine.resources.conversion.ConvertibleValue;
 import com.alexanderberndt.appintegration.engine.resources.conversion.TextParserSupplier;
+import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
 import com.alexanderberndt.appintegration.utils.DataMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,10 +16,7 @@ import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ExternalResource {
 
@@ -84,12 +82,22 @@ public class ExternalResource {
         return metadataMap;
     }
 
-    public InputStream getContentAsInputStream() throws IOException {
-        return content.convertToInputStreamValue().get();
+    @Nonnull
+    public InputStream getContentAsInputStream() {
+        try {
+            return Objects.requireNonNull(content.convertToInputStreamValue().get());
+        } catch (IOException e) {
+            throw new AppIntegrationException("Failed to convert content to input-stream", e);
+        }
     }
 
-    public Reader getContentAsReader() throws IOException {
-        return content.convertToReaderValue().get();
+    @Nonnull
+    public Reader getContentAsReader() {
+        try {
+            return Objects.requireNonNull(content.convertToReaderValue().get());
+        } catch (IOException e) {
+            throw new AppIntegrationException("Failed to convert content to reader", e);
+        }
     }
 
     public void setContent(InputStream inputStream) {

@@ -2,10 +2,10 @@ package com.alexanderberndt.appintegration.utils;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class DataMap extends HashMap<String, Object> {
+public class DataMap extends LinkedHashMap<String, Object> {
 
     private static final long serialVersionUID = -615425898867657848L;
 

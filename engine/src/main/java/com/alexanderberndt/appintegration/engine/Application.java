@@ -11,33 +11,6 @@ import java.util.Map;
  */
 public interface Application {
 
-//    @Nonnull
-//    private final String applicationInfoUrl;
-//
-//    @Nonnull
-//    private final String resourceLoaderName;
-//
-//    @Nonnull
-//    private final String processingPipelineName;
-//
-//    @Nullable
-//    private final List<String> contextProviderNames;
-//
-//    @Nullable
-//    private final Map<String, Object> globalProperties;
-//
-//    public Application(@Nonnull String applicationInfoUrl,
-//                       @Nonnull String resourceLoaderName,
-//                       @Nonnull String processingPipelineName,
-//                       @Nullable List<String> contextProviderNames,
-//                       @Nullable Map<String, Object> globalProperties) {
-//        this.applicationInfoUrl = applicationInfoUrl;
-//        this.resourceLoaderName = resourceLoaderName;
-//        this.processingPipelineName = processingPipelineName;
-//        this.contextProviderNames = contextProviderNames;
-//        this.globalProperties = globalProperties;
-//    }
-
     /**
      * Location of the <code>application-info.json</code> file. This url must be understood by used
      * resource-loader and cannot contain any placeholders.
@@ -68,6 +41,15 @@ public interface Application {
     String getProcessingPipelineName();
 
     @Nullable
-    Map<String, Object> getGlobalProperties();
+    default Map<String, Object> getGlobalProperties() {
+        return null;
+    }
+
+    enum FetchingMode { PREFETCH_ONLY, PREFETCH_AND_LIVE_LOAD, LIVE_LOAD_ONLY }
+
+    @Nonnull
+    default FetchingMode getFetchingMode() {
+        return FetchingMode.PREFETCH_AND_LIVE_LOAD;
+    }
 
 }

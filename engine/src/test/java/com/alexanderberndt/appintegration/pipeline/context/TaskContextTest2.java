@@ -1,15 +1,12 @@
-package com.alexanderberndt.appintegration.tasks.prepare;
+package com.alexanderberndt.appintegration.pipeline.context;
 
 import com.alexanderberndt.appintegration.engine.logging.LogAppender;
-import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
 import com.alexanderberndt.appintegration.engine.testsupport.TestGlobalContext;
 import com.alexanderberndt.appintegration.engine.testsupport.TestLoadingTask;
 import com.alexanderberndt.appintegration.pipeline.ProcessingPipeline;
 import com.alexanderberndt.appintegration.pipeline.builder.simple.SimplePipelineBuilder;
-import com.alexanderberndt.appintegration.pipeline.context.TaskContext;
-import com.alexanderberndt.appintegration.pipeline.task.ProcessingTask;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,7 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
-class PropertiesTaskTest {
+class TaskContextTest2 {
 
     @Mock
     private LogAppender logAppenderMock;
@@ -38,18 +35,14 @@ class PropertiesTaskTest {
         globalContext = new TestGlobalContext(logAppenderMock);
 
         pipeline = new SimplePipelineBuilder()
-                .addPreparationTask("properties", new PropertiesTask())
-                .withTaskParam("verify:hello", "Hello World!")
-                .withTaskParam("verify:hello.css", "This is a CSS value!")
-                .withTaskParam("verify:the-number", 42)
                 .addLoadingTask("load", new TestLoadingTask("Hello World!"))
-                .addProcessingTask("verify", new ProcessingTask() {
-                    @Override
-                    public void process(TaskContext context, ExternalResource resource) {
-                        stringValue.value = context.getValue("hello", String.class);
-                        numberValue.value = context.getValue("the-number", Integer.class);
-                    }
+                .addProcessingTask("verify", (context, resource) -> {
+                    stringValue.value = context.getValue("str", String.class);
+                    numberValue.value = context.getValue("number", Integer.class);
                 })
+                .withTaskParam("str", "Hello World!")
+                .withTaskParam("str.css", "This is a CSS value!")
+                .withTaskParam("number", 42)
                 .build();
 
         pipeline.initContextWithTaskDefaults(globalContext);
@@ -61,7 +54,7 @@ class PropertiesTaskTest {
 
 
     @Test
-    void prepareTextRes() {
+    void testTextRes() {
         final ExternalResourceRef resourceRef = ExternalResourceRef.create("/test.txt", ExternalResourceType.TEXT);
         pipeline.loadAndProcessResourceRef(globalContext, resourceRef, globalContext);
         assertEquals("Hello World!", stringValue.value);

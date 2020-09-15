@@ -1,4 +1,4 @@
-package com.alexanderberndt.appintegration.core;
+package com.alexanderberndt.appintegration.engine.testsupport;
 
 import com.alexanderberndt.appintegration.engine.ApplicationInstance;
 
@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CoreTestAppInstance implements ApplicationInstance {
+public class TestAppInstance implements ApplicationInstance {
 
     private final String applicationId;
 
@@ -15,12 +15,12 @@ public class CoreTestAppInstance implements ApplicationInstance {
 
     private final Map<String, String> contextMap = new HashMap<>();
 
-    public CoreTestAppInstance(String applicationId, String componentId) {
+    public TestAppInstance(String applicationId, String componentId) {
         this.applicationId = applicationId;
         this.componentId = componentId;
     }
 
-    public CoreTestAppInstance(String applicationId, String componentId, Map<String, String> contextMap) {
+    public TestAppInstance(String applicationId, String componentId, Map<String, String> contextMap) {
         this.applicationId = applicationId;
         this.componentId = componentId;
         this.contextMap.putAll(contextMap);

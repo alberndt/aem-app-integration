@@ -1,14 +1,16 @@
 package com.alexanderberndt.appintegration.aem.engine;
 
 import com.alexanderberndt.appintegration.pipeline.TaskFactory;
-import com.alexanderberndt.appintegration.pipeline.task.GenericTask;
 import com.alexanderberndt.appintegration.pipeline.task.LoadingTask;
 import com.alexanderberndt.appintegration.pipeline.task.PreparationTask;
 import com.alexanderberndt.appintegration.pipeline.task.ProcessingTask;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,66 +18,88 @@ import java.util.Map;
 @Component
 public class AemTaskFactory implements TaskFactory {
 
+    public static final String TASK_NAME_PROPERTY = "task-name";
+
     private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private final Map<String, GenericTask> taskMap = new HashMap<>();
+    private final Map<String, PreparationTask> preparationTaskMap = new HashMap<>();
 
+    private final Map<String, LoadingTask> loadingTaskMap = new HashMap<>();
+
+    private final Map<String, ProcessingTask> processingTaskMap = new HashMap<>();
+
+    @Nullable
     @Override
-    public GenericTask getTask(String name) {
-        return taskMap.get(name);
+    public PreparationTask getPreparationTask(@Nonnull String name) {
+        return preparationTaskMap.get(name);
     }
 
-    @Reference(name = "genericTask", cardinality = ReferenceCardinality.MULTIPLE,
-            policy = ReferencePolicy.DYNAMIC, policyOption = ReferencePolicyOption.GREEDY)
-    protected void bindGenericTask(final GenericTask task, Map<String, ?> properties) {
-        final String taskName = getTaskName(task);
-        LOG.info("register generic-task {} of class {}", taskName, task.getClass());
-        taskMap.put(taskName, task);
+    @Nullable
+    @Override
+    public LoadingTask getLoadingTask(@Nonnull String name) {
+        return loadingTaskMap.get(name);
     }
 
-    protected void unbindGenericTask(final GenericTask task) {
-        taskMap.remove(getTaskName(task));
+    @Nullable
+    @Override
+    public ProcessingTask getProcessingTask(@Nonnull String name) {
+        return processingTaskMap.get(name);
     }
 
     @Reference(name = "preparationTask", cardinality = ReferenceCardinality.MULTIPLE,
             policy = ReferencePolicy.DYNAMIC, policyOption = ReferencePolicyOption.GREEDY)
     protected void bindPreparationTask(final PreparationTask task, Map<String, ?> properties) {
-        final String taskName = getTaskName(task);
+        final String taskName = getTaskName(task.getClass(), properties);
         LOG.info("register preparation-task {} of class {}", taskName, task.getClass());
-        taskMap.put(taskName, task);
+        preparationTaskMap.put(taskName, task);
     }
 
     protected void unbindPreparationTask(final PreparationTask task) {
-        taskMap.remove(getTaskName(task));
+        preparationTaskMap.entrySet().removeIf(entry -> (entry.getValue() == task));
     }
 
     @Reference(name = "loadingTask", cardinality = ReferenceCardinality.MULTIPLE,
             policy = ReferencePolicy.DYNAMIC, policyOption = ReferencePolicyOption.GREEDY)
     protected void bindLoadingTask(final LoadingTask task, Map<String, ?> properties) {
-        final String taskName = getTaskName(task);
+        final String taskName = getTaskName(task.getClass(), properties);
         LOG.info("register loading-task {} of class {}", taskName, task.getClass());
-        taskMap.put(taskName, task);
+        loadingTaskMap.put(taskName, task);
     }
 
     protected void unbindLoadingTask(final LoadingTask task) {
-        taskMap.remove(getTaskName(task));
+        loadingTaskMap.entrySet().removeIf(entry -> (entry.getValue() == task));
     }
 
     @Reference(name = "processingTask", cardinality = ReferenceCardinality.MULTIPLE,
             policy = ReferencePolicy.DYNAMIC, policyOption = ReferencePolicyOption.GREEDY)
     protected void bindProcessingTask(final ProcessingTask task, Map<String, ?> properties) {
-        final String taskName = getTaskName(task);
+        final String taskName = getTaskName(task.getClass(), properties);
         LOG.info("register processing-task {} of class {}", taskName, task.getClass());
-        taskMap.put(taskName, task);
+        processingTaskMap.put(taskName, task);
     }
 
     protected void unbindProcessingTask(final ProcessingTask task) {
-        taskMap.remove(getTaskName(task));
+        processingTaskMap.entrySet().removeIf(entry -> (entry.getValue() == task));
     }
 
+    protected String getTaskName(@Nonnull final Class<?> taskClass, @Nullable Map<String, ?> properties) {
 
-    protected String getTaskName(final GenericTask task) {
-        return task.getName();
+        // is task-name specified via a task-name property?
+        if (properties != null) {
+            Object taskNameObj = properties.get(TASK_NAME_PROPERTY);
+            if (taskNameObj instanceof String) {
+                String taskName = (String) taskNameObj;
+                if (StringUtils.isNotBlank(taskName)) {
+                    return taskName;
+                }
+            }
+        }
+
+        // derive task-name from the implementing class
+        // (remove ending Task, and convert camel-case to kebab-case
+        return taskClass.getSimpleName()
+                .replaceAll("Task$", "")
+                .replaceAll("([a-z])([A-Z])", "$1-$2")
+                .toLowerCase();
     }
-
 }

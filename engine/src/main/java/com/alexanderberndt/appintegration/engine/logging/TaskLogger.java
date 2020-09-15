@@ -1,6 +1,5 @@
 package com.alexanderberndt.appintegration.engine.logging;
 
-import com.alexanderberndt.appintegration.pipeline.task.GenericTask;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nonnull;
@@ -9,27 +8,15 @@ public class TaskLogger extends AbstractLogger {
 
     private String parentInstanceName;
 
-    public TaskLogger(@Nonnull AbstractLogger parentLogger, @Nonnull GenericTask task, @Nonnull String taskNamespace) {
+    public TaskLogger(@Nonnull AbstractLogger parentLogger, @Nonnull String taskId, @Nonnull String taskName) {
         super(parentLogger);
         this.parentInstanceName = parentLogger.loggerInstanceName;
-        initProperties(task, taskNamespace);
+        initProperties(taskId, taskName);
     }
 
-    public TaskLogger(@Nonnull AbstractLogger parentLogger, @Nonnull String taskName, @Nonnull String taskNamespace) {
-        super(parentLogger);
-        this.parentInstanceName = parentLogger.loggerInstanceName;
-        initProperties(taskName, taskNamespace);
-    }
-
-
-    public TaskLogger(@Nonnull LogAppender appender, @Nonnull GenericTask task, @Nonnull String taskNamespace) {
+    public TaskLogger(@Nonnull LogAppender appender, @Nonnull String taskId, @Nonnull String taskName) {
         super(appender);
-        initProperties(task, taskNamespace);
-    }
-
-    public TaskLogger(@Nonnull LogAppender appender, @Nonnull String taskName, @Nonnull String taskNamespace) {
-        super(appender);
-        initProperties(taskName, taskNamespace);
+        initProperties(taskId, taskName);
     }
 
     @Nonnull
@@ -38,22 +25,17 @@ public class TaskLogger extends AbstractLogger {
         return "task";
     }
 
-    private void initProperties(@Nonnull GenericTask task, @Nonnull String taskNamespace) {
-        initProperties(task.getName(), taskNamespace);
-        setProperty("humanReadableTaskName", task.getHumanReadableName());
-    }
-
-    private void initProperties(@Nonnull String taskName, @Nonnull String taskNamespace) {
-        if (StringUtils.equals(taskName, taskNamespace)) {
-            setProperty("taskName", taskNamespace);
+    private void initProperties(@Nonnull String taskId, @Nonnull String taskName) {
+        if (StringUtils.equals(taskName, taskId)) {
+            setProperty("taskName", taskId);
         } else {
-            setProperty("taskName", String.format("%s (%s)", taskNamespace, taskName));
+            setProperty("taskName", String.format("%s (%s)", taskId, taskName));
         }
 
         if (StringUtils.isNotBlank(parentInstanceName)) {
-            setLoggerInstanceName(taskNamespace + " @ " + parentInstanceName);
+            setLoggerInstanceName(taskId + " @ " + parentInstanceName);
         } else {
-            setLoggerInstanceName(taskNamespace);
+            setLoggerInstanceName(taskId);
         }
     }
 }

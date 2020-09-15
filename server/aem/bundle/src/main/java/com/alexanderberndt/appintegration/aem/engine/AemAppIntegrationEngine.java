@@ -3,6 +3,7 @@ package com.alexanderberndt.appintegration.aem.engine;
 import com.alexanderberndt.appintegration.aem.engine.logging.AemLogAppender;
 import com.alexanderberndt.appintegration.engine.AppIntegrationEngine;
 import com.alexanderberndt.appintegration.engine.AppIntegrationFactory;
+import com.alexanderberndt.appintegration.engine.ExternalResourceCache;
 import com.alexanderberndt.appintegration.engine.logging.LogAppender;
 import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
 import org.apache.sling.api.resource.*;
@@ -15,7 +16,7 @@ import javax.annotation.Nonnull;
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.GregorianCalendar;
-import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static org.apache.sling.api.resource.ResourceResolverFactory.SUBSERVICE;
 
@@ -32,27 +33,34 @@ public class AemAppIntegrationEngine extends AppIntegrationEngine<SlingApplicati
     @Reference
     private ResourceResolverFactory resolverFactory;
 
+    @Nonnull
     @Override
     protected AppIntegrationFactory<SlingApplicationInstance, AemGlobalContext> getFactory() {
         return factory;
     }
 
-
     @Override
-    protected void callWithGlobalContext(String applicationId, Consumer<AemGlobalContext> consumer) {
+    protected <R> R callWithGlobalContext(String applicationId, Function<AemGlobalContext, R> function) {
+
         try (ResourceResolver resolver = resolverFactory.getServiceResourceResolver(Collections.singletonMap(SUBSERVICE, SUB_SERVICE_ID))) {
+
             final AemGlobalContext context = new AemGlobalContext(resolver, createLogAppender(resolver, applicationId));
 
-            consumer.accept(context);
+            final R result = function.apply(context);
 
             resolver.commit();
+
+            return result;
 
         } catch (LoginException | PersistenceException e) {
             throw new AppIntegrationException("Cannot login to service user session!", e);
         }
-
     }
 
+    @Override
+    protected <R> R callWithExternalResourceCache(String applicationId, Function<ExternalResourceCache, R> function) {
+        return null;
+    }
 
 
 

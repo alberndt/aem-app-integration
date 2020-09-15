@@ -1,7 +1,6 @@
 package com.alexanderberndt.appintegration.engine.logging;
 
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
-import com.alexanderberndt.appintegration.pipeline.task.GenericTask;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nonnull;
@@ -35,13 +34,8 @@ public class ResourceLogger extends AbstractLogger {
     }
 
     @Nonnull
-    public TaskLogger createTaskLogger(GenericTask task, String taskNamespace) {
-        return new TaskLogger(this, task, taskNamespace);
-    }
-
-    @Nonnull
-    public TaskLogger createTaskLogger(String taskName, String taskNamespace) {
-        return new TaskLogger(this, taskName, taskNamespace);
+    public TaskLogger createTaskLogger(String taskId, String taskName) {
+        return new TaskLogger(this, taskId, taskName);
     }
 
     public void setUrl(String url) {

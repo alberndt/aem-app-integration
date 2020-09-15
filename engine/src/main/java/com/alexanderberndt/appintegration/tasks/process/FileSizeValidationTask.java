@@ -15,7 +15,7 @@ public class FileSizeValidationTask implements ProcessingTask {
 
 
     @Override
-    public void process(TaskContext context, ExternalResource resource) throws IOException {
+    public void process(TaskContext context, ExternalResource resource)  {
         final InputStream inputStream = resource.getContentAsInputStream();
         if (inputStream != null) {
             resource.setContent(new ByteCountingInputStream(inputStream));

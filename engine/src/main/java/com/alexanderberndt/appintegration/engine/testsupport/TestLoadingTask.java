@@ -1,14 +1,27 @@
-package com.alexanderberndt.appintegration.pipeline.task;
+package com.alexanderberndt.appintegration.engine.testsupport;
 
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceFactory;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
 import com.alexanderberndt.appintegration.pipeline.context.TaskContext;
+import com.alexanderberndt.appintegration.pipeline.task.LoadingTask;
 
-public interface LoadingTask {
+import javax.annotation.Nonnull;
+import java.io.ByteArrayInputStream;
 
+public class TestLoadingTask implements LoadingTask {
 
-    ExternalResource load(TaskContext context, ExternalResourceRef resourceRef, ExternalResourceFactory factory);
+    @Nonnull
+    final byte[] content;
+
+    public TestLoadingTask(@Nonnull String content) {
+        this.content = content.getBytes();
+    }
+
+    @Override
+    public ExternalResource load(TaskContext context, ExternalResourceRef resourceRef, ExternalResourceFactory factory) {
+        return factory.createExternalResource(resourceRef, new ByteArrayInputStream(content));
+    }
 
     /**
      * <p>Implementing classes should define a set of task-properties. This should be done by calling
@@ -20,7 +33,8 @@ public interface LoadingTask {
      *
      * @param taskContext TaskContext
      */
-    default void declareTaskPropertiesAndDefaults(TaskContext taskContext) {
+    @Override
+    public void declareTaskPropertiesAndDefaults(TaskContext taskContext) {
+        // no task properties
     }
-
 }

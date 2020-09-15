@@ -1,17 +1,17 @@
-package com.alexanderberndt.appintegration.core;
+package com.alexanderberndt.appintegration.engine.testsupport;
 
 import com.alexanderberndt.appintegration.engine.logging.TaskLogger;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
 import com.alexanderberndt.appintegration.pipeline.configuration.Ranking;
 import com.alexanderberndt.appintegration.pipeline.context.GlobalContext;
 import com.alexanderberndt.appintegration.pipeline.context.TaskContext;
+import com.alexanderberndt.appintegration.utils.DataMap;
 
 import javax.annotation.Nonnull;
-import java.util.Map;
 
-public final class CoreTestTaskContext extends TaskContext {
+public final class TestTaskContext extends TaskContext {
 
-    protected CoreTestTaskContext(GlobalContext globalContext, TaskLogger taskLogger, Ranking rank, String taskNamespace, ExternalResourceType resourceType, @Nonnull Map<String, Object> executionDataMap) {
+    protected TestTaskContext(GlobalContext globalContext, TaskLogger taskLogger, Ranking rank, String taskNamespace, ExternalResourceType resourceType, @Nonnull DataMap executionDataMap) {
         super(globalContext, taskLogger, rank, taskNamespace, resourceType, executionDataMap);
     }
 }

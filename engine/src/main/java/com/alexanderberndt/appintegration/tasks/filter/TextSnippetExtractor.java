@@ -6,19 +6,13 @@ import com.alexanderberndt.appintegration.pipeline.task.ProcessingTask;
 import com.alexanderberndt.appintegration.tasks.utils.LineFilterReader;
 import org.osgi.service.component.annotations.Component;
 
-import java.io.IOException;
 import java.io.Reader;
 
 @Component
 public class TextSnippetExtractor implements ProcessingTask {
 
     @Override
-    public String getName() {
-        return "text-snippet-extractor";
-    }
-
-    @Override
-    public void process(TaskContext context, ExternalResource resource) throws IOException {
+    public void process(TaskContext context, ExternalResource resource)  {
         resource.setContent(new TextSnippetExtractingReader(resource.getContentAsReader()));
         // ToDo: Implement error handling
     }

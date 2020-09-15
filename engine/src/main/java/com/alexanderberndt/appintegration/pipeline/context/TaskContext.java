@@ -5,7 +5,9 @@ import com.alexanderberndt.appintegration.engine.logging.AbstractLogger;
 import com.alexanderberndt.appintegration.engine.logging.TaskLogger;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
 import com.alexanderberndt.appintegration.pipeline.configuration.ConfigurationException;
+import com.alexanderberndt.appintegration.pipeline.configuration.MultiValue;
 import com.alexanderberndt.appintegration.pipeline.configuration.Ranking;
+import com.alexanderberndt.appintegration.utils.DataMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +45,7 @@ public class TaskContext {
     private final ExternalResourceType resourceType;
 
     @Nonnull
-    private final Map<String, Object> executionDataMap;
+    private final DataMap executionDataMap;
 
     @Nonnull
     private final TaskLogger taskLogger;
@@ -57,7 +59,7 @@ public class TaskContext {
             @Nonnull Ranking rank,
             @Nonnull String taskNamespace,
             @Nonnull ExternalResourceType resourceType,
-            @Nonnull Map<String, Object> executionDataMap) {
+            @Nonnull DataMap executionDataMap) {
         this.globalContext = Objects.requireNonNull(globalContext, "GlobalContext MUST NOT NULL!");
         this.taskLogger = Objects.requireNonNull(taskLogger, "TaskLogger MUST NOT NULL!");
         this.readConfigurationLog = taskLogger.createDetailsLogger("Effective configuration...");
@@ -162,7 +164,7 @@ public class TaskContext {
                     addWarning(String.format("Value %s is invalid type for %s", value, nk.getPlainKey()));
                 }
             } else {
-                globalContext.getProcessingParams().setValue(nk.getNamespace(), nk.getKey(), rank, resourceType, value);
+                globalContext.getProcessingParams().setValue(nk.getNamespace(), nk.getKey(), rank, nk.getResourceType(), value);
             }
         } catch (ConfigurationException e) {
             addWarning(e.getMessage());
@@ -189,6 +191,31 @@ public class TaskContext {
     public Set<String> keySet() {
         return globalContext.getProcessingParams().keySet(taskNamespace);
     }
+
+    public DataMap getConfiguration()  {
+
+        final DataMap configuration = new DataMap();
+
+        final Map<String, MultiValue> configurationValues = globalContext.getProcessingParams().configurationValues(taskNamespace);
+        for (Map.Entry<String, MultiValue> entry : configurationValues.entrySet()) {
+            Object value;
+            try {
+                final Object execValue = executionDataMap.get(entry.getKey());
+                if (execValue != null) {
+                    value = entry.getValue().getValue(resourceType, execValue);
+                } else {
+                    value = entry.getValue().getValue(resourceType);
+                }
+            } catch (ConfigurationException e) {
+                value = entry.getValue().getValue(resourceType);
+            }
+            configuration.setData(entry.getKey(), value);
+        }
+
+        return configuration;
+    }
+
+
 
     public void setKeyComplete() {
         LOG.debug("setKeyComplete({}) @ {} with keys = {}", rank, this.taskNamespace, this.keySet());

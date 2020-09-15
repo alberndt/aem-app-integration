@@ -1,4 +1,4 @@
-package com.alexanderberndt.appintegration.core;
+package com.alexanderberndt.appintegration.engine.testsupport;
 
 import com.alexanderberndt.appintegration.engine.ExternalResourceCache;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
@@ -18,14 +18,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class CoreTestExternalResourceCache implements ExternalResourceCache {
+public class TestExternalResourceCache implements ExternalResourceCache {
 
     private String readVersionId;
 
     private String writeVersionId;
 
     private final Map<CacheKey, CacheValue> resourceCache = new HashMap<>();
-
 
     @Override
     public void storeResource(@Nonnull ExternalResource resource) {

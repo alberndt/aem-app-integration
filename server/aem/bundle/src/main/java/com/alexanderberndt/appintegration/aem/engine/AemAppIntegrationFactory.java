@@ -1,7 +1,12 @@
 package com.alexanderberndt.appintegration.aem.engine;
 
-import com.alexanderberndt.appintegration.engine.*;
+import com.alexanderberndt.appintegration.engine.AppIntegrationFactory;
+import com.alexanderberndt.appintegration.engine.Application;
+import com.alexanderberndt.appintegration.engine.ContextProvider;
+import com.alexanderberndt.appintegration.engine.ResourceLoader;
 import com.alexanderberndt.appintegration.engine.resources.conversion.TextParser;
+import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
+import com.alexanderberndt.appintegration.pipeline.ProcessingPipeline;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.*;
 import org.slf4j.Logger;
@@ -52,14 +57,24 @@ public class AemAppIntegrationFactory implements AppIntegrationFactory<SlingAppl
 
     @Nonnull
     @Override
-    public ProcessingPipelineFactory<AemGlobalContext> getProcessingPipelineFactory() {
-        return processingPipelineFactory;
-    }
-
-    @Nonnull
-    @Override
     public Collection<TextParser> getAllTextParsers() {
         return textParserList;
+    }
+
+    /**
+     * Create a new instance of an processing pipeline, and updates the context with the default task configuration
+     * and logging information.
+     *
+     * @param context
+     * @param name    Name of the pipeline
+     * @return A processing pipeline, and a initialized context
+     * @throws AppIntegrationException In case the pipeline could not be created, an exception shall be thrown.
+     *                                 Otherwise the method shall always create a valid pipeline.
+     */
+    @Nonnull
+    @Override
+    public ProcessingPipeline createProcessingPipeline(@Nonnull AemGlobalContext context, @Nonnull String name) throws AppIntegrationException {
+        return processingPipelineFactory.createProcessingPipeline(context.getResourceResolver(), name);
     }
 
 

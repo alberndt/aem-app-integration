@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 public class PipelineConfiguration {
 
-    private static final String INTERNAL_NAMESPACE_SEPARATOR = "#°#";
+    private static final String INTERNAL_NAMESPACE_SEPARATOR = "°°°";
 
     private final Map<String, MultiValue> values = new HashMap<>();
 
@@ -53,6 +53,13 @@ public class PipelineConfiguration {
                 .filter(key -> StringUtils.startsWith(key, prefix))
                 .map(key -> StringUtils.removeStart(key, prefix))
                 .collect(Collectors.toSet());
+    }
+
+    public Map<String, MultiValue> configurationValues(@Nonnull String namespace) {
+        final String prefix = getNamespaceId(namespace) + INTERNAL_NAMESPACE_SEPARATOR;
+        return values.entrySet().stream()
+                .filter(entry -> StringUtils.startsWith(entry.getKey(), prefix))
+                .collect(Collectors.toMap(entry -> StringUtils.removeStart(entry.getKey(), prefix), Map.Entry::getValue));
     }
 
     /**

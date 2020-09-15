@@ -4,8 +4,6 @@ import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.pipeline.ProcessingPipeline;
 import com.alexanderberndt.appintegration.pipeline.context.TaskContext;
 
-import java.io.IOException;
-
 /**
  * <p>Filter for a {@link ProcessingPipeline}, which is applied for all applicable resources of an
  * {@link com.alexanderberndt.appintegration.engine.Application}.</p>
@@ -16,11 +14,23 @@ import java.io.IOException;
  *     <li>{@link org.jsoup.nodes.Document} (html-snippets only)</li>
  * </ul>
  */
-public interface ProcessingTask extends GenericTask {
+public interface ProcessingTask {
 
 
-    void process(TaskContext context, ExternalResource resource) throws IOException;
+    void process(TaskContext context, ExternalResource resource);
 
+    /**
+     * <p>Implementing classes should define a set of task-properties. This should be done by calling
+     * {@link TaskContext#setValue(String, Object)} and {@link TaskContext#setType(String, Class)}. Although these
+     * defaults can be overwritten, this ensures that they have a defined type and meaningful default values.</p>
+     *
+     * <p>With {@link TaskContext#setKeyComplete()} can be assured, that only known properties can be overwritten.
+     * A warning is created, if a new property is created. This helps, that not accidentally wrong properties are specified.</p>
+     *
+     * @param taskContext TaskContext
+     */
+    default void declareTaskPropertiesAndDefaults(TaskContext taskContext) {
+    }
 
     // ToDo: Input-Combinations or Alternatives
 

@@ -5,25 +5,27 @@ import com.alexanderberndt.appintegration.engine.logging.TaskLogger;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceFactory;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
-import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
-import com.alexanderberndt.appintegration.pipeline.builder.BasicPipelineBuilder;
-import com.alexanderberndt.appintegration.pipeline.builder.PipelineBuilder;
+import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
+import com.alexanderberndt.appintegration.pipeline.configuration.Ranking;
 import com.alexanderberndt.appintegration.pipeline.context.GlobalContext;
 import com.alexanderberndt.appintegration.pipeline.context.TaskContext;
 import com.alexanderberndt.appintegration.pipeline.task.LoadingTask;
 import com.alexanderberndt.appintegration.pipeline.task.PreparationTask;
 import com.alexanderberndt.appintegration.pipeline.task.ProcessingTask;
+import com.alexanderberndt.appintegration.utils.DataMap;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import java.io.IOException;
+import javax.annotation.Nullable;
 import java.lang.invoke.MethodHandles;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 import static com.alexanderberndt.appintegration.pipeline.configuration.Ranking.PIPELINE_EXECUTION;
 
@@ -34,77 +36,121 @@ public class ProcessingPipeline {
 
     private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private final GlobalContext context;
+    @Nonnull
+    private final List<TaskWrapper<PreparationTask>> preparationTasks;
 
-    private final List<TaskInstance<PreparationTask>> preparationTasks;
+    @Nonnull
+    private final TaskWrapper<LoadingTask> loadingTask;
 
-    private final TaskInstance<LoadingTask> loadingTask;
+    @Nonnull
+    private final List<TaskWrapper<ProcessingTask>> processingTasks;
 
-    private final List<TaskInstance<ProcessingTask>> processingTasks;
-
-    public ProcessingPipeline(GlobalContext context,
-                              List<TaskInstance<PreparationTask>> preparationTasks,
-                              TaskInstance<LoadingTask> loadingTask,
-                              List<TaskInstance<ProcessingTask>> processingTasks) {
-        this.context = context;
-        this.preparationTasks = preparationTasks;
+    public ProcessingPipeline(
+            @Nullable List<TaskWrapper<PreparationTask>> preparationTasks,
+            @Nonnull TaskWrapper<LoadingTask> loadingTask,
+            @Nullable List<TaskWrapper<ProcessingTask>> processingTasks) {
+        this.preparationTasks = Optional.ofNullable(preparationTasks).orElse(Collections.emptyList());
         this.loadingTask = loadingTask;
-        this.processingTasks = processingTasks;
+        this.processingTasks = Optional.ofNullable(processingTasks).orElse(Collections.emptyList());
+    }
+
+    public void initContextWithTaskDefaults(@Nonnull GlobalContext context) {
+        final ResourceLogger logger = context.getIntegrationLog().createResourceLogger("defaults");
+        final DataMap processingData = new DataMap();
+        preparationTasks.forEach(taskWrapper ->
+                applyWithContext(taskWrapper, context, logger, Ranking.TASK_DEFAULT, ExternalResourceType.ANY, processingData,
+                        taskContext -> {
+                            taskWrapper.getTask().declareTaskPropertiesAndDefaults(taskContext);
+                            return null;
+                        }));
+        applyWithContext(loadingTask, context, logger, Ranking.TASK_DEFAULT, ExternalResourceType.ANY, processingData,
+                taskContext -> {
+                    loadingTask.getTask().declareTaskPropertiesAndDefaults(taskContext);
+                    return null;
+                });
+        processingTasks.forEach(taskWrapper ->
+                applyWithContext(taskWrapper, context, logger, Ranking.TASK_DEFAULT, ExternalResourceType.ANY, processingData,
+                        taskContext -> {
+                            taskWrapper.getTask().declareTaskPropertiesAndDefaults(taskContext);
+                            return null;
+                        }));
+    }
+
+    public void initContextWithPipelineConfig(@Nonnull GlobalContext context) {
+        final ResourceLogger logger = context.getIntegrationLog().createResourceLogger("pipeline config");
+        final DataMap processingData = new DataMap();
+        preparationTasks.forEach(taskWrapper ->
+                applyWithContext(taskWrapper, context, logger, Ranking.TASK_DEFAULT, ExternalResourceType.ANY, processingData,
+                        taskContext -> this.copyTaskConfiguration(taskWrapper, taskContext)));
+        applyWithContext(loadingTask, context, logger, Ranking.TASK_DEFAULT, ExternalResourceType.ANY, processingData,
+                taskContext -> this.copyTaskConfiguration(loadingTask, taskContext));
+        processingTasks.forEach(taskWrapper ->
+                applyWithContext(taskWrapper, context, logger, Ranking.TASK_DEFAULT, ExternalResourceType.ANY, processingData,
+                        taskContext -> this.copyTaskConfiguration(taskWrapper, taskContext)));
+    }
+
+    protected <T> Void copyTaskConfiguration(TaskWrapper<T> taskWrapper, TaskContext taskContext) {
+        final DataMap configuration = taskWrapper.getConfiguration();
+        if ((configuration != null) && !configuration.isEmpty()) {
+            configuration.forEach((key, value) -> {
+                final String qualifiedKey = StringUtils.prependIfMissing(key, taskWrapper.getId() + TaskContext.NAMESPACE_SEPARATOR);
+                taskContext.setValue(qualifiedKey, value);
+            });
+        }
+        return null;
     }
 
 
-    @Deprecated
-    public static BasicPipelineBuilder createPipelineInstance(@Nonnull GlobalContext context, @Nonnull ResourceLogger pipelineLog) {
-        return new BasicPipelineBuilder(context, pipelineLog);
-    }
-
-    @Deprecated
-    public static PipelineBuilder createPipelineInstance(@Nonnull GlobalContext context, @Nonnull TaskFactory taskFactory, @Nonnull ResourceLogger pipelineLog) {
-        return new PipelineBuilder(context, taskFactory, pipelineLog);
-    }
-
-
-    public ExternalResource loadAndProcessResourceRef(ExternalResourceRef resourceRef, ExternalResourceFactory factory) throws IOException {
-
-        validatePipeline();
+    public ExternalResource loadAndProcessResourceRef(@Nonnull GlobalContext context, @Nonnull ExternalResourceRef resourceRef, @Nonnull ExternalResourceFactory factory) {
 
         final ResourceLogger log = context.getIntegrationLog().createResourceLogger(resourceRef);
-        final Map<String, Object> processingData = new HashMap<>();
+        final DataMap processingData = new DataMap();
 
         final StopWatch stopWatch = new StopWatch();
         stopWatch.start();
 
         // preparation tasks
-        for (TaskInstance<PreparationTask> taskInstance : preparationTasks) {
-            LOG.debug("{}::prepare", taskInstance.getTaskNamespace());
-            final TaskLogger taskLogger = log.createTaskLogger(taskInstance.getTask(), taskInstance.getTaskNamespace());
-            TaskContext taskContext = context.createTaskContext(taskLogger, PIPELINE_EXECUTION, taskInstance.getTaskNamespace(), resourceRef.getExpectedType(), processingData);
-            taskInstance.getTask().prepare(taskContext, resourceRef);
+        for (TaskWrapper<PreparationTask> taskWrapper : preparationTasks) {
+            final ExternalResourceType resourceType = resourceRef.getExpectedType();
+            applyWithContext(taskWrapper, context, log, PIPELINE_EXECUTION, resourceType, processingData,
+                    taskContext -> {
+                        taskWrapper.getTask().prepare(taskContext, resourceRef);
+                        return null;
+                    });
         }
 
         // loading task
-        LOG.debug("{}::load", loadingTask.getTaskNamespace());
-        final TaskLogger loadTaskLogger = log.createTaskLogger(loadingTask.getTask(), loadingTask.getTaskNamespace());
-        TaskContext loadContext = context.createTaskContext(loadTaskLogger, PIPELINE_EXECUTION, loadingTask.getTaskNamespace(), resourceRef.getExpectedType(), processingData);
-        ExternalResource resource = loadingTask.getTask().load(loadContext, resourceRef, factory);
+        final ExternalResource resource =
+                applyWithContext(loadingTask, context, log, PIPELINE_EXECUTION, resourceRef.getExpectedType(), processingData,
+                        taskContext -> loadingTask.getTask().load(taskContext, resourceRef, factory));
 
         // processing tasks
-        for (TaskInstance<ProcessingTask> taskInstance : processingTasks) {
-            LOG.debug("{}::prepare", taskInstance.getTaskNamespace());
-            final TaskLogger taskLogger = log.createTaskLogger(taskInstance.getTask(), taskInstance.getTaskNamespace());
-            TaskContext taskContext = context.createTaskContext(taskLogger, PIPELINE_EXECUTION, taskInstance.getTaskNamespace(), resource.getType(), processingData);
-            taskInstance.getTask().process(taskContext, resource);
+        for (TaskWrapper<ProcessingTask> taskWrapper : processingTasks) {
+            final ExternalResourceType resourceType = resource.getType();
+            applyWithContext(taskWrapper, context, log, PIPELINE_EXECUTION, resourceType, processingData,
+                    taskContext -> {
+                        taskWrapper.getTask().process(taskContext, resource);
+                        return null;
+                    });
         }
 
         log.setTime(String.format("%,d ms", stopWatch.getTime(TimeUnit.MILLISECONDS)));
         return resource;
     }
 
-    public void validatePipeline() {
-        if (loadingTask == null) {
-            throw new AppIntegrationException("A LoadingTask must be added to the Pipeline before!");
-        }
-    }
+    protected <T, R> R applyWithContext(
+            @Nonnull TaskWrapper<T> taskWrapper,
+            @Nonnull GlobalContext context,
+            @Nonnull ResourceLogger logger,
+            @Nonnull Ranking ranking,
+            @Nonnull ExternalResourceType resourceType,
+            @Nonnull DataMap processingData,
+            @Nonnull Function<TaskContext, R> function) {
 
+        LOG.debug("call with context for task {}", taskWrapper.getId());
+        final TaskLogger taskLogger = logger.createTaskLogger(taskWrapper.getId(), taskWrapper.getName());
+        final TaskContext taskContext = context.createTaskContext(taskLogger, ranking, taskWrapper.getId(), resourceType, processingData);
+        return function.apply(taskContext);
+    }
 
 }

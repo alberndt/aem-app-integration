@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
-class ProcessingPipelineFactoryTest {
+class ProcessingProcessingPipelineBuilderTest {
 
     @Test
     void testPipeline1() throws IOException {
@@ -13,7 +13,7 @@ class ProcessingPipelineFactoryTest {
 
 //        InputStream pipelineInputStream = ClassLoader.getSystemResourceAsStream("simple-app1/local/integration-pipeline.json");
 //        ObjectMapper objectMapper = new ObjectMapper();
-//        PipelineDefinition pipelineDefinition = objectMapper.readValue(pipelineInputStream, PipelineDefinition.class);
+//        YamlPipelineDefinition pipelineDefinition = objectMapper.readValue(pipelineInputStream, YamlPipelineDefinition.class);
 //        assertNotNull(pipelineDefinition);
 //
 //        ProcessingPipelineFactory factory = new ProcessingPipelineFactory();

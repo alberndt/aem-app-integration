@@ -1,4 +1,4 @@
-package com.alexanderberndt.appintegration.core;
+package com.alexanderberndt.appintegration.engine.testsupport;
 
 import com.alexanderberndt.appintegration.engine.Application;
 
@@ -7,7 +7,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 
-public class CoreTestApplication implements Application {
+public class TestApplication implements Application {
 
     @Nonnull
     private final String applicationInfoUrl;
@@ -24,11 +24,11 @@ public class CoreTestApplication implements Application {
     @Nullable
     private final Map<String, Object> globalProperties;
 
-    public CoreTestApplication(@Nonnull String applicationInfoUrl,
-                               @Nonnull String resourceLoaderName,
-                               @Nonnull String processingPipelineName,
-                               @Nullable List<String> contextProviderNames,
-                               @Nullable Map<String, Object> globalProperties) {
+    public TestApplication(@Nonnull String applicationInfoUrl,
+                           @Nonnull String resourceLoaderName,
+                           @Nonnull String processingPipelineName,
+                           @Nullable List<String> contextProviderNames,
+                           @Nullable Map<String, Object> globalProperties) {
         this.applicationInfoUrl = applicationInfoUrl;
         this.resourceLoaderName = resourceLoaderName;
         this.processingPipelineName = processingPipelineName;
