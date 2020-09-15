@@ -203,8 +203,11 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
 
         // build processing pipeline
         final String pipelineName = application.getProcessingPipelineName();
-        final ProcessingPipeline pipeline = getFactory().createProcessingPipeline(context, pipelineName);
-        if (pipeline == null) {
+        final ProcessingPipeline pipeline;
+        try {
+            pipeline = getFactory().createProcessingPipeline(context, pipelineName);
+        } catch (AppIntegrationException e) {
+            LOG.error("Cannot create pipeline {} for application {}", pipelineName, applicationId, e);
             context.getIntegrationLog().addError("Cannot create pipeline %s for application %s", pipelineName, applicationId);
             return;
         }

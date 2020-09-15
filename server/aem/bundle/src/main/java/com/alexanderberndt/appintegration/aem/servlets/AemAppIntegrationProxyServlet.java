@@ -24,8 +24,11 @@ public class AemAppIntegrationProxyServlet extends HttpServlet {
 
     private static final long serialVersionUID = -1812227983368047424L;
 
-    @Reference
-    private AemAppIntegrationEngine integrationEngine;
+    private final AemAppIntegrationEngine integrationEngine;
+
+    public AemAppIntegrationProxyServlet(@Reference AemAppIntegrationEngine integrationEngine) {
+        this.integrationEngine = integrationEngine;
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
