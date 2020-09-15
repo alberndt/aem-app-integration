@@ -286,7 +286,7 @@ class TaskContextTest {
         taskContext.setValue("test", "Hello World!");
         executionTaskContext.setValue("test", 10);
 
-        Mockito.verify(executionTaskContext).addWarning(Mockito.anyString());
-        Mockito.verify(executionTaskContext, Mockito.never()).addError(Mockito.anyString());
+        Mockito.verify(executionTaskContext).addWarning(Mockito.anyString(), Mockito.any());
+        Mockito.verify(executionTaskContext, Mockito.never()).addError(Mockito.anyString(), Mockito.any());
     }
 }

@@ -44,7 +44,7 @@ public class TaskContext {
     @Nonnull
     private final ExternalResourceType resourceType;
 
-    @Nonnull
+    @Nullable
     private final DataMap executionDataMap;
 
     @Nonnull
@@ -59,14 +59,14 @@ public class TaskContext {
             @Nonnull Ranking rank,
             @Nonnull String taskNamespace,
             @Nonnull ExternalResourceType resourceType,
-            @Nonnull DataMap executionDataMap) {
+            @Nullable DataMap executionDataMap) {
         this.globalContext = Objects.requireNonNull(globalContext, "GlobalContext MUST NOT NULL!");
         this.taskLogger = Objects.requireNonNull(taskLogger, "TaskLogger MUST NOT NULL!");
         this.readConfigurationLog = taskLogger.createDetailsLogger("Effective configuration...");
         this.rank = Objects.requireNonNull(rank, "Ranking MUST NOT NULL!");
         this.taskNamespace = Objects.requireNonNull(taskNamespace, "TaskNamespace MUST NOT NULL!");
         this.resourceType = Objects.requireNonNull(resourceType, "ExternalResourceType MUST NOT NULL!");
-        this.executionDataMap = Objects.requireNonNull(executionDataMap, "ExecutionDataMap MUST NOT NULL!");
+        this.executionDataMap = executionDataMap;
     }
 
     public void addWarning(@Nonnull String message, Object... args) {
@@ -134,7 +134,7 @@ public class TaskContext {
 
     protected Object getValueInternal(NamespaceKey nk) {
         Object returnValue;
-        final Object executionValue = executionDataMap.get(nk.getPlainKey());
+        final Object executionValue = (executionDataMap != null) ? executionDataMap.get(nk.getPlainKey()) : null;
         if (executionValue != null) {
             try {
                 returnValue = globalContext.getProcessingParams().getValue(nk.getNamespace(), nk.getKey(), resourceType, executionValue);
@@ -159,9 +159,13 @@ public class TaskContext {
 
             if (rank == Ranking.PIPELINE_EXECUTION) {
                 if (globalContext.getProcessingParams().isValidType(nk.getNamespace(), nk.getKey(), value)) {
-                    executionDataMap.put(nk.getPlainKey(), value);
+                    if (executionDataMap != null) {
+                        executionDataMap.put(nk.getPlainKey(), value);
+                    } else {
+                        addWarning("Can't set %s=%s, as no execution-data-map was provided",nk.getPlainKey(), value);
+                    }
                 } else {
-                    addWarning(String.format("Value %s is invalid type for %s", value, nk.getPlainKey()));
+                    addWarning("Value %s is invalid type for %s", value, nk.getPlainKey());
                 }
             } else {
                 globalContext.getProcessingParams().setValue(nk.getNamespace(), nk.getKey(), rank, nk.getResourceType(), value);

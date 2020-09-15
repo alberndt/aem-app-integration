@@ -95,24 +95,18 @@ public class TestAppIntegrationFactory implements AppIntegrationFactory<TestAppI
      * Create a new instance of an processing pipeline, and updates the context with the default task configuration
      * and logging information.
      *
-     * @param context
+     * @param context Global Context
      * @param name    Name of the pipeline
      * @return A processing pipeline, and a initialized context
-     * @throws AppIntegrationException In case the pipeline could not be created, an exception shall be thrown.
-     *                                 Otherwise the method shall always create a valid pipeline.
      */
     @Nonnull
     @Override
-    public ProcessingPipeline createProcessingPipeline(TestGlobalContext context, @Nonnull String name) {
+    public ProcessingPipeline createProcessingPipeline(@Nonnull TestGlobalContext context, @Nonnull String name) {
         return processingPipelineFactory.createProcessingPipeline(name);
     }
 
     public void registerApplication(@Nonnull String id, @Nonnull Application application) {
         applicationMap.put(id, application);
-    }
-
-    public void unregisterApplication(@Nonnull String id) {
-        applicationMap.remove(id);
     }
 
 }

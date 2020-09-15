@@ -46,4 +46,8 @@ public class TestAppIntegrationEngine extends AppIntegrationEngine<TestAppInstan
         resourceCacheMap.put(applicationId, cache);
     }
 
+    public ExternalResourceCache getExternalResourceCache(String applicationId) {
+        return resourceCacheMap.get(applicationId);
+    }
+
 }

@@ -4,6 +4,7 @@ import com.alexanderberndt.appintegration.engine.logging.LogAppender;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
+import com.alexanderberndt.appintegration.engine.testsupport.TestAppIntegrationFactory;
 import com.alexanderberndt.appintegration.engine.testsupport.TestGlobalContext;
 import com.alexanderberndt.appintegration.engine.testsupport.TestLoadingTask;
 import com.alexanderberndt.appintegration.pipeline.ProcessingPipeline;
@@ -20,6 +21,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 class PropertiesTaskTest {
+
+    private final TestAppIntegrationFactory appIntegrationFactory = new TestAppIntegrationFactory();
 
     @Mock
     private LogAppender logAppenderMock;
@@ -63,7 +66,7 @@ class PropertiesTaskTest {
     @Test
     void prepareTextRes() {
         final ExternalResourceRef resourceRef = ExternalResourceRef.create("/test.txt", ExternalResourceType.TEXT);
-        pipeline.loadAndProcessResourceRef(globalContext, resourceRef, globalContext);
+        pipeline.loadAndProcessResourceRef(globalContext, resourceRef, appIntegrationFactory.getExternalResourceFactory());
         assertEquals("Hello World!", stringValue.value);
         assertEquals(new Integer(42), numberValue.value);
     }
@@ -71,7 +74,7 @@ class PropertiesTaskTest {
     @Test
     void prepareCssRes() {
         final ExternalResourceRef resourceRef = ExternalResourceRef.create("/test.css", ExternalResourceType.CSS);
-        pipeline.loadAndProcessResourceRef(globalContext, resourceRef, globalContext);
+        pipeline.loadAndProcessResourceRef(globalContext, resourceRef, appIntegrationFactory.getExternalResourceFactory());
         assertEquals("This is a CSS value!", stringValue.value);
         assertEquals(new Integer(42), numberValue.value);
     }

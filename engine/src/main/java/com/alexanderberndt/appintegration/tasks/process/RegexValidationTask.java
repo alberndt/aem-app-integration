@@ -5,6 +5,7 @@ import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
 import com.alexanderberndt.appintegration.pipeline.context.TaskContext;
 import com.alexanderberndt.appintegration.pipeline.task.ProcessingTask;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,10 @@ public class RegexValidationTask implements ProcessingTask {
     @Override
     public void process(TaskContext context, ExternalResource resource) {
         final String regexString = context.getValue(REGEX_PARAM, String.class);
+        if (StringUtils.isBlank(regexString)) {
+            throw new AppIntegrationException("No regex provided!");
+        }
+
         final Pattern pattern;
         try {
             pattern = Pattern.compile(regexString);

@@ -7,6 +7,7 @@ import com.alexanderberndt.appintegration.pipeline.TaskWrapper;
 import com.alexanderberndt.appintegration.pipeline.task.LoadingTask;
 import com.alexanderberndt.appintegration.pipeline.task.PreparationTask;
 import com.alexanderberndt.appintegration.pipeline.task.ProcessingTask;
+import com.alexanderberndt.appintegration.utils.DataMap;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nonnull;
@@ -50,23 +51,28 @@ public class ProcessingPipelineBuilder {
         if ((taskDefMap != null) && (!taskDefMap.isEmpty())) {
             for (Map.Entry<String, TaskDefinition> taskDefEntry : taskDefMap.entrySet()) {
                 final String taskId = taskDefEntry.getKey();
-                @Nullable
                 final TaskDefinition taskDef = taskDefEntry.getValue();
-                final String taskName = StringUtils.defaultIfBlank((taskDef != null) ? taskDef.getName() : null, taskId);
-
-                final T task = taskFactoryMethod.apply(taskName);
-                if (task == null) {
-                    throw new AppIntegrationException("task " + taskName + " is not found by " + taskFactoryMethod.toString() + ". Cannot create pipeline!");
-                }
-
-                if (!taskNameSet.add(taskId)) {
-                    throw new AppIntegrationException("Cannot create pipeline, as task-id " + taskId + " is used twice! It must be unique id for the entire pipeline!");
-                }
-
-                taskList.add(new TaskWrapper<>(taskId, taskName, task, (taskDef != null) ? taskDef.getConfiguration() : null));
+                taskList.add(createTaskWrapper(taskId, taskDef, taskNameSet, taskFactoryMethod));
             }
         }
         return taskList;
+    }
+
+    @Nonnull
+    private <T> TaskWrapper<T> createTaskWrapper(@Nonnull String taskId, @Nullable TaskDefinition taskDef, @Nonnull Set<String> taskNameSet, @Nonnull Function<String, T> taskFactoryMethod) {
+        final String taskName = StringUtils.defaultIfBlank((taskDef != null) ? taskDef.getName() : null, taskId);
+
+        final T task = taskFactoryMethod.apply(taskName);
+        if (task == null) {
+            throw new AppIntegrationException("task " + taskName + " is not found by " + taskFactoryMethod.toString() + ". Cannot create pipeline!");
+        }
+
+        if (!taskNameSet.add(taskId)) {
+            throw new AppIntegrationException("Cannot create pipeline, as task-id " + taskId + " is used twice! It must be unique id for the entire pipeline!");
+        }
+
+        final DataMap configuration = (taskDef != null) ? taskDef.getConfiguration() : null;
+        return new TaskWrapper<>(taskId, taskName, task, configuration);
     }
 
 }

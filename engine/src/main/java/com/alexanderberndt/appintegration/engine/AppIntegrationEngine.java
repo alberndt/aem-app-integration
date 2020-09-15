@@ -5,7 +5,6 @@ import com.alexanderberndt.appintegration.engine.logging.TaskLogger;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
-import com.alexanderberndt.appintegration.engine.resources.conversion.StringConverter;
 import com.alexanderberndt.appintegration.engine.resourcetypes.appinfo.ApplicationInfoJson;
 import com.alexanderberndt.appintegration.engine.resourcetypes.appinfo.ComponentInfoJson;
 import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
@@ -19,9 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -114,6 +111,16 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
     protected ExternalResource getExternalResource(C context, URI uri, Application application, I instance) {
         final ProcessingPipeline pipeline = getFactory().createProcessingPipeline(context, application.getProcessingPipelineName());
 
+        // inject the resource-loader
+        final String resourceLoaderName = application.getResourceLoaderName();
+        final ResourceLoader resourceLoader = getFactory().getResourceLoader(resourceLoaderName);
+        context.setResourceLoader(resourceLoader);
+        if (resourceLoader == null) {
+            // ToDo: Nice logging
+            throw new AppIntegrationException(String.format("ResourceLoader %s not found. Cannot create context", resourceLoaderName));
+        }
+
+
         if (uri != null) {
 
             // ToDo: Resource-Cache ist Teil der Pipeline
@@ -122,7 +129,7 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
             final ExternalResourceRef snippetRef = new ExternalResourceRef(uri, ExternalResourceType.HTML_SNIPPET);
 
             pipeline.initContextWithTaskDefaults(context);
-            return pipeline.loadAndProcessResourceRef(context, snippetRef, this::createExternalResource);
+            return pipeline.loadAndProcessResourceRef(context, snippetRef, getFactory().getExternalResourceFactory());
         } else {
 
             // ToDo: load application-info.json via pipeline
@@ -134,8 +141,12 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
             final VerifiedInstance<I> verifiedInstance = VerifiedInstance.verify(instance, this.getFactory());
             final ExternalResourceRef snippetRef = resolveSnippetResource(verifiedInstance, applicationInfoJson);
 
+
+
+
             pipeline.initContextWithTaskDefaults(context);
-            return pipeline.loadAndProcessResourceRef(context, snippetRef, this::createExternalResource);
+            pipeline.initContextWithPipelineConfig(context);
+            return pipeline.loadAndProcessResourceRef(context, snippetRef, getFactory().getExternalResourceFactory());
         }
     }
 
@@ -206,11 +217,14 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
         final ProcessingPipeline pipeline;
         try {
             pipeline = getFactory().createProcessingPipeline(context, pipelineName);
+            pipeline.initContextWithTaskDefaults(context);
+            pipeline.initContextWithPipelineConfig(context);
         } catch (AppIntegrationException e) {
             LOG.error("Cannot create pipeline {} for application {}", pipelineName, applicationId, e);
             context.getIntegrationLog().addError("Cannot create pipeline %s for application %s", pipelineName, applicationId);
             return;
         }
+
 
         // add global properties
         final Map<String, Object> globalProperties = application.getGlobalProperties();
@@ -246,7 +260,7 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
         for (ExternalResourceRef snippetRef : resolvedSnippetsSet) {
             final ExternalResource snippet;
             try {
-                snippet = pipeline.loadAndProcessResourceRef(context, snippetRef, this::createExternalResource);
+                snippet = pipeline.loadAndProcessResourceRef(context, snippetRef, getFactory().getExternalResourceFactory());
                 referencedResourcesSet.addAll(snippet.getReferencedResources());
             } catch (AppIntegrationException e) {
                 LOG.error("cannot load", e);
@@ -258,7 +272,7 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
         for (ExternalResourceRef resourceRef : referencedResourcesSet) {
             final ExternalResource resource;
             try {
-                resource = pipeline.loadAndProcessResourceRef(context, resourceRef, this::createExternalResource);
+                resource = pipeline.loadAndProcessResourceRef(context, resourceRef, getFactory().getExternalResourceFactory());
                 referencedResourcesSet.addAll(resource.getReferencedResources());
             } catch (AppIntegrationException e) {
                 LOG.error("cannot load", e);
@@ -280,13 +294,6 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
     /* Internal methods */
 
     @Nonnull
-    protected ExternalResource createExternalResource(@Nonnull URI uri, @Nullable ExternalResourceType
-            type, @Nonnull InputStream content, Map<String, Object> metadataMap) {
-        return new ExternalResource(uri, type, content, metadataMap, () -> Collections.singletonList(new StringConverter()));
-    }
-
-
-    @Nonnull
     protected ApplicationInfoJson getOrLoadApplicationInfoJson(@Nonnull Application application) {
         final ApplicationInfoJson cachedAppInfo = applicationInfoCache.get(application.getApplicationInfoUrl());
         if (cachedAppInfo != null) {
@@ -306,7 +313,7 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
             } catch (URISyntaxException e) {
                 throw new AppIntegrationException("Cannot load application-info '" + application.getApplicationInfoUrl() + "'!", e);
             }
-            final ExternalResource loadedRes = loader.load(new ExternalResourceRef(uri, ExternalResourceType.APPLICATION_PROPERTIES), this::createExternalResource);
+            final ExternalResource loadedRes = loader.load(new ExternalResourceRef(uri, ExternalResourceType.APPLICATION_PROPERTIES), getFactory().getExternalResourceFactory());
             final ApplicationInfoJson appInfo = loadedRes.getContentAsParsedObject(ApplicationInfoJson.class);
             this.applicationInfoCache.put(application.getApplicationInfoUrl(), appInfo);
 
@@ -317,7 +324,7 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
         }
     }
 
-
+    @Nonnull
     protected ExternalResourceRef resolveSnippetResource(
             @Nonnull VerifiedInstance<I> instance,
             @Nonnull ApplicationInfoJson applicationInfo) {
@@ -380,17 +387,10 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
         return application;
     }
 
-    public ExternalResourceRef resolveRelativeUrl(@Nonnull URI baseUri, @Nonnull String
-            relativeUrl, @Nonnull ExternalResourceType expectedType) {
-//        try {
-//            final URL url = baseUri.resolve(relativeUrl).toURL();
-//            // ToDo: Add handling of relative urls
-//            //return resolveAbsoluteUrl(url.toString(), expectedType);
-//        } catch (URISyntaxException | MalformedURLException e) {
-//            LOG.error(String.format("Cannot resolve relative-url %s from base-url %s", relativeUrl, baseUri), e);
-//            // ToDo: Add error message to any context object
-        return null;
-//        }
+    @Nonnull
+    public ExternalResourceRef resolveRelativeUrl(@Nonnull URI baseUri, @Nonnull String relativeUrl, @Nonnull ExternalResourceType expectedType) {
+        final URI resolvedUri = baseUri.resolve(relativeUrl).normalize();
+        return new ExternalResourceRef(resolvedUri, expectedType);
     }
 
     @Nonnull
