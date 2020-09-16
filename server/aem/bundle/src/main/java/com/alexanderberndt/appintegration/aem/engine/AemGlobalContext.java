@@ -10,6 +10,7 @@ import com.alexanderberndt.appintegration.utils.DataMap;
 import org.apache.sling.api.resource.ResourceResolver;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class AemGlobalContext extends GlobalContext {
 
@@ -23,8 +24,8 @@ public class AemGlobalContext extends GlobalContext {
 
     @Nonnull
     @Override
-    public TaskContext createTaskContext(@Nonnull TaskLogger taskLogger, @Nonnull Ranking rank, @Nonnull String taskId, @Nonnull ExternalResourceType resourceType, @Nonnull DataMap processingData) {
-        return new AemTaskContext(this, taskLogger, rank, taskId, resourceType, processingData);
+    public TaskContext createTaskContext(@Nonnull TaskLogger taskLogger, @Nonnull Ranking rank, @Nonnull String taskId, @Nonnull ExternalResourceType resourceType, @Nullable DataMap executionDataMap) {
+        return new AemTaskContext(this, taskLogger, rank, taskId, resourceType, executionDataMap);
     }
 
     @Nonnull
