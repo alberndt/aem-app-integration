@@ -4,13 +4,14 @@ import com.alexanderberndt.appintegration.engine.logging.appender.Slf4jLogAppend
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
-import com.alexanderberndt.appintegration.engine.resourcetypes.appinfo.ApplicationInfoJson;
 import com.alexanderberndt.appintegration.engine.testsupport.TestAppInstance;
 import com.alexanderberndt.appintegration.engine.testsupport.TestAppIntegrationEngine;
 import com.alexanderberndt.appintegration.engine.testsupport.TestAppIntegrationFactory;
 import com.alexanderberndt.appintegration.engine.testsupport.TestApplication;
 import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -40,7 +41,7 @@ class AppIntegrationEngineTest {
     @BeforeEach
     void before() {
         factory = new TestAppIntegrationFactory();
-        factory.registerApplication("test-app", new TestApplication(TEST_APP_URL, SYSTEM_RESOURCE_LOADER_NAME, "simple-pipeline1", CORE_CONTEXT_PROVIDERS, null));
+        factory.registerApplication(new TestApplication("test-app", TEST_APP_URL, SYSTEM_RESOURCE_LOADER_NAME, "simple-pipeline1", CORE_CONTEXT_PROVIDERS, null));
 
         //engine = new TestAppIntegrationEngine(factory, () -> new JsonLogAppender(() -> new FileWriter("../logviewer/public/test-app-log.json")));
         engine = new TestAppIntegrationEngine(factory, Slf4jLogAppender::new);
@@ -57,14 +58,30 @@ class AppIntegrationEngineTest {
     }
 
     @Test
-    void loadApplicationInfoJson() throws IOException {
-        ApplicationInfoJson applicationInfo = engine.loadApplicationInfoJson(verifiedInstance.getApplication());
+    void pretest() throws URISyntaxException, IOException, ResourceLoaderException {
+        ResourceLoader loader = factory.getResourceLoader(SYSTEM_RESOURCE_LOADER_NAME);
+        assertNotNull(loader);
 
-        assertNotNull(applicationInfo);
-        assertEquals("Newsletter", applicationInfo.getName());
+        URI appInfoUri = loader.resolveBaseUri(TEST_APP_URL);
+        assertNotNull(appInfoUri);
+
+        ExternalResource appInfoResource = loader.load(new ExternalResourceRef(appInfoUri, ExternalResourceType.APPLICATION_PROPERTIES), factory.getExternalResourceFactory());
+        assertNotNull(appInfoResource);
+
+        String content = appInfoResource.getContentAsParsedObject(String.class);
+        assertTrue(StringUtils.isNotBlank(content));
     }
 
+//    @Test
+//    void loadApplicationInfoJson() throws IOException {
+//        ApplicationInfoJson applicationInfo = engine.loadApplicationInfoJson(verifiedInstance.getApplication());
+//
+//        assertNotNull(applicationInfo);
+//        assertEquals("Newsletter", applicationInfo.getName());
+//    }
+
     @Test
+    @Disabled
     void prefetch()  {
         engine.prefetch(Arrays.asList(instance1, instance2));
     }
@@ -72,8 +89,10 @@ class AppIntegrationEngineTest {
     @Test
     void getHtmlSnippet() throws IOException {
         ExternalResource htmlSnippet = engine.getHtmlSnippet(instance1);
-
         assertNotNull(htmlSnippet);
+
+        final String content = htmlSnippet.getContentAsParsedObject(String.class);
+        assertTrue(StringUtils.isNotBlank(content));
     }
 
     @Test
@@ -82,16 +101,16 @@ class AppIntegrationEngineTest {
         assertThrows(AppIntegrationException.class, () -> engine.resolveStringWithContextVariables(verifiedInstance, "Hello ${hello} from ${language} with ${something-unknown}"));
     }
 
-    @Test
-    void resolveSnippetResource() throws IOException, URISyntaxException {
-        ApplicationInfoJson applicationInfoJson = engine.loadApplicationInfoJson(verifiedInstance.getApplication());
-
-        final ExternalResourceRef resourceRef = engine.resolveSnippetResource(verifiedInstance, applicationInfoJson);
-
-        assertNotNull(resourceRef);
-        assertEquals(ExternalResourceType.HTML_SNIPPET, resourceRef.getExpectedType());
-        assertEquals(new URI("simple-app1/server/subscribe.product-news.de.html"), resourceRef.getUri());
-    }
+//    @Test
+//    void resolveSnippetResource() throws IOException, URISyntaxException {
+//        ApplicationInfoJson applicationInfoJson = engine.loadApplicationInfoJson(verifiedInstance.getApplication());
+//
+//        final ExternalResourceRef resourceRef = engine.resolveSnippetResource(verifiedInstance, applicationInfoJson);
+//
+//        assertNotNull(resourceRef);
+//        assertEquals(ExternalResourceType.HTML_SNIPPET, resourceRef.getExpectedType());
+//        assertEquals(new URI("simple-app1/server/subscribe.product-news.de.html"), resourceRef.getUri());
+//    }
 
 
 }

@@ -10,6 +10,7 @@ import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.regex.Matcher;
@@ -24,7 +25,7 @@ public class RegexValidationTask implements ProcessingTask {
     public static final String REGEX_PARAM = "regex";
 
     @Override
-    public void process(TaskContext context, ExternalResource resource) {
+    public void process(@Nonnull TaskContext context, @Nonnull ExternalResource resource) {
         final String regexString = context.getValue(REGEX_PARAM, String.class);
         if (StringUtils.isBlank(regexString)) {
             throw new AppIntegrationException("No regex provided!");

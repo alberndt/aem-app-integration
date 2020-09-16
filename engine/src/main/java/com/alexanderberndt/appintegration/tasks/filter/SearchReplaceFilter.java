@@ -6,13 +6,14 @@ import com.alexanderberndt.appintegration.pipeline.task.ProcessingTask;
 import com.alexanderberndt.appintegration.tasks.utils.LineFilterReader;
 import org.osgi.service.component.annotations.Component;
 
+import javax.annotation.Nonnull;
 import java.io.Reader;
 
 @Component
 public class SearchReplaceFilter implements ProcessingTask {
 
     @Override
-    public void process(TaskContext context, ExternalResource resource)  {
+    public void process(@Nonnull TaskContext context, @Nonnull ExternalResource resource)  {
         resource.setContent(new SearchReplaceReader(resource.getContentAsReader()));
         // ToDo: Implement error handling
     }

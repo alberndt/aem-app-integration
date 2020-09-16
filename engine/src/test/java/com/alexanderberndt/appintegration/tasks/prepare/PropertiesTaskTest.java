@@ -17,6 +17,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import javax.annotation.Nonnull;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
@@ -48,7 +50,7 @@ class PropertiesTaskTest {
                 .addLoadingTask("load", new TestLoadingTask("Hello World!"))
                 .addProcessingTask("verify", new ProcessingTask() {
                     @Override
-                    public void process(TaskContext context, ExternalResource resource) {
+                    public void process(@Nonnull TaskContext context, @Nonnull ExternalResource resource) {
                         stringValue.value = context.getValue("hello", String.class);
                         numberValue.value = context.getValue("the-number", Integer.class);
                     }

@@ -105,8 +105,8 @@ public class TestAppIntegrationFactory implements AppIntegrationFactory<TestAppI
         return processingPipelineFactory.createProcessingPipeline(name);
     }
 
-    public void registerApplication(@Nonnull String id, @Nonnull Application application) {
-        applicationMap.put(id, application);
+    public void registerApplication(@Nonnull Application application) {
+        applicationMap.put(application.getApplicationId(), application);
     }
 
 }

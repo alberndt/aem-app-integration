@@ -7,13 +7,14 @@ import com.alexanderberndt.appintegration.tasks.utils.LineFilterReader;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 
+import javax.annotation.Nonnull;
 import java.io.Reader;
 
 @Component
 public class RegexReplaceFilter implements ProcessingTask {
 
     @Override
-    public void process(TaskContext context, ExternalResource resource) {
+    public void process(@Nonnull TaskContext context, @Nonnull ExternalResource resource) {
         final String regex = context.getValue("regex", String.class);
         final String replacement = context.getValue("replacement", String.class);
 

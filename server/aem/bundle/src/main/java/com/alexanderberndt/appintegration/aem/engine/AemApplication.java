@@ -86,6 +86,7 @@ public class AemApplication implements Application {
         this.globalProperties = Collections.unmodifiableMap(convertToMap(configuration.globalProperties()));
     }
 
+    @Nonnull
     public String getApplicationId() {
         return applicationId;
     }

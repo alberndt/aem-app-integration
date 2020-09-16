@@ -119,7 +119,9 @@ public class ExternalResource {
 
 
     public <C> C getContentAsParsedObject(@Nonnull Class<C> expectedType) throws IOException {
-        return content.convertTo(expectedType).get();
+        final C parsedObject = content.convertTo(expectedType).get();
+        this.content = content.recreateWithNewContent(parsedObject);
+        return parsedObject;
     }
 
     public void setContentAsParsedObject(Object parsedContent) {

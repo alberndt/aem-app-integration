@@ -12,6 +12,16 @@ import java.util.Map;
 public interface Application {
 
     /**
+     * Globally unique id for the application. This shall be the same id, as which is queried with
+     * {@link AppIntegrationFactory#getApplication(String)}. Or it should be the same as the key of
+     * {@link AppIntegrationFactory#getAllApplications()}.
+     *
+     * @return application-id
+     */
+    @Nonnull
+    String getApplicationId();
+
+    /**
      * Location of the <code>application-info.json</code> file. This url must be understood by used
      * resource-loader and cannot contain any placeholders.
      *
@@ -45,7 +55,7 @@ public interface Application {
         return null;
     }
 
-    enum FetchingMode { PREFETCH_ONLY, PREFETCH_AND_LIVE_LOAD, LIVE_LOAD_ONLY }
+    enum FetchingMode {PREFETCH_ONLY, PREFETCH_AND_LIVE_LOAD, LIVE_LOAD_ONLY}
 
     @Nonnull
     default FetchingMode getFetchingMode() {

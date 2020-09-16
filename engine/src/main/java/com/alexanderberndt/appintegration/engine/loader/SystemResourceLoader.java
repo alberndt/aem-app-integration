@@ -5,6 +5,7 @@ import com.alexanderberndt.appintegration.engine.ResourceLoaderException;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceFactory;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
+import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +24,13 @@ public class SystemResourceLoader implements ResourceLoader {
     @Nonnull
     @Override
     public ExternalResource load(@Nonnull ExternalResourceRef resourceRef, @Nonnull ExternalResourceFactory factory) throws ResourceLoaderException {
-        final String resourcePath = StringUtils.removeStart(resourceRef.getUri().normalize().getPath(), "/");
+
+        final URI uri = resourceRef.getUri();
+        if (!StringUtils.equals("classpath", uri.getScheme()) || !StringUtils.equals("system", uri.getHost())) {
+            throw new AppIntegrationException("SystemResourceLoader supports only URI's with classpath://system/<path>, but was " + uri.toString());
+        }
+
+        final String resourcePath = StringUtils.removeStart(uri.normalize().getPath(), "/");
         final InputStream inputStream = ClassLoader.getSystemResourceAsStream(resourcePath);
         if (inputStream != null) {
             return factory.createExternalResource(resourceRef, inputStream);

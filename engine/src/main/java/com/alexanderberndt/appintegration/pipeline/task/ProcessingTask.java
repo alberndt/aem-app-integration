@@ -4,6 +4,8 @@ import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.pipeline.ProcessingPipeline;
 import com.alexanderberndt.appintegration.pipeline.context.TaskContext;
 
+import javax.annotation.Nonnull;
+
 /**
  * <p>Filter for a {@link ProcessingPipeline}, which is applied for all applicable resources of an
  * {@link com.alexanderberndt.appintegration.engine.Application}.</p>
@@ -17,7 +19,7 @@ import com.alexanderberndt.appintegration.pipeline.context.TaskContext;
 public interface ProcessingTask {
 
 
-    void process(TaskContext context, ExternalResource resource);
+    void process(@Nonnull TaskContext context, @Nonnull ExternalResource resource);
 
     /**
      * <p>Implementing classes should define a set of task-properties. This should be done by calling

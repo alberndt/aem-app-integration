@@ -17,7 +17,7 @@ public class AddReferencedResourceTask implements ProcessingTask {
     private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
-    public void process(@Nonnull TaskContext context, ExternalResource resource) {
+    public void process(@Nonnull TaskContext context, @Nonnull ExternalResource resource) {
         String relativeUrl = context.getValue("relativeUrl", String.class);
         String expectedTypeAsString = context.getValue("expectedType", String.class);
 
