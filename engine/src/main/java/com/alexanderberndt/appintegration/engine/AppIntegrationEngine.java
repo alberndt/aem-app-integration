@@ -108,8 +108,7 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
         final ProcessingPipeline pipeline = getFactory().createProcessingPipeline(context, application.getProcessingPipelineName());
         pipeline.initContextWithTaskDefaults(context);
         pipeline.initContextWithPipelineConfig(context);
-
-        // inject resource
+        context.getProcessingParams().setReadOnly();
 
         // check, if the URI is cached
         final URI cachedSnippetUri = Optional.of(instanceToSnippetUriMapCache)
@@ -123,29 +122,11 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
             snippetUri = cachedSnippetUri;
         } else {
             // get application-info.json
-
-            //final ApplicationInfoJson applicationInfoJson = getOrLoadApplicationInfoJson(application);
             final URI appInfoUri = getApplicationInfoUri(application, loader);
-
-            final ApplicationInfoJson applicationInfoJson;
-            final ApplicationInfoJson cachedAppInfo = applicationInfoCache.get(appInfoUri);
-            if (cachedAppInfo != null) {
-                applicationInfoJson = cachedAppInfo;
-            } else {
-                try {
-                    // ToDo: load application-info.json via pipeline
-                    final ExternalResourceRef appInfoResourceRef = new ExternalResourceRef(appInfoUri, ExternalResourceType.APPLICATION_PROPERTIES);
-                    final ExternalResource loadedAppInfoResource = pipeline.loadAndProcessResourceRef(context, appInfoResourceRef, getFactory().getExternalResourceFactory());
-                    applicationInfoJson = loadedAppInfoResource.getContentAsParsedObject(ApplicationInfoJson.class);
-                    this.applicationInfoCache.put(appInfoUri, applicationInfoJson);
-                } catch (IOException e) {
-                    throw new AppIntegrationException("Cannot load application-info.json", e);
-                }
-            }
+            final ApplicationInfoJson applicationInfoJson = getCachedOrLoadApplicationInfoJson(context, appInfoUri, pipeline);
 
             // resolve snippet
             final VerifiedInstance<I> verifiedInstance = VerifiedInstance.verify(instance, this.getFactory());
-            //snippetRef = resolveSnippetResource(verifiedInstance, applicationInfoJson);
             final String componentId = instance.getComponentId();
             final ComponentInfoJson componentInfo = applicationInfoJson.getComponents().get(componentId);
             if (componentInfo == null) {
@@ -160,8 +141,25 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
 
         final ExternalResourceRef snippetRef = new ExternalResourceRef(snippetUri, ExternalResourceType.HTML_SNIPPET);
         final ExternalResource snippetRes = pipeline.loadAndProcessResourceRef(context, snippetRef, getFactory().getExternalResourceFactory());
+        return Objects.requireNonNull(snippetRes);
+    }
 
-        return snippetRes;
+    private ApplicationInfoJson getCachedOrLoadApplicationInfoJson(C context, URI appInfoUri, ProcessingPipeline pipeline) {
+        final ApplicationInfoJson applicationInfoJson;
+        final ApplicationInfoJson cachedAppInfo = applicationInfoCache.get(appInfoUri);
+        if (cachedAppInfo != null) {
+            applicationInfoJson = cachedAppInfo;
+        } else {
+            try {
+                final ExternalResourceRef appInfoResourceRef = new ExternalResourceRef(appInfoUri, ExternalResourceType.APPLICATION_PROPERTIES);
+                final ExternalResource loadedAppInfoResource = pipeline.loadAndProcessResourceRef(context, appInfoResourceRef, getFactory().getExternalResourceFactory());
+                applicationInfoJson = loadedAppInfoResource.getContentAsParsedObject(ApplicationInfoJson.class);
+                this.applicationInfoCache.put(appInfoUri, applicationInfoJson);
+            } catch (IOException e) {
+                throw new AppIntegrationException("Cannot load application-info.json", e);
+            }
+        }
+        return applicationInfoJson;
     }
 
     @Nonnull
@@ -244,7 +242,7 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
         }
 
         // inject the resource-loader
-        requireInjectResourceLoader(context, application);
+        final ResourceLoader loader = requireInjectResourceLoader(context, application);
 
         // build processing pipeline
         final ProcessingPipeline pipeline = setupProcessingPipeline(context, applicationId, application);
@@ -265,7 +263,8 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
         context.getProcessingParams().setReadOnly();
 
         // load application-properties.json
-        final ApplicationInfoJson applicationInfo = null;//loadApplicationInfoJson(application);
+        final URI appInfoUri = getApplicationInfoUri(application, loader);
+        final ApplicationInfoJson applicationInfo = getCachedOrLoadApplicationInfoJson(context, appInfoUri, pipeline);
 
         // resolve url for all instances (some may resolve to the same url)
         final Set<ExternalResourceRef> resolvedSnippetsSet = new LinkedHashSet<>();

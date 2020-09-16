@@ -11,7 +11,6 @@ import com.alexanderberndt.appintegration.engine.testsupport.TestApplication;
 import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -81,7 +80,6 @@ class AppIntegrationEngineTest {
 //    }
 
     @Test
-    @Disabled
     void prefetch()  {
         engine.prefetch(Arrays.asList(instance1, instance2));
     }
