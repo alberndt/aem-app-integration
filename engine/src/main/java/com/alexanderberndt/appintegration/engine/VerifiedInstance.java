@@ -44,6 +44,7 @@ public class VerifiedInstance<I extends ApplicationInstance> {
         return application.getProcessingPipelineName();
     }
 
+    @Nonnull
     public Application getApplication() {
         return application;
     }
@@ -52,6 +53,7 @@ public class VerifiedInstance<I extends ApplicationInstance> {
         return instance.getComponentId();
     }
 
+    @Nonnull
     public I getInstance() {
         return instance;
     }

@@ -120,7 +120,7 @@ public class AemApplication implements Application {
      *
      * @return list of context-providers
      */
-    @Nullable
+    @Nonnull
     @Override
     public List<String> getContextProviderNames() {
         return contextProviderNames;

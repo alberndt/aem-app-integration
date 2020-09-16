@@ -44,7 +44,7 @@ public interface Application {
      *
      * @return list of context-providers
      */
-    @Nullable
+    @Nonnull
     List<String> getContextProviderNames();
 
     @Nonnull

@@ -45,7 +45,7 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
 
     /* Runtime methods */
 
-    public ExternalResource getHtmlSnippet(I instance) throws IOException {
+    public ExternalResource getHtmlSnippet(I instance) {
 
         final String applicationId = instance.getApplicationId();
         final Application application = this.getFactory().getApplication(applicationId);
@@ -57,49 +57,6 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
 
         // ToDo: Integration-Log should differ by type (only save for pre-fetch)
         return callWithGlobalContext(applicationId, context -> getExternalResource(context, applicationId, application, instance));
-
-//
-//
-//            Optional.ofNullable()..
-//
-//            orElse(null);
-//
-//            // resolve instance to url
-//            URI uri = new URI("");
-//            ExternalResourceRef resourceRef = new ExternalResourceRef(uri, ExternalResourceType.HTML_SNIPPET);
-//
-//            // try the cached version
-//            if (this.
-//
-//                    isCachingEnabled() && (application.getFetchingMode() != FetchingMode.LIVE_LOAD_ONLY)) {
-//
-//                final ExternalResource resource = callWithExternalResourceCache(applicationId,
-//                        cache -> cache.getCachedResource(resourceRef, this::createExternalResource));
-//
-//                if (resource != null) {
-//                    return resource;
-//                }
-//            }
-//
-//            // try live-fetching
-//            if (application.getFetchingMode() != FetchingMode.PREFETCH_ONLY) {
-//                // get pipeline
-//
-//                // load
-//
-//                // get pipeline
-//                final ProcessingPipelineFactory pipelineFactory = this.getFactory().getProcessingPipelineFactory();
-//                final ProcessingPipeline pipeline = pipelineFactory.createProcessingPipeline(application.getProcessingPipelineName());
-//
-//                //
-//                pipeline.declareTaskPropertiesAndDefaults();
-//
-//
-//            }
-//
-//        }
-//        return null;
-//        //return loadHtmlSnippet(instance.getApplicationId(), instance.getComponentId(), instance);
     }
 
     protected ExternalResource getExternalResource(C context, String applicationId, Application application, I instance) {
@@ -175,25 +132,53 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
 
 
     @Nonnull
-    private ResourceLoader requireInjectResourceLoader(@Nonnull C context, @Nonnull Application application) {
+    private ResourceLoader requireResourceLoader(@Nonnull Application application) {
         final String resourceLoaderName = application.getResourceLoaderName();
         final ResourceLoader resourceLoader = getFactory().getResourceLoader(resourceLoaderName);
-        if (resourceLoader != null) {
-            context.setResourceLoader(resourceLoader);
-            return resourceLoader;
-        } else {
-            // ToDo: Nice logging
+        if (resourceLoader == null) {
             throw new AppIntegrationException(String.format("ResourceLoader %s is not defined!", resourceLoaderName));
         }
-
+        return resourceLoader;
     }
 
-    public ExternalResource getStaticResource(String relativePath) {
-        return null;
+    @Nonnull
+    private ResourceLoader requireInjectResourceLoader(@Nonnull C context, @Nonnull Application application) {
+        final ResourceLoader resourceLoader = requireResourceLoader(application);
+        context.setResourceLoader(resourceLoader);
+        return resourceLoader;
     }
 
+    @SuppressWarnings("unused")
+    public ExternalResource getStaticResource(@Nonnull String applicationId, @Nonnull String relativePath) {
+        final Application application = requireApplication(applicationId);
+        final ResourceLoader loader = requireResourceLoader(application);
+
+        final URI baseURI;
+        final String appInfoUrl = application.getApplicationInfoUrl();
+        try {
+            baseURI = loader.resolveBaseUri(appInfoUrl);
+        } catch (URISyntaxException e) {
+            throw new AppIntegrationException("Cannot resolve application-info.json url " + appInfoUrl, e);
+        }
+
+        final URI resourceUri = baseURI.resolve(relativePath).normalize();
+        final ExternalResourceRef resourceRef = new ExternalResourceRef(resourceUri, ExternalResourceType.ANY);
+
+        final ExternalResource cachedRes =  this.callWithExternalResourceCache(applicationId,
+                cache -> cache.getCachedResource(resourceRef, getFactory().getExternalResourceFactory())
+        );
+
+        if (cachedRes != null) {
+            return cachedRes;
+        } else {
+            // load live  + refactor to make cache part of the pipeline
+            throw new UnsupportedOperationException("Not yet implemented!");
+        }
+    }
+
+    @SuppressWarnings("unused")
     public boolean isDynamicPath(String relativePath) {
-        return false;
+        throw new UnsupportedOperationException("Not yet implemented!");
     }
 
     public List<String> getDynamicPaths() {
@@ -330,37 +315,6 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
 
     /* Internal methods */
 
-//    @Nonnull
-//    protected ApplicationInfoJson getOrLoadApplicationInfoJson(@Nonnull Application application) {
-//        final ApplicationInfoJson cachedAppInfo = applicationInfoCache.get(application.getApplicationInfoUrl());
-//        if (cachedAppInfo != null) {
-//            return cachedAppInfo;
-//        } else {
-//            return loadApplicationInfoJson(application);
-//        }
-//    }
-//
-//    @Nonnull
-//    protected ApplicationInfoJson loadApplicationInfoJson(@Nonnull Application application) {
-//        final ResourceLoader loader = requireInjectResourceLoader(context, application);
-//        try {
-//            final URI uri;
-//            try {
-//                uri = loader.resolveBaseUri(application.getApplicationInfoUrl());
-//            } catch (URISyntaxException e) {
-//                throw new AppIntegrationException("Cannot load application-info '" + application.getApplicationInfoUrl() + "'!", e);
-//            }
-//            final ExternalResource loadedRes = loader.load(new ExternalResourceRef(uri, ExternalResourceType.APPLICATION_PROPERTIES), getFactory().getExternalResourceFactory());
-//            final ApplicationInfoJson appInfo = loadedRes.getContentAsParsedObject(ApplicationInfoJson.class);
-//            this.applicationInfoCache.put(application.getApplicationInfoUrl(), appInfo);
-//
-//            return appInfo;
-//
-//        } catch (ResourceLoaderException | IOException e) {
-//            throw new AppIntegrationException("Cannot load application-info.json", e);
-//        }
-//    }
-
     @Nonnull
     protected ExternalResourceRef resolveSnippetResource(
             @Nonnull VerifiedInstance<I> instance,
@@ -409,12 +363,6 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
         }
     }
 
-
-    protected ExternalResource loadHtmlSnippet(@Nonnull final VerifiedInstance<I> instance) throws IOException {
-        throw new UnsupportedOperationException("method not implemented!");
-
-    }
-
     @Nonnull
     protected Application requireApplication(@Nonnull String applicationId) {
         final Application application = this.getFactory().getApplication(applicationId);
@@ -432,7 +380,7 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
 
 
     @Nonnull
-    protected List<ContextProvider<I>> requireContextProviders(VerifiedInstance<I> instance) {
+    protected List<ContextProvider<I>> requireContextProviders(@Nonnull VerifiedInstance<I> instance) {
         final List<String> notFoundContextProviders = new ArrayList<>();
         final List<ContextProvider<I>> contextProviders = new ArrayList<>();
         for (final String providerName : instance.getApplication().getContextProviderNames()) {
@@ -451,91 +399,4 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
                     notFoundContextProviders, instance.getApplicationId()));
         }
     }
-
-
-//    private String resolveUrl(String url, List<ContextProvider<I>> contextProviderList, I instance) {
-//        Map<String, String> context = new HashMap<>();
-//        for (ContextProvider<I> contextProvider : contextProviderList) {
-//            context.putAll(contextProvider.getContext(instance));
-//        }
-//        return StringSubstitutor.replace(url, context);
-//    }
-//
-//
-//    @Nonnull
-//    private ApplicationRecord getApplicationRecord(@Nonnull String applicationId) {
-//        return Optional.ofNullable(applicationRecordMap.get(applicationId))
-//                .orElseThrow(() -> new AppIntegrationException("Unknown application-id " + applicationId));
-//    }
-//
-//
-//    private class ApplicationRecord {
-//
-//        private final String applicationId;
-//
-//        private final Application application;
-//
-//        private ResourceLoader resourceLoader = null;
-//
-//        private List<ContextProvider<I>> contextProviderList = null;
-//
-//        public ApplicationRecord(String applicationId, Application application) {
-//            this.applicationId = applicationId;
-//            this.application = application;
-//        }
-//
-//        public String getApplicationInfoUrl() {
-//            return application.getApplicationInfoUrl();
-//        }
-//
-//        public void clearResourceLoader(String resourceLoaderId) {
-//            if (StringUtils.equals(resourceLoaderId, application.getResourceLoaderName())) {
-//                this.resourceLoader = null;
-//            }
-//        }
-//
-//        public ResourceLoader getResourceLoader() {
-//            if (this.resourceLoader == null) {
-//                final String resourceLoaderId = application.getResourceLoaderName();
-//                if (StringUtils.isBlank(resourceLoaderId)) {
-//                    throw new AppIntegrationException("Application " + applicationId + " has no resource-loader defined");
-//                }
-//                this.resourceLoader = Optional.ofNullable(resourceLoaderMap.get(resourceLoaderId))
-//                        .orElseThrow(() -> new AppIntegrationException("Unsupported resource-loader " + resourceLoaderId + " of application " + applicationId));
-//            }
-//            return this.resourceLoader;
-//        }
-//
-//        public String resolveRelativeUrl(String relativeUrl) {
-//            return null;
-//            //return this.getResourceLoader().resolveRelativeUrl(application.getApplicationInfoUrl(), relativeUrl);
-//        }
-//
-//        public void clearContextProvider(String contextProviderId) {
-//            if ((application.getContextProviderNames() != null) && (application.getContextProviderNames().contains(contextProviderId))) {
-//                this.contextProviderList = null;
-//            }
-//        }
-//
-//        public List<ContextProvider<I>> getContextProviders() {
-//            if (this.contextProviderList == null) {
-//                final List<String> usedContextProviderIdList = application.getContextProviderNames();
-//                if ((usedContextProviderIdList == null) || usedContextProviderIdList.isEmpty()) {
-//                    this.contextProviderList = Collections.emptyList();
-//                } else {
-//                    // verify, all context providers exists
-//                    final String unsupportedContextProviders = usedContextProviderIdList.stream()
-//                            .filter(id -> !contextProviderMap.containsKey(id))
-//                            .collect(Collectors.joining(", "));
-//
-//                    if (StringUtils.isNotBlank(unsupportedContextProviders)) {
-//                        throw new AppIntegrationException("Unsupported context providers " + unsupportedContextProviders + " of application " + applicationId);
-//                    }
-//
-//                    this.contextProviderList = usedContextProviderIdList.stream().map(contextProviderMap::get).collect(Collectors.toList());
-//                }
-//            }
-//            return this.contextProviderList;
-//        }
-//    }
 }

@@ -21,7 +21,7 @@ public class TestApplication implements Application {
     @Nonnull
     private final String processingPipelineName;
 
-    @Nullable
+    @Nonnull
     private final List<String> contextProviderNames;
 
     @Nullable
@@ -31,7 +31,7 @@ public class TestApplication implements Application {
                            @Nonnull String applicationInfoUrl,
                            @Nonnull String resourceLoaderName,
                            @Nonnull String processingPipelineName,
-                           @Nullable List<String> contextProviderNames,
+                           @Nonnull List<String> contextProviderNames,
                            @Nullable Map<String, Object> globalProperties) {
         this.applicationId = applicationId;
         this.applicationInfoUrl = applicationInfoUrl;
@@ -70,8 +70,8 @@ public class TestApplication implements Application {
         return processingPipelineName;
     }
 
+    @Nonnull
     @Override
-    @Nullable
     public List<String> getContextProviderNames() {
         return contextProviderNames;
     }
