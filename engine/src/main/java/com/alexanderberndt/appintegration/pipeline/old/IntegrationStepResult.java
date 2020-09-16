@@ -1,8 +1,6 @@
 package com.alexanderberndt.appintegration.pipeline.old;
 
-import java.util.ArrayList;
-import java.util.List;
-
+@Deprecated
 // ToDo: Integrate in ProcessingStep
 public class IntegrationStepResult<T> {
 
@@ -12,8 +10,6 @@ public class IntegrationStepResult<T> {
 
     private T result;
 
-    private final List<IntegrationMessage> messageList = new ArrayList<>();
-
 
     private void mergeStatus(Status newStatus) {
         if ((this.status == null) || (this.status.ordinal() < newStatus.ordinal())) {
@@ -21,19 +17,6 @@ public class IntegrationStepResult<T> {
         }
     }
 
-    public void addInfo(String messagePattern, Object... objects) {
-        messageList.add(IntegrationMessage.createMessage(IntegrationMessage.Type.INFO, messagePattern, objects));
-    }
-
-    public void addWarning(String messagePattern, Object... objects) {
-        mergeStatus(Status.WARNING);
-        messageList.add(IntegrationMessage.createMessage(IntegrationMessage.Type.WARNING, messagePattern, objects));
-    }
-
-    public void addError(String messagePattern, Object... objects) {
-        mergeStatus(Status.ERROR);
-        messageList.add(IntegrationMessage.createMessage(IntegrationMessage.Type.ERROR, messagePattern, objects));
-    }
 
     public Status getStatus() {
         return status;
@@ -49,10 +32,6 @@ public class IntegrationStepResult<T> {
 
     public void setResult(T result) {
         this.result = result;
-    }
-
-    public List<IntegrationMessage> getMessageList() {
-        return messageList;
     }
 
 }

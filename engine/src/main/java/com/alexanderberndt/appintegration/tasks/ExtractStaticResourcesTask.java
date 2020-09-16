@@ -1,6 +1,5 @@
 package com.alexanderberndt.appintegration.tasks;
 
-import com.alexanderberndt.appintegration.pipeline.old.IntegrationResourceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +12,6 @@ public class ExtractStaticResourcesTask {
     private static final String ATTRIBUTE_PARAM = "attribute";
     private static final String EXPECTED_TYPE_PARAM = "expectedType";
 
-    private IntegrationResourceType expectedResourceType;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExtractStaticResourcesTask.class);
 
@@ -32,7 +30,7 @@ public class ExtractStaticResourcesTask {
 //    }
 //
 //    @Override
-//    public void execute(ProcessingItem resource, IntegrationJob job) {
+//    public void execute(....) {
 //
 //        LOGGER.info("extract static resources");
 //
