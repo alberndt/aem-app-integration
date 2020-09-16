@@ -2,6 +2,7 @@ package com.alexanderberndt.appintegration.engine;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.io.Serializable;
 import java.util.Map;
 
 public class ResourceLoaderException extends Exception{
@@ -14,24 +15,25 @@ public class ResourceLoaderException extends Exception{
     private final FailedReason reason;
 
     @Nullable
-    private final Map<String, Object> loadStatusDetails;
+    private final Map<String, Serializable> loadStatusDetails;
 
 
     public ResourceLoaderException(@Nonnull FailedReason reason, String message) {
-        this(reason, message, (Map<String, Object>) null);
+        this(reason, message, (Map<String, Serializable>) null);
     }
 
+    @SuppressWarnings("unused")
     public ResourceLoaderException(@Nonnull FailedReason reason, String message, Throwable cause) {
         this(reason, message, null, cause);
     }
 
-    public ResourceLoaderException(@Nonnull FailedReason reason, @Nonnull String message, @Nullable Map<String, Object> loadStatusDetails) {
+    public ResourceLoaderException(@Nonnull FailedReason reason, @Nonnull String message, @Nullable Map<String, Serializable> loadStatusDetails) {
         super(message);
         this.reason = reason;
         this.loadStatusDetails = loadStatusDetails;
     }
 
-    public ResourceLoaderException(@Nonnull FailedReason reason, @Nonnull String message, @Nullable Map<String, Object> loadStatusDetails, Throwable cause) {
+    public ResourceLoaderException(@Nonnull FailedReason reason, @Nonnull String message, @Nullable Map<String, Serializable> loadStatusDetails, Throwable cause) {
         super(message, cause);
         this.reason = reason;
         this.loadStatusDetails = loadStatusDetails;
@@ -43,7 +45,7 @@ public class ResourceLoaderException extends Exception{
     }
 
     @Nullable
-    public Map<String, Object> getLoadStatusDetails() {
+    public Map<String, Serializable> getLoadStatusDetails() {
         return loadStatusDetails;
     }
 }

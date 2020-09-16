@@ -12,12 +12,13 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.io.Serializable;
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.*;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 public class ExternalResource {
 
@@ -42,7 +43,7 @@ public class ExternalResource {
 
     private LoadStatus loadStatus;
 
-    private Map<String, Object> loadStatusDetails;
+    private Map<String, Serializable> loadStatusDetails;
 
     public ExternalResource(
             @Nonnull URI uri,
@@ -111,7 +112,7 @@ public class ExternalResource {
         this.content = this.content.recreateWithNewContent(reader);
     }
 
-    public void appendInputStreamFilter(Function<InputStream, InputStream> filterGenerator) {
+    public void appendInputStreamFilter(UnaryOperator<InputStream> filterGenerator) {
         final InputStream inputStream = this.getContentAsInputStream();
         this.setContent(filterGenerator.apply(inputStream));
     }
@@ -175,7 +176,7 @@ public class ExternalResource {
         }
     }
 
-    public void setLoadStatus(LoadStatus loadStatus, Map<String, Object> loadStatusDetails) {
+    public void setLoadStatus(LoadStatus loadStatus, Map<String, Serializable> loadStatusDetails) {
         this.loadStatus = loadStatus;
         this.loadStatusDetails = loadStatusDetails;
     }
@@ -184,7 +185,7 @@ public class ExternalResource {
         return loadStatus;
     }
 
-    public Map<String, Object> getLoadStatusDetails() {
+    public Map<String, Serializable> getLoadStatusDetails() {
         return loadStatusDetails;
     }
 

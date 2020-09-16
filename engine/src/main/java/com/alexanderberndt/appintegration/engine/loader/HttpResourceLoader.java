@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.io.Serializable;
 import java.lang.invoke.MethodHandles;
 import java.net.*;
 import java.nio.charset.Charset;
@@ -70,7 +71,7 @@ public class HttpResourceLoader implements ResourceLoader {
 
             LOG.info("Fetching content for {}", url);
             connection.connect();
-            final Map<String, Object> loadStatusDetails = new HashMap<>();
+            final Map<String, Serializable> loadStatusDetails = new HashMap<>();
             loadStatusDetails.put("status", connection.getResponseCode());
             loadStatusDetails.put("message", connection.getResponseMessage());
 
