@@ -45,7 +45,7 @@ public class AemAppIntegrationEngine extends AppIntegrationEngine<SlingApplicati
 
         try (ResourceResolver resolver = resolverFactory.getServiceResourceResolver(Collections.singletonMap(SUBSERVICE, SUB_SERVICE_ID))) {
 
-            final AemGlobalContext context = new AemGlobalContext(resolver, createLogAppender(resolver, application.getApplicationId()));
+            final AemGlobalContext context = new AemGlobalContext(createLogAppender(resolver, application.getApplicationId()), application, this);
 
             final R result = function.apply(context);
 
