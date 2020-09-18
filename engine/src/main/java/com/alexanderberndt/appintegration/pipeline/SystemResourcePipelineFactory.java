@@ -42,7 +42,7 @@ public class SystemResourcePipelineFactory {
      *                                 Otherwise the method shall always create a valid pipeline.
      */
     @Nonnull
-    public ProcessingPipeline createProcessingPipeline(@Nonnull final String name) throws AppIntegrationException {
+    public ProcessingPipeline createProcessingPipeline(@Nonnull final String name) {
 
         // first try a cache-hit
         if (pipelineDefinitionMap.containsKey(name)) {

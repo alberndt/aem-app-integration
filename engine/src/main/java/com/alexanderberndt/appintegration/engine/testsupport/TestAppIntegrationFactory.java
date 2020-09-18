@@ -33,6 +33,8 @@ public class TestAppIntegrationFactory implements AppIntegrationFactory<TestAppI
 
     private final List<TextParser> textParsers;
 
+    private final Map<String, ProcessingPipeline> customProcessingPipelinesMap = new HashMap<>();
+
     public TestAppIntegrationFactory() {
         resourceLoaderMap = new HashMap<>();
         resourceLoaderMap.put(SYSTEM_RESOURCE_LOADER_NAME, new SystemResourceLoader());
@@ -91,6 +93,10 @@ public class TestAppIntegrationFactory implements AppIntegrationFactory<TestAppI
         return textParsers;
     }
 
+    public void registerPipeline(String pipelineName, ProcessingPipeline pipeline) {
+        customProcessingPipelinesMap.put(pipelineName, pipeline);
+    }
+
     /**
      * Create a new instance of an processing pipeline, and updates the context with the default task configuration
      * and logging information.
@@ -102,6 +108,10 @@ public class TestAppIntegrationFactory implements AppIntegrationFactory<TestAppI
     @Nonnull
     @Override
     public ProcessingPipeline createProcessingPipeline(@Nonnull TestGlobalContext context, @Nonnull String name) {
+        ProcessingPipeline pipeline = customProcessingPipelinesMap.get(name);
+        if (pipeline != null) {
+            return pipeline;
+        }
         return processingPipelineFactory.createProcessingPipeline(name);
     }
 

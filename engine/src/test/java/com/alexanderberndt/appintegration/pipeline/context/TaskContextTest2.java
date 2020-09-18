@@ -1,32 +1,29 @@
 package com.alexanderberndt.appintegration.pipeline.context;
 
-import com.alexanderberndt.appintegration.engine.logging.LogAppender;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
-import com.alexanderberndt.appintegration.engine.testsupport.TestAppIntegrationFactory;
-import com.alexanderberndt.appintegration.engine.testsupport.TestGlobalContext;
+import com.alexanderberndt.appintegration.engine.testsupport.TestAppIntegrationEngine;
+import com.alexanderberndt.appintegration.engine.testsupport.TestApplication;
 import com.alexanderberndt.appintegration.engine.testsupport.TestLoadingTask;
 import com.alexanderberndt.appintegration.pipeline.ProcessingPipeline;
 import com.alexanderberndt.appintegration.pipeline.builder.simple.SimplePipelineBuilder;
+import com.alexanderberndt.appintegration.tasks.prepare.ResourceTypeByFileExtensionTask;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Collections;
+
+import static com.alexanderberndt.appintegration.engine.testsupport.TestAppIntegrationFactory.SYSTEM_RESOURCE_LOADER_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 class TaskContextTest2 {
 
-    private final TestAppIntegrationFactory appIntegrationFactory = new TestAppIntegrationFactory();
+    private static final String TEST_APP = "test-app";
 
-    @Mock
-    private LogAppender logAppenderMock;
-
-    private GlobalContext globalContext;
-
-    private ProcessingPipeline pipeline;
+    private TestAppIntegrationEngine engine;
 
     private TestValue<String> stringValue;
 
@@ -35,9 +32,11 @@ class TaskContextTest2 {
 
     @BeforeEach
     void beforeEach() {
-        globalContext = new TestGlobalContext(logAppenderMock);
 
-        pipeline = new SimplePipelineBuilder()
+        final TestApplication testApplication = new TestApplication(TEST_APP, "xxx", SYSTEM_RESOURCE_LOADER_NAME, "custom", Collections.emptyList(), null);
+
+        final ProcessingPipeline pipeline = new SimplePipelineBuilder()
+                .addPreparationTask("check-type", new ResourceTypeByFileExtensionTask())
                 .addLoadingTask("load", new TestLoadingTask("Hello World!"))
                 .addProcessingTask("verify", (context, resource) -> {
                     stringValue.value = context.getValue("str", String.class);
@@ -48,8 +47,10 @@ class TaskContextTest2 {
                 .withTaskParam("number", 42)
                 .build();
 
-        pipeline.initContextWithTaskDefaults(globalContext);
-        pipeline.initContextWithPipelineConfig(globalContext);
+
+        engine = new TestAppIntegrationEngine();
+        engine.getFactory().registerApplication(testApplication);
+        engine.getFactory().registerPipeline("custom", pipeline);
 
         stringValue = new TestValue<>();
         numberValue = new TestValue<>();
@@ -59,7 +60,7 @@ class TaskContextTest2 {
     @Test
     void testTextRes() {
         final ExternalResourceRef resourceRef = ExternalResourceRef.create("/test.txt", ExternalResourceType.TEXT);
-        pipeline.loadAndProcessResourceRef(globalContext, resourceRef, appIntegrationFactory.getExternalResourceFactory());
+        engine.getStaticResource(TEST_APP, "/test.txt");
         assertEquals("Hello World!", stringValue.value);
         assertEquals(new Integer(42), numberValue.value);
     }
@@ -67,7 +68,7 @@ class TaskContextTest2 {
     @Test
     void prepareCssRes() {
         final ExternalResourceRef resourceRef = ExternalResourceRef.create("/test.css", ExternalResourceType.CSS);
-        pipeline.loadAndProcessResourceRef(globalContext, resourceRef, appIntegrationFactory.getExternalResourceFactory());
+        engine.getStaticResource(TEST_APP, "/test.css");
         assertEquals("This is a CSS value!", stringValue.value);
         assertEquals(new Integer(42), numberValue.value);
     }

@@ -1,9 +1,10 @@
 package com.alexanderberndt.appintegration.engine.testsupport;
 
 import com.alexanderberndt.appintegration.engine.AppIntegrationEngine;
-import com.alexanderberndt.appintegration.engine.AppIntegrationFactory;
 import com.alexanderberndt.appintegration.engine.ExternalResourceCache;
 import com.alexanderberndt.appintegration.engine.logging.LogAppender;
+import com.alexanderberndt.appintegration.engine.logging.appender.Slf4jLogAppender;
+import com.alexanderberndt.appintegration.engine.utils.VerifiedApplication;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
@@ -21,6 +22,10 @@ public class TestAppIntegrationEngine extends AppIntegrationEngine<TestAppInstan
 
     private final Map<String, ExternalResourceCache> resourceCacheMap = new HashMap<>();
 
+    public TestAppIntegrationEngine() {
+        this(new TestAppIntegrationFactory(), Slf4jLogAppender::new);
+    }
+
     public TestAppIntegrationEngine(@Nonnull TestAppIntegrationFactory factory, @Nonnull final Supplier<LogAppender> appenderSupplier) {
         this.factory = factory;
         this.appenderSupplier = appenderSupplier;
@@ -28,13 +33,13 @@ public class TestAppIntegrationEngine extends AppIntegrationEngine<TestAppInstan
 
     @Nonnull
     @Override
-    protected AppIntegrationFactory<TestAppInstance, TestGlobalContext> getFactory() {
+    public TestAppIntegrationFactory getFactory() {
         return factory;
     }
 
     @Override
-    protected <R> R callWithGlobalContext(String applicationId, Function<TestGlobalContext, R> function) {
-        return function.apply(new TestGlobalContext(appenderSupplier.get()));
+    protected <R> R callWithGlobalContext(@Nonnull VerifiedApplication verifiedApplication, @Nonnull Function<TestGlobalContext, R> function) {
+        return function.apply(new TestGlobalContext(appenderSupplier.get(), verifiedApplication, this));
     }
 
     @Override

@@ -3,7 +3,6 @@ package com.alexanderberndt.appintegration.pipeline;
 import com.alexanderberndt.appintegration.engine.logging.ResourceLogger;
 import com.alexanderberndt.appintegration.engine.logging.TaskLogger;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
-import com.alexanderberndt.appintegration.engine.resources.ExternalResourceFactory;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
 import com.alexanderberndt.appintegration.pipeline.configuration.Ranking;
@@ -101,7 +100,7 @@ public class ProcessingPipeline {
     }
 
 
-    public ExternalResource loadAndProcessResourceRef(@Nonnull GlobalContext context, @Nonnull ExternalResourceRef resourceRef, @Nonnull ExternalResourceFactory factory) {
+    public ExternalResource loadAndProcessResourceRef(@Nonnull GlobalContext context, @Nonnull ExternalResourceRef resourceRef) {
 
         final ResourceLogger log = context.getIntegrationLog().createResourceLogger(resourceRef);
         final DataMap processingData = new DataMap();
@@ -122,7 +121,7 @@ public class ProcessingPipeline {
         // loading task
         final ExternalResource resource =
                 applyWithContext(loadingTask, context, log, PIPELINE_EXECUTION, resourceRef.getExpectedType(), processingData,
-                        taskContext -> loadingTask.getTask().load(taskContext, resourceRef, factory));
+                        taskContext -> loadingTask.getTask().load(taskContext, resourceRef));
 
         // processing tasks
         for (TaskWrapper<ProcessingTask> taskWrapper : processingTasks) {

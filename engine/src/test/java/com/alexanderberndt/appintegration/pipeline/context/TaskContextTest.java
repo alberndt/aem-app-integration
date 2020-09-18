@@ -1,11 +1,13 @@
 package com.alexanderberndt.appintegration.pipeline.context;
 
+import com.alexanderberndt.appintegration.engine.AppIntegrationEngine;
 import com.alexanderberndt.appintegration.engine.ResourceLoader;
 import com.alexanderberndt.appintegration.engine.logging.LogAppender;
 import com.alexanderberndt.appintegration.engine.logging.TaskLogger;
 import com.alexanderberndt.appintegration.engine.logging.appender.Slf4jLogAppender;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
 import com.alexanderberndt.appintegration.engine.testsupport.TestGlobalContext;
+import com.alexanderberndt.appintegration.engine.utils.VerifiedApplication;
 import com.alexanderberndt.appintegration.pipeline.configuration.Ranking;
 import com.alexanderberndt.appintegration.utils.DataMap;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,6 +29,12 @@ class TaskContextTest {
     @Mock
     private ResourceLoader resourceLoaderMock;
 
+    @Mock
+    private VerifiedApplication verifiedApplication;
+
+    @Mock
+    private AppIntegrationEngine<?,?> engine;
+
     private GlobalContext globalContext;
 
     private TaskContext taskContext;
@@ -40,11 +48,11 @@ class TaskContextTest {
     void beforeEach() {
         assertNotNull(resourceLoaderMock);
         logAppenderMock = Mockito.spy(new Slf4jLogAppender());
-        GlobalContext tmpCtx = new TestGlobalContext(logAppenderMock);
-        tmpCtx.setResourceLoader(resourceLoaderMock);
-        globalContext = Mockito.spy(tmpCtx);
+        globalContext = Mockito.spy(new TestGlobalContext(logAppenderMock, verifiedApplication, engine));
         taskLogger = new TaskLogger(logAppenderMock, "test", "test task");
         this.taskContext = Mockito.spy(new TaskContext(globalContext, taskLogger, Ranking.TASK_DEFAULT, MY_NAMESPACE, ExternalResourceType.ANY, new DataMap()));
+
+        Mockito.lenient().when(verifiedApplication.getResourceLoader()).thenReturn(resourceLoaderMock);
     }
 
     @Test

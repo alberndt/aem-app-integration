@@ -3,9 +3,11 @@ package com.alexanderberndt.appintegration.pipeline.task;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
 import com.alexanderberndt.appintegration.pipeline.context.TaskContext;
 
+import javax.annotation.Nonnull;
+
 public interface PreparationTask  {
 
-    void prepare(TaskContext context, ExternalResourceRef resourceRef);
+    void prepare(@Nonnull TaskContext context, @Nonnull ExternalResourceRef resourceRef);
 
     /**
      * <p>Implementing classes should define a set of task-properties. This should be done by calling
@@ -17,7 +19,7 @@ public interface PreparationTask  {
      *
      * @param taskContext TaskContext
      */
-    default void declareTaskPropertiesAndDefaults(TaskContext taskContext) {
+    default void declareTaskPropertiesAndDefaults(@Nonnull TaskContext taskContext) {
     }
 
 }

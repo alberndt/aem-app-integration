@@ -1,14 +1,16 @@
-package com.alexanderberndt.appintegration.engine;
+package com.alexanderberndt.appintegration.engine.utils;
 
-import com.alexanderberndt.appintegration.pipeline.context.GlobalContext;
+import com.alexanderberndt.appintegration.engine.AppIntegrationFactory;
+import com.alexanderberndt.appintegration.engine.Application;
+import com.alexanderberndt.appintegration.engine.ResourceLoader;
 
 import javax.annotation.Nonnull;
 import java.util.Objects;
 
-public class VerifiedInstance<I extends ApplicationInstance> {
+public class VerifiedApplication {
 
     @Nonnull
-    private final I instance;
+    private final String applicationId;
 
     @Nonnull
     private final Application application;
@@ -16,46 +18,31 @@ public class VerifiedInstance<I extends ApplicationInstance> {
     @Nonnull
     private final ResourceLoader resourceLoader;
 
-    private VerifiedInstance(@Nonnull I instance, @Nonnull Application application, @Nonnull ResourceLoader resourceLoader) {
+    public VerifiedApplication(@Nonnull String applicationId, @Nonnull Application application, @Nonnull ResourceLoader resourceLoader) {
+        this.applicationId = applicationId;
         this.application = application;
-        this.instance = instance;
         this.resourceLoader = resourceLoader;
     }
 
-    public static <I extends ApplicationInstance, C extends GlobalContext> VerifiedInstance<I> verify(@Nonnull I instance, @Nonnull AppIntegrationFactory<I, C> factory) {
-        final String applicationId = instance.getApplicationId();
+    public static VerifiedApplication verify(@Nonnull String applicationId, @Nonnull AppIntegrationFactory<?, ?> factory) {
         final Application application = Objects.requireNonNull(factory.getApplication(applicationId),
                 () -> String.format("Application %s is undefined", applicationId));
-
         final String resourceLoaderName = application.getResourceLoaderName();
         final ResourceLoader resourceLoader = Objects.requireNonNull(factory.getResourceLoader(resourceLoaderName),
                 () -> String.format("ResourceLoader %s for application %s is not available!",
                         resourceLoaderName, applicationId));
 
-        return new VerifiedInstance<>(instance, application, resourceLoader);
+        return new VerifiedApplication(applicationId, application, resourceLoader);
     }
 
-
+    @Nonnull
     public String getApplicationId() {
-        return instance.getApplicationId();
-    }
-
-    public String getProcessingPipelineName() {
-        return application.getProcessingPipelineName();
+        return applicationId;
     }
 
     @Nonnull
     public Application getApplication() {
         return application;
-    }
-
-    public String getComponentId() {
-        return instance.getComponentId();
-    }
-
-    @Nonnull
-    public I getInstance() {
-        return instance;
     }
 
     @Nonnull

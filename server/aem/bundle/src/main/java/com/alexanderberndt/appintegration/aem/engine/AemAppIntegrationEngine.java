@@ -5,6 +5,7 @@ import com.alexanderberndt.appintegration.engine.AppIntegrationEngine;
 import com.alexanderberndt.appintegration.engine.AppIntegrationFactory;
 import com.alexanderberndt.appintegration.engine.ExternalResourceCache;
 import com.alexanderberndt.appintegration.engine.logging.LogAppender;
+import com.alexanderberndt.appintegration.engine.utils.VerifiedApplication;
 import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
 import org.apache.sling.api.resource.*;
 import org.osgi.service.component.annotations.Component;
@@ -35,16 +36,16 @@ public class AemAppIntegrationEngine extends AppIntegrationEngine<SlingApplicati
 
     @Nonnull
     @Override
-    protected AppIntegrationFactory<SlingApplicationInstance, AemGlobalContext> getFactory() {
+    public AppIntegrationFactory<SlingApplicationInstance, AemGlobalContext> getFactory() {
         return factory;
     }
 
     @Override
-    protected <R> R callWithGlobalContext(String applicationId, Function<AemGlobalContext, R> function) {
+    protected <R> R callWithGlobalContext(@Nonnull VerifiedApplication application, @Nonnull Function<AemGlobalContext, R> function) {
 
         try (ResourceResolver resolver = resolverFactory.getServiceResourceResolver(Collections.singletonMap(SUBSERVICE, SUB_SERVICE_ID))) {
 
-            final AemGlobalContext context = new AemGlobalContext(resolver, createLogAppender(resolver, applicationId));
+            final AemGlobalContext context = new AemGlobalContext(resolver, createLogAppender(resolver, application.getApplicationId()));
 
             final R result = function.apply(context);
 

@@ -7,6 +7,8 @@ import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
 import com.alexanderberndt.appintegration.engine.resourcetypes.appinfo.ApplicationInfoJson;
 import com.alexanderberndt.appintegration.engine.resourcetypes.appinfo.ComponentInfoJson;
+import com.alexanderberndt.appintegration.engine.utils.VerifiedApplication;
+import com.alexanderberndt.appintegration.engine.utils.VerifiedInstance;
 import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
 import com.alexanderberndt.appintegration.pipeline.ProcessingPipeline;
 import com.alexanderberndt.appintegration.pipeline.configuration.Ranking;
@@ -33,12 +35,12 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
     private final Map<String, Map<I, URI>> instanceToSnippetUriMapCache = Collections.synchronizedMap(new HashMap<>());
 
     // Cache for application-infos.json objects
-    private final Map<URI, ApplicationInfoJson> applicationInfoCache = Collections.synchronizedMap(new HashMap<>());
+    private final Map<URI, TimestampValue<ApplicationInfoJson>> applicationInfoCache = Collections.synchronizedMap(new HashMap<>());
 
     @Nonnull
-    protected abstract AppIntegrationFactory<I, C> getFactory();
+    public abstract AppIntegrationFactory<I, C> getFactory();
 
-    protected abstract <R> R callWithGlobalContext(String applicationId, Function<C, R> function);
+    protected abstract <R> R callWithGlobalContext(@Nonnull VerifiedApplication application, @Nonnull Function<C, R> function);
 
     protected abstract <R> R callWithExternalResourceCache(String applicationId, Function<ExternalResourceCache, R> function);
 
@@ -47,133 +49,43 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
 
     public ExternalResource getHtmlSnippet(I instance) {
 
-        final String applicationId = instance.getApplicationId();
-        final Application application = this.getFactory().getApplication(applicationId);
-        if (application == null) {
-            LOG.error("Application {} is undefined", applicationId);
-            return null;
-        }
-
-
+        final VerifiedInstance<I> verifiedInstance = VerifiedInstance.verify(instance, this.getFactory());
         // ToDo: Integration-Log should differ by type (only save for pre-fetch)
-        return callWithGlobalContext(applicationId, context -> getExternalResource(context, applicationId, application, instance));
-    }
 
-    protected ExternalResource getExternalResource(C context, String applicationId, Application application, I instance) {
-
-        final ResourceLoader loader = requireInjectResourceLoader(context, application);
-        final ProcessingPipeline pipeline = getFactory().createProcessingPipeline(context, application.getProcessingPipelineName());
-        pipeline.initContextWithTaskDefaults(context);
-        pipeline.initContextWithPipelineConfig(context);
-        context.getProcessingParams().setReadOnly();
-
-        // check, if the URI is cached
-        final URI cachedSnippetUri = Optional.of(instanceToSnippetUriMapCache)
-                .map(snippetUriCache -> snippetUriCache.get(applicationId))
-                .map(innerSnippetUriCache -> innerSnippetUriCache.get(instance))
-                .orElse(null);
-
-
-        final URI snippetUri;
-        if (cachedSnippetUri != null) {
-            snippetUri = cachedSnippetUri;
-        } else {
-            // get application-info.json
-            final URI appInfoUri = getApplicationInfoUri(application, loader);
-            final ApplicationInfoJson applicationInfoJson = getCachedOrLoadApplicationInfoJson(context, appInfoUri, pipeline);
-
-            // resolve snippet
-            final VerifiedInstance<I> verifiedInstance = VerifiedInstance.verify(instance, this.getFactory());
-            final String componentId = instance.getComponentId();
-            final ComponentInfoJson componentInfo = applicationInfoJson.getComponents().get(componentId);
-            if (componentInfo == null) {
-                throw new AppIntegrationException(
-                        String.format("Unknown component %s for application %s", instance.getComponentId(), instance.getApplicationId()));
-            }
-
-            final String relativeUrlTemplate = componentInfo.getUrl();
-            final String relativeUrl = resolveStringWithContextVariables(verifiedInstance, relativeUrlTemplate);
-            snippetUri = appInfoUri.resolve(relativeUrl).normalize();
-        }
-
-        final ExternalResourceRef snippetRef = new ExternalResourceRef(snippetUri, ExternalResourceType.HTML_SNIPPET);
-        final ExternalResource snippetRes = pipeline.loadAndProcessResourceRef(context, snippetRef, getFactory().getExternalResourceFactory());
-        return Objects.requireNonNull(snippetRes);
-    }
-
-    private ApplicationInfoJson getCachedOrLoadApplicationInfoJson(C context, URI appInfoUri, ProcessingPipeline pipeline) {
-        final ApplicationInfoJson applicationInfoJson;
-        final ApplicationInfoJson cachedAppInfo = applicationInfoCache.get(appInfoUri);
-        if (cachedAppInfo != null) {
-            applicationInfoJson = cachedAppInfo;
-        } else {
-            try {
-                final ExternalResourceRef appInfoResourceRef = new ExternalResourceRef(appInfoUri, ExternalResourceType.APPLICATION_PROPERTIES);
-                final ExternalResource loadedAppInfoResource = pipeline.loadAndProcessResourceRef(context, appInfoResourceRef, getFactory().getExternalResourceFactory());
-                applicationInfoJson = loadedAppInfoResource.getContentAsParsedObject(ApplicationInfoJson.class);
-                this.applicationInfoCache.put(appInfoUri, applicationInfoJson);
-            } catch (IOException e) {
-                throw new AppIntegrationException("Cannot load application-info.json", e);
-            }
-        }
-        return applicationInfoJson;
-    }
-
-    @Nonnull
-    private URI getApplicationInfoUri(Application application, ResourceLoader loader) {
-        final URI appInfoUri;
-        try {
-            appInfoUri = loader.resolveBaseUri(application.getApplicationInfoUrl());
-        } catch (URISyntaxException e) {
-            throw new AppIntegrationException("Cannot resolve application-information.json url " + application.getApplicationInfoUrl(), e);
-        }
-        return appInfoUri;
+        return callWithGlobalContext(verifiedInstance.getVerifiedApplication(), context -> {
+            final ProcessingPipeline pipeline = createPipelineAndInitContext(verifiedInstance.getApplication().getProcessingPipelineName(), context);
+            // ToDo: Unify injecting context
+            injectGlobalProperties(context, verifiedInstance.getApplication().getGlobalProperties());
+            final URI snippetUri = getSnippetUri(context, verifiedInstance, pipeline);
+            final ExternalResourceRef snippetRef = new ExternalResourceRef(snippetUri, ExternalResourceType.HTML_SNIPPET);
+            final ExternalResource snippetRes = pipeline.loadAndProcessResourceRef(context, snippetRef);
+            return Objects.requireNonNull(snippetRes);
+        });
     }
 
 
-    @Nonnull
-    private ResourceLoader requireResourceLoader(@Nonnull Application application) {
-        final String resourceLoaderName = application.getResourceLoaderName();
-        final ResourceLoader resourceLoader = getFactory().getResourceLoader(resourceLoaderName);
-        if (resourceLoader == null) {
-            throw new AppIntegrationException(String.format("ResourceLoader %s is not defined!", resourceLoaderName));
-        }
-        return resourceLoader;
-    }
-
-    @Nonnull
-    private ResourceLoader requireInjectResourceLoader(@Nonnull C context, @Nonnull Application application) {
-        final ResourceLoader resourceLoader = requireResourceLoader(application);
-        context.setResourceLoader(resourceLoader);
-        return resourceLoader;
-    }
-
-    @SuppressWarnings("unused")
     public ExternalResource getStaticResource(@Nonnull String applicationId, @Nonnull String relativePath) {
-        final Application application = requireApplication(applicationId);
-        final ResourceLoader loader = requireResourceLoader(application);
 
-        final URI baseURI;
-        final String appInfoUrl = application.getApplicationInfoUrl();
-        try {
-            baseURI = loader.resolveBaseUri(appInfoUrl);
-        } catch (URISyntaxException e) {
-            throw new AppIntegrationException("Cannot resolve application-info.json url " + appInfoUrl, e);
-        }
+        final VerifiedApplication verifiedApplication = VerifiedApplication.verify(applicationId, getFactory());
 
-        final URI resourceUri = baseURI.resolve(relativePath).normalize();
-        final ExternalResourceRef resourceRef = new ExternalResourceRef(resourceUri, ExternalResourceType.ANY);
+        return callWithGlobalContext(verifiedApplication, context -> {
 
-        final ExternalResource cachedRes =  this.callWithExternalResourceCache(applicationId,
-                cache -> cache.getCachedResource(resourceRef, getFactory().getExternalResourceFactory())
-        );
+            final ProcessingPipeline pipeline = createPipelineAndInitContext(verifiedApplication.getApplication().getProcessingPipelineName(), context);
 
-        if (cachedRes != null) {
-            return cachedRes;
-        } else {
-            // load live  + refactor to make cache part of the pipeline
-            throw new UnsupportedOperationException("Not yet implemented!");
-        }
+            final URI baseURI;
+            final String appInfoUrl = verifiedApplication.getApplication().getApplicationInfoUrl();
+            try {
+                baseURI = verifiedApplication.getResourceLoader().resolveBaseUri(appInfoUrl);
+            } catch (URISyntaxException e) {
+                throw new AppIntegrationException("Cannot resolve application-info.json url " + appInfoUrl, e);
+            }
+
+            final URI resourceUri = baseURI.resolve(relativePath).normalize();
+            final ExternalResourceRef snippetRef = new ExternalResourceRef(resourceUri, ExternalResourceType.ANY);
+            final ExternalResource snippetRes = pipeline.loadAndProcessResourceRef(context, snippetRef);
+            return Objects.requireNonNull(snippetRes);
+
+        });
     }
 
     @SuppressWarnings("unused")
@@ -208,67 +120,68 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
         for (Map.Entry<String, List<I>> applicationEntry : instanceMap.entrySet()) {
             final String applicationId = applicationEntry.getKey();
             final List<I> applicationInstanceList = applicationEntry.getValue();
-            LOG.info("prefetch {} instances for application {}", applicationInstanceList.size(), applicationId);
+            final VerifiedApplication verifiedApplication = VerifiedApplication.verify(applicationId, getFactory());
 
-            callWithGlobalContext(applicationId, context -> {
-                prefetch(context, applicationId, applicationInstanceList);
+            LOG.info("prefetch {} instances for application {}", applicationInstanceList.size(), applicationId);
+            callWithGlobalContext(verifiedApplication, context -> {
+                prefetch(context, verifiedApplication, applicationInstanceList);
                 return true;
             });
         }
     }
 
 
-    protected void prefetch(C context, String applicationId, List<I> applicationInstanceList) {
+    protected void prefetch(C context, VerifiedApplication verifiedApplication, List<I> applicationInstanceList) {
 
-        final Application application = this.getFactory().getApplication(applicationId);
-        if (application == null) {
-            context.getIntegrationLog().addError("Application %s is undefined", applicationId);
-            return;
-        }
-
-        // inject the resource-loader
-        final ResourceLoader loader = requireInjectResourceLoader(context, application);
+        final Application application = verifiedApplication.getApplication();
 
         // build processing pipeline
-        final ProcessingPipeline pipeline = setupProcessingPipeline(context, applicationId, application);
+        final ProcessingPipeline pipeline = createPipelineAndInitContext(verifiedApplication.getApplication().getProcessingPipelineName(), context);
 
         // add global properties
-        final Map<String, Object> globalProperties = application.getGlobalProperties();
-        if (globalProperties != null) {
-            ResourceLogger resourceLogger = context.getIntegrationLog().createResourceLogger(ExternalResourceRef.create("global", ExternalResourceType.ANY));
-            final TaskLogger taskLogger = resourceLogger.createTaskLogger("Set Global Properties Task", "set-globals");
-            final TaskContext taskContext = context.createTaskContext(
-                    taskLogger, Ranking.GLOBAL, "global", ExternalResourceType.ANY, null);
-            for (final Map.Entry<String, Object> propEntry : globalProperties.entrySet()) {
-                taskContext.setValue(propEntry.getKey(), propEntry.getValue());
-            }
-        }
+        injectGlobalProperties(context, application.getGlobalProperties());
 
         // set global context read-only - values are only written to
         context.getProcessingParams().setReadOnly();
 
-        // load application-properties.json
-        final URI appInfoUri = getApplicationInfoUri(application, loader);
-        final ApplicationInfoJson applicationInfo = getCachedOrLoadApplicationInfoJson(context, appInfoUri, pipeline);
 
-        // resolve url for all instances (some may resolve to the same url)
-        final Set<ExternalResourceRef> resolvedSnippetsSet = new LinkedHashSet<>();
-        for (I instance : applicationInstanceList) {
-            final VerifiedInstance<I> verifiedInstance = VerifiedInstance.verify(instance, getFactory());
-            final ExternalResourceRef snippetRef = resolveSnippetResource(verifiedInstance, applicationInfo);
-            resolvedSnippetsSet.add(snippetRef);
+//        final URI snippetUri = getSnippetUri(context, verifiedInstance, pipeline);
+//        final ExternalResourceRef snippetRef = new ExternalResourceRef(snippetUri, ExternalResourceType.HTML_SNIPPET);
+//        final ExternalResource snippetRes = pipeline.loadAndProcessResourceRef(context, snippetRef);
+//        return Objects.requireNonNull(snippetRes);
+
+        // clear cache
+
+
+        // load application-properties.json
+        final URI appInfoUri = getApplicationInfoUri(verifiedApplication);
+        final ApplicationInfoJson applicationInfo;
+        synchronized (this) {
+            this.applicationInfoCache.remove(appInfoUri);
+            // ToDo: add forceReload parameter
+            applicationInfo = getCachedOrLoadApplicationInfoJson(context, appInfoUri, pipeline);
         }
 
-        // ToDo: Setup Context
+        // resolve url for all instances (some may resolve to the same url)
+        final Set<URI> resolvedSnippetsSet = new LinkedHashSet<>();
+        for (I instance : applicationInstanceList) {
+
+            // ToDo: use Verified application
+            final VerifiedInstance<I> verifiedInstance = VerifiedInstance.verify(instance, getFactory());
+
+            // ToDo: Re-use application info
+            resolvedSnippetsSet.add(getSnippetUri(context, verifiedInstance, pipeline));
+        }
+
 
         // Load all resolved snippets
         // ToDo: Replace with ExternalResourceSet
         final Set<ExternalResourceRef> referencedResourcesSet = new LinkedHashSet<>();
-        for (ExternalResourceRef snippetRef : resolvedSnippetsSet) {
-            final ExternalResource snippet;
+        for (URI snippetUri : resolvedSnippetsSet) {
+            final ExternalResourceRef snippetRef = new ExternalResourceRef(snippetUri, ExternalResourceType.HTML_SNIPPET);
             try {
-                snippet = pipeline.loadAndProcessResourceRef(context, snippetRef, getFactory().getExternalResourceFactory());
-                referencedResourcesSet.addAll(snippet.getReferencedResources());
+                final ExternalResource snippetRes = pipeline.loadAndProcessResourceRef(context, snippetRef);
+                referencedResourcesSet.addAll(snippetRes.getReferencedResources());
             } catch (AppIntegrationException e) {
                 LOG.error("cannot load", e);
             }
@@ -279,7 +192,7 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
         for (ExternalResourceRef resourceRef : referencedResourcesSet) {
             final ExternalResource resource;
             try {
-                resource = pipeline.loadAndProcessResourceRef(context, resourceRef, getFactory().getExternalResourceFactory());
+                resource = pipeline.loadAndProcessResourceRef(context, resourceRef);
                 referencedResourcesSet.addAll(resource.getReferencedResources());
             } catch (AppIntegrationException e) {
                 LOG.error("cannot load", e);
@@ -293,20 +206,6 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
         // ToDo: Error handling or logging
     }
 
-    @Nonnull
-    private ProcessingPipeline setupProcessingPipeline(C context, String applicationId, Application application) {
-        final String pipelineName = application.getProcessingPipelineName();
-        final ProcessingPipeline pipeline;
-        try {
-            pipeline = getFactory().createProcessingPipeline(context, pipelineName);
-            pipeline.initContextWithTaskDefaults(context);
-            pipeline.initContextWithPipelineConfig(context);
-        } catch (AppIntegrationException e) {
-            context.getIntegrationLog().addError("Cannot create pipeline %s for application %s", pipelineName, applicationId);
-            throw new AppIntegrationException(String.format("Cannot create pipeline %s for application %s", pipelineName, applicationId), e);
-        }
-        return pipeline;
-    }
 
 
     /* Management methods ??? */
@@ -316,31 +215,99 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
     /* Internal methods */
 
     @Nonnull
-    protected ExternalResourceRef resolveSnippetResource(
-            @Nonnull VerifiedInstance<I> instance,
-            @Nonnull ApplicationInfoJson applicationInfo) {
-
-        final ComponentInfoJson componentInfo = applicationInfo.getComponents().get(instance.getComponentId());
-        if (componentInfo == null) {
-            throw new AppIntegrationException(
-                    String.format("Unknown component %s for application %s", instance.getComponentId(), instance.getApplicationId()));
-        }
-
-        final String baseUrl = instance.getApplication().getApplicationInfoUrl();
-        final URI baseUri;
+    protected ProcessingPipeline createPipelineAndInitContext(@Nonnull String processingPipelineName, @Nonnull C context) {
         try {
-            baseUri = new URI(baseUrl);
-        } catch (URISyntaxException e) {
-            throw new AppIntegrationException("Cannot create URI for " + baseUrl, e);
+            final ProcessingPipeline pipeline = getFactory().createProcessingPipeline(context, processingPipelineName);
+            pipeline.initContextWithTaskDefaults(context);
+            pipeline.initContextWithPipelineConfig(context);
+            // ToDo: Global properties
+            // verifiedInstance.getApplication().getGlobalProperties()
+            context.getProcessingParams().setReadOnly();
+            return pipeline;
+        } catch (AppIntegrationException e) {
+            context.getIntegrationLog().addError("Cannot create pipeline %s", processingPipelineName);
+            throw new AppIntegrationException(String.format("Cannot create pipeline %s", processingPipelineName), e);
         }
-        final String relativeUrlTemplate = componentInfo.getUrl();
-        final String relativeUrl = resolveStringWithContextVariables(instance, relativeUrlTemplate);
-//        try {
-        // ToDo: Re-work URI handling
-        return resolveRelativeUrl(baseUri, relativeUrl, ExternalResourceType.HTML_SNIPPET);
-//        } catch (URISyntaxException e) {
-//            throw new AppIntegrationException("cannot resolve snippet - no valid URI", e);
-//        }
+    }
+
+    private void injectGlobalProperties(C context, Map<String, Object> globalProperties) {
+        if (globalProperties != null) {
+            ResourceLogger resourceLogger = context.getIntegrationLog().createResourceLogger(ExternalResourceRef.create("global", ExternalResourceType.ANY));
+            final TaskLogger taskLogger = resourceLogger.createTaskLogger("Set Global Properties Task", "set-globals");
+            final TaskContext taskContext = context.createTaskContext(
+                    taskLogger, Ranking.GLOBAL, "global", ExternalResourceType.ANY, null);
+            for (final Map.Entry<String, Object> propEntry : globalProperties.entrySet()) {
+                taskContext.setValue(propEntry.getKey(), propEntry.getValue());
+            }
+        }
+    }
+
+
+    @Nonnull
+    private URI getSnippetUri(@Nonnull C context, @Nonnull VerifiedInstance<I> verifiedInstance, ProcessingPipeline pipeline) {
+        // check, if the URI is cached
+        final URI cachedSnippetUri = Optional.of(instanceToSnippetUriMapCache)
+                .map(snippetUriCache -> snippetUriCache.get(verifiedInstance.getApplicationId()))
+                .map(innerSnippetUriCache -> innerSnippetUriCache.get(verifiedInstance.getInstance()))
+                .orElse(null);
+
+
+        final URI snippetUri;
+        if (cachedSnippetUri != null) {
+            snippetUri = cachedSnippetUri;
+        } else {
+            // get application-info.json
+            final URI appInfoUri = getApplicationInfoUri(verifiedInstance.getVerifiedApplication());
+            final ApplicationInfoJson applicationInfoJson = getCachedOrLoadApplicationInfoJson(context, appInfoUri, pipeline);
+
+            // resolve snippet
+            final String componentId = verifiedInstance.getComponentId();
+            final ComponentInfoJson componentInfo = applicationInfoJson.getComponents().get(componentId);
+            if (componentInfo == null) {
+                throw new AppIntegrationException(
+                        String.format("Unknown component %s for application %s", componentId, verifiedInstance.getApplicationId()));
+            }
+
+            final String relativeUrlTemplate = componentInfo.getUrl();
+            final String relativeUrl = resolveStringWithContextVariables(verifiedInstance, relativeUrlTemplate);
+            snippetUri = appInfoUri.resolve(relativeUrl).normalize();
+        }
+        return snippetUri;
+    }
+
+    @Nonnull
+    private ApplicationInfoJson getCachedOrLoadApplicationInfoJson(@Nonnull C context, @Nonnull URI appInfoUri, @Nonnull ProcessingPipeline pipeline) {
+
+        // try from cache
+        final TimestampValue<ApplicationInfoJson> cachedAppInfoJson = applicationInfoCache.get(appInfoUri);
+        if ((cachedAppInfoJson != null) && cachedAppInfoJson.isFresh()) {
+            return cachedAppInfoJson.getValue();
+        }
+
+        // load
+        synchronized (this) {
+            try {
+                final ExternalResourceRef appInfoResourceRef = new ExternalResourceRef(appInfoUri, ExternalResourceType.APPLICATION_PROPERTIES);
+                final ExternalResource loadedAppInfoResource = pipeline.loadAndProcessResourceRef(context, appInfoResourceRef);
+                final ApplicationInfoJson appInfoJson = loadedAppInfoResource.getContentAsParsedObject(ApplicationInfoJson.class);
+                Objects.requireNonNull(appInfoJson);
+                applicationInfoCache.put(appInfoUri, new TimestampValue<>(appInfoJson));
+                return appInfoJson;
+            } catch (IOException e) {
+                throw new AppIntegrationException("Cannot load application-info.json", e);
+            }
+        }
+    }
+
+    @Nonnull
+    private URI getApplicationInfoUri(@Nonnull VerifiedApplication verifiedApplication) {
+        final ResourceLoader loader = verifiedApplication.getResourceLoader();
+        final String appInfoUrl = verifiedApplication.getApplication().getApplicationInfoUrl();
+        try {
+            return loader.resolveBaseUri(appInfoUrl);
+        } catch (URISyntaxException e) {
+            throw new AppIntegrationException("Cannot resolve application-information.json url " + appInfoUrl, e);
+        }
     }
 
 
@@ -364,22 +331,6 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
     }
 
     @Nonnull
-    protected Application requireApplication(@Nonnull String applicationId) {
-        final Application application = this.getFactory().getApplication(applicationId);
-        if (application == null) {
-            throw new AppIntegrationException(String.format("Application %s is not defined!", applicationId));
-        }
-        return application;
-    }
-
-    @Nonnull
-    public ExternalResourceRef resolveRelativeUrl(@Nonnull URI baseUri, @Nonnull String relativeUrl, @Nonnull ExternalResourceType expectedType) {
-        final URI resolvedUri = baseUri.resolve(relativeUrl).normalize();
-        return new ExternalResourceRef(resolvedUri, expectedType);
-    }
-
-
-    @Nonnull
     protected List<ContextProvider<I>> requireContextProviders(@Nonnull VerifiedInstance<I> instance) {
         final List<String> notFoundContextProviders = new ArrayList<>();
         final List<ContextProvider<I>> contextProviders = new ArrayList<>();
@@ -397,6 +348,28 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
             throw new AppIntegrationException(String.format(
                     "The requested context providers %s for application %s are not available",
                     notFoundContextProviders, instance.getApplicationId()));
+        }
+    }
+
+    private static class TimestampValue<T> {
+
+        private static final long CACHE_TIMEOUT_MILLIS = 1000L * 60L * 5L;
+
+        private final T value;
+
+        private final long timestamp;
+
+        public TimestampValue(T value) {
+            this.value = value;
+            this.timestamp = System.currentTimeMillis();
+        }
+
+        public T getValue() {
+            return value;
+        }
+
+        public boolean isFresh() {
+            return (timestamp + CACHE_TIMEOUT_MILLIS) < System.currentTimeMillis();
         }
     }
 }

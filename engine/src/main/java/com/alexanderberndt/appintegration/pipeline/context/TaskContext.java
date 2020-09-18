@@ -3,6 +3,7 @@ package com.alexanderberndt.appintegration.pipeline.context;
 import com.alexanderberndt.appintegration.engine.ResourceLoader;
 import com.alexanderberndt.appintegration.engine.logging.AbstractLogger;
 import com.alexanderberndt.appintegration.engine.logging.TaskLogger;
+import com.alexanderberndt.appintegration.engine.resources.ExternalResourceFactory;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
 import com.alexanderberndt.appintegration.pipeline.configuration.ConfigurationException;
 import com.alexanderberndt.appintegration.pipeline.configuration.MultiValue;
@@ -91,6 +92,11 @@ public class TaskContext {
     @Nonnull
     public ResourceLoader getResourceLoader() {
         return globalContext.getResourceLoader();
+    }
+
+    @Nonnull
+    public ExternalResourceFactory getResourceFactory() {
+        return globalContext.getResourceFactory();
     }
 
     public Object getValue(@Nonnull String key) {

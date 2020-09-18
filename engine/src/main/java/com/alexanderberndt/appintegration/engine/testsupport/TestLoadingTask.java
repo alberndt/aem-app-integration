@@ -1,7 +1,6 @@
 package com.alexanderberndt.appintegration.engine.testsupport;
 
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
-import com.alexanderberndt.appintegration.engine.resources.ExternalResourceFactory;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
 import com.alexanderberndt.appintegration.pipeline.context.TaskContext;
 import com.alexanderberndt.appintegration.pipeline.task.LoadingTask;
@@ -19,8 +18,8 @@ public class TestLoadingTask implements LoadingTask {
     }
 
     @Override
-    public ExternalResource load(TaskContext context, ExternalResourceRef resourceRef, ExternalResourceFactory factory) {
-        return factory.createExternalResource(resourceRef, new ByteArrayInputStream(content));
+    public ExternalResource load(TaskContext context, ExternalResourceRef resourceRef) {
+        return context.getResourceFactory().createExternalResource(resourceRef, new ByteArrayInputStream(content));
     }
 
     /**

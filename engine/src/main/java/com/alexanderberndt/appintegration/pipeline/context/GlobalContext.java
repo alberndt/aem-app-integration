@@ -1,10 +1,13 @@
 package com.alexanderberndt.appintegration.pipeline.context;
 
+import com.alexanderberndt.appintegration.engine.AppIntegrationEngine;
 import com.alexanderberndt.appintegration.engine.ResourceLoader;
 import com.alexanderberndt.appintegration.engine.logging.IntegrationLogger;
 import com.alexanderberndt.appintegration.engine.logging.LogAppender;
 import com.alexanderberndt.appintegration.engine.logging.TaskLogger;
+import com.alexanderberndt.appintegration.engine.resources.ExternalResourceFactory;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
+import com.alexanderberndt.appintegration.engine.utils.VerifiedApplication;
 import com.alexanderberndt.appintegration.pipeline.configuration.PipelineConfiguration;
 import com.alexanderberndt.appintegration.pipeline.configuration.Ranking;
 import com.alexanderberndt.appintegration.utils.DataMap;
@@ -19,8 +22,10 @@ public abstract class GlobalContext {
 
     private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    @Nullable
-    private ResourceLoader resourceLoader;
+    @Nonnull
+    private final VerifiedApplication verifiedApplication;
+
+    @Nonnull final AppIntegrationEngine<?, ?> engine;
 
     @Nonnull
     private final PipelineConfiguration processingParams = new PipelineConfiguration();
@@ -29,8 +34,10 @@ public abstract class GlobalContext {
     private final IntegrationLogger logger;
 
 
-    protected GlobalContext(@Nonnull LogAppender logAppender) {
+    protected GlobalContext(@Nonnull LogAppender logAppender, @Nonnull VerifiedApplication verifiedApplication, @Nonnull AppIntegrationEngine<?, ?> engine) {
         this.logger = new IntegrationLogger(logAppender);
+        this.verifiedApplication = verifiedApplication;
+        this.engine = engine;
     }
 
     @Nonnull
@@ -41,13 +48,15 @@ public abstract class GlobalContext {
             @Nonnull ExternalResourceType resourceType,
             @Nullable DataMap processingData);
 
-    @Nullable
+    @Nonnull
     public ResourceLoader getResourceLoader() {
-        return resourceLoader;
+        return verifiedApplication.getResourceLoader();
     }
 
-    public void setResourceLoader(@Nullable ResourceLoader resourceLoader) {
-        this.resourceLoader = resourceLoader;
+    @Nonnull
+    public ExternalResourceFactory getResourceFactory() {
+        // ToDo: move to engine
+        return engine.getFactory().getExternalResourceFactory();
     }
 
     @Nonnull

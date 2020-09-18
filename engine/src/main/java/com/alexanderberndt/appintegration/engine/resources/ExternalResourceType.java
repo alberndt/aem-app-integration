@@ -8,8 +8,8 @@ import java.nio.charset.StandardCharsets;
 
 public enum ExternalResourceType {
 
-    ANY(null, false, null),
-    BINARY(null, false, ANY),
+    ANY(StandardCharsets.UTF_8, false, null),
+    BINARY(StandardCharsets.UTF_8, false, ANY),
     TEXT(StandardCharsets.UTF_8, false, ANY),
     PLAIN_TEXT(StandardCharsets.UTF_8, false, TEXT),
     APPLICATION_PROPERTIES(StandardCharsets.UTF_8, false, TEXT),
@@ -41,6 +41,15 @@ public enum ExternalResourceType {
 
     public ExternalResourceType getLessQualifiedType() {
         return lessQualifiedType;
+    }
+
+    public boolean isSpecializationOf(final ExternalResourceType otherType) {
+        ExternalResourceType myType = this;
+        while (myType != null) {
+            myType = myType.getLessQualifiedType();
+            if (otherType == myType) return true;
+        }
+        return false;
     }
 
     public boolean isSameOrSpecializationOf(final ExternalResourceType otherType) {

@@ -8,6 +8,7 @@ import com.alexanderberndt.appintegration.engine.testsupport.TestAppInstance;
 import com.alexanderberndt.appintegration.engine.testsupport.TestAppIntegrationEngine;
 import com.alexanderberndt.appintegration.engine.testsupport.TestAppIntegrationFactory;
 import com.alexanderberndt.appintegration.engine.testsupport.TestApplication;
+import com.alexanderberndt.appintegration.engine.utils.VerifiedInstance;
 import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
