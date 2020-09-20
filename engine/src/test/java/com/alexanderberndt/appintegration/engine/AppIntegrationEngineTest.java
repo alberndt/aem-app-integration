@@ -8,8 +8,6 @@ import com.alexanderberndt.appintegration.engine.testsupport.TestAppInstance;
 import com.alexanderberndt.appintegration.engine.testsupport.TestAppIntegrationEngine;
 import com.alexanderberndt.appintegration.engine.testsupport.TestAppIntegrationFactory;
 import com.alexanderberndt.appintegration.engine.testsupport.TestApplication;
-import com.alexanderberndt.appintegration.engine.utils.VerifiedInstance;
-import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,7 +21,8 @@ import java.util.Map;
 
 import static com.alexanderberndt.appintegration.engine.testsupport.TestAppIntegrationFactory.CORE_CONTEXT_PROVIDERS;
 import static com.alexanderberndt.appintegration.engine.testsupport.TestAppIntegrationFactory.SYSTEM_RESOURCE_LOADER_NAME;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AppIntegrationEngineTest {
 
@@ -35,8 +34,6 @@ class AppIntegrationEngineTest {
 
     private TestAppInstance instance1;
     private TestAppInstance instance2;
-
-    private VerifiedInstance<TestAppInstance> verifiedInstance;
 
     @BeforeEach
     void before() {
@@ -53,8 +50,6 @@ class AppIntegrationEngineTest {
         instance1 = new TestAppInstance("test-app", "subscribe", instanceContextMap);
         instanceContextMap.put("language", "en");
         instance2 = new TestAppInstance("test-app", "subscribe", instanceContextMap);
-        verifiedInstance = VerifiedInstance.verify(instance1, factory);
-        assertNotNull(verifiedInstance);
     }
 
     @Test
@@ -93,23 +88,5 @@ class AppIntegrationEngineTest {
         final String content = htmlSnippet.getContentAsParsedObject(String.class);
         assertTrue(StringUtils.isNotBlank(content));
     }
-
-    @Test
-    void resolveStringWithContextVariables() {
-        assertEquals("Hello world from de", engine.resolveStringWithContextVariables(verifiedInstance, "Hello ${hello} from ${language}"));
-        assertThrows(AppIntegrationException.class, () -> engine.resolveStringWithContextVariables(verifiedInstance, "Hello ${hello} from ${language} with ${something-unknown}"));
-    }
-
-//    @Test
-//    void resolveSnippetResource() throws IOException, URISyntaxException {
-//        ApplicationInfoJson applicationInfoJson = engine.loadApplicationInfoJson(verifiedInstance.getApplication());
-//
-//        final ExternalResourceRef resourceRef = engine.resolveSnippetResource(verifiedInstance, applicationInfoJson);
-//
-//        assertNotNull(resourceRef);
-//        assertEquals(ExternalResourceType.HTML_SNIPPET, resourceRef.getExpectedType());
-//        assertEquals(new URI("simple-app1/server/subscribe.product-news.de.html"), resourceRef.getUri());
-//    }
-
 
 }

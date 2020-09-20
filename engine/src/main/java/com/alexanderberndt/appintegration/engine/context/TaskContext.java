@@ -1,4 +1,4 @@
-package com.alexanderberndt.appintegration.pipeline.context;
+package com.alexanderberndt.appintegration.engine.context;
 
 import com.alexanderberndt.appintegration.engine.ResourceLoader;
 import com.alexanderberndt.appintegration.engine.logging.AbstractLogger;
@@ -15,7 +15,9 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.invoke.MethodHandles;
-import java.util.*;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * The TaskContext is a light-weight facade for the {@link GlobalContext}, which adds the specific processing-context
@@ -34,7 +36,7 @@ public class TaskContext {
     private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Nonnull
-    private final GlobalContext globalContext;
+    private final GlobalContext<?,?> globalContext;
 
     @Nonnull
     private final Ranking rank;
@@ -55,7 +57,7 @@ public class TaskContext {
 
 
     protected TaskContext(
-            @Nonnull GlobalContext globalContext,
+            @Nonnull GlobalContext<?,?> globalContext,
             @Nonnull TaskLogger taskLogger,
             @Nonnull Ranking rank,
             @Nonnull String taskNamespace,
@@ -71,22 +73,11 @@ public class TaskContext {
     }
 
     public void addWarning(@Nonnull String message, Object... args) {
-        globalContext.addWarning(taskNamespace + ": " + formatMessage(message, args));
+        taskLogger.addWarning(taskNamespace + ": " + message, args);
     }
 
     public void addError(@Nonnull String message, Object... args) {
-        globalContext.addError(taskNamespace + ": " + formatMessage(message, args));
-    }
-
-    @Deprecated
-    protected String formatMessage(String message, Object... args) {
-        String formattedMsg;
-        try {
-            formattedMsg = String.format(message, args);
-        } catch (IllegalFormatException e) {
-            formattedMsg = message + " " + Arrays.toString(args);
-        }
-        return formattedMsg;
+        taskLogger.addError(taskNamespace + ": " + message, args);
     }
 
     @Nonnull
@@ -256,7 +247,7 @@ public class TaskContext {
                 if (isTypeSpecifierAllowed) {
                     resourceTypeFromKey = parsedResourceTypeFromKey;
                 } else {
-                    this.addWarning(typeSpecifierWarning, args);
+                    addWarning(typeSpecifierWarning, args);
                 }
             }
         }

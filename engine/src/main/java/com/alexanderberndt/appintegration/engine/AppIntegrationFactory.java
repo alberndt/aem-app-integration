@@ -1,5 +1,6 @@
 package com.alexanderberndt.appintegration.engine;
 
+import com.alexanderberndt.appintegration.engine.context.GlobalContext;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceFactory;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
@@ -7,7 +8,6 @@ import com.alexanderberndt.appintegration.engine.resources.conversion.TextParser
 import com.alexanderberndt.appintegration.engine.resources.conversion.TextParserSupplier;
 import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
 import com.alexanderberndt.appintegration.pipeline.ProcessingPipeline;
-import com.alexanderberndt.appintegration.pipeline.context.GlobalContext;
 import com.alexanderberndt.appintegration.utils.DataMap;
 
 import javax.annotation.Nonnull;
@@ -17,7 +17,7 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.Map;
 
-public interface AppIntegrationFactory<I extends ApplicationInstance, C extends GlobalContext> {
+public interface AppIntegrationFactory<I extends ApplicationInstance, C extends GlobalContext<I, C>> {
 
     @Nonnull
     Map<String, Application> getAllApplications();

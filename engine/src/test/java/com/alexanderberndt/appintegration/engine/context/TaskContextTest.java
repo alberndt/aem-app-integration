@@ -1,13 +1,11 @@
-package com.alexanderberndt.appintegration.pipeline.context;
+package com.alexanderberndt.appintegration.engine.context;
 
-import com.alexanderberndt.appintegration.engine.AppIntegrationEngine;
-import com.alexanderberndt.appintegration.engine.ResourceLoader;
 import com.alexanderberndt.appintegration.engine.logging.LogAppender;
+import com.alexanderberndt.appintegration.engine.logging.LogStatus;
 import com.alexanderberndt.appintegration.engine.logging.TaskLogger;
-import com.alexanderberndt.appintegration.engine.logging.appender.Slf4jLogAppender;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
 import com.alexanderberndt.appintegration.engine.testsupport.TestGlobalContext;
-import com.alexanderberndt.appintegration.engine.utils.VerifiedApplication;
+import com.alexanderberndt.appintegration.pipeline.configuration.PipelineConfiguration;
 import com.alexanderberndt.appintegration.pipeline.configuration.Ranking;
 import com.alexanderberndt.appintegration.utils.DataMap;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,8 +16,11 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class TaskContextTest {
@@ -27,32 +28,26 @@ class TaskContextTest {
     public static final String MY_NAMESPACE = "my-namespace";
 
     @Mock
-    private ResourceLoader resourceLoaderMock;
+    private TestGlobalContext globalContext;
 
     @Mock
-    private VerifiedApplication verifiedApplication;
-
-    @Mock
-    private AppIntegrationEngine<?,?> engine;
-
-    private GlobalContext globalContext;
-
-    private TaskContext taskContext;
+    private LogAppender logAppenderMock;
 
     private TaskLogger taskLogger;
 
-    private LogAppender logAppenderMock;
+    private TaskContext taskContext;
+
+    private PipelineConfiguration pipelineConfiguration;
 
 
     @BeforeEach
     void beforeEach() {
-        assertNotNull(resourceLoaderMock);
-        logAppenderMock = Mockito.spy(new Slf4jLogAppender());
-        globalContext = Mockito.spy(new TestGlobalContext(logAppenderMock, verifiedApplication, engine));
-        taskLogger = new TaskLogger(logAppenderMock, "test", "test task");
-        this.taskContext = Mockito.spy(new TaskContext(globalContext, taskLogger, Ranking.TASK_DEFAULT, MY_NAMESPACE, ExternalResourceType.ANY, new DataMap()));
+        this.pipelineConfiguration = new PipelineConfiguration();
+        assertNotNull(globalContext);
+        Mockito.lenient().when(globalContext.getProcessingParams()).thenReturn(pipelineConfiguration);
 
-        Mockito.lenient().when(verifiedApplication.getResourceLoader()).thenReturn(resourceLoaderMock);
+        taskLogger = new TaskLogger(logAppenderMock, "test", "test task");
+        this.taskContext = new TaskContext(globalContext, taskLogger, Ranking.TASK_DEFAULT, MY_NAMESPACE, ExternalResourceType.ANY, new DataMap());
     }
 
     @Test
@@ -62,8 +57,8 @@ class TaskContextTest {
         assertEquals("any-variable", nk.getKey());
         assertEquals(ExternalResourceType.ANY, nk.getResourceType());
         assertEquals("my-namespace:any-variable", nk.getPlainKey());
-        Mockito.verify(globalContext, Mockito.never()).addWarning(Mockito.anyString());
-        Mockito.verify(globalContext, Mockito.never()).addError(Mockito.anyString());
+        verify(logAppenderMock, never()).appendLogEntry(any(), eq(LogStatus.WARNING), anyString());
+        verify(logAppenderMock, never()).appendLogEntry(any(), eq(LogStatus.ERROR), anyString());
     }
 
     @Test
@@ -73,8 +68,8 @@ class TaskContextTest {
         assertEquals("any-other", nk.getKey());
         assertEquals(ExternalResourceType.ANY, nk.getResourceType());
         assertEquals("other:any-other", nk.getPlainKey());
-        Mockito.verify(globalContext, Mockito.never()).addWarning(Mockito.anyString());
-        Mockito.verify(globalContext, Mockito.never()).addError(Mockito.anyString());
+        verify(logAppenderMock, never()).appendLogEntry(any(), eq(LogStatus.WARNING), anyString());
+        verify(logAppenderMock, never()).appendLogEntry(any(), eq(LogStatus.ERROR), anyString());
     }
 
     @Test
@@ -84,8 +79,8 @@ class TaskContextTest {
         assertEquals("any-other", nk.getKey());
         assertEquals(ExternalResourceType.APPLICATION_PROPERTIES, nk.getResourceType());
         assertEquals("other:any-other", nk.getPlainKey());
-        Mockito.verify(globalContext, Mockito.never()).addWarning(Mockito.anyString());
-        Mockito.verify(globalContext, Mockito.never()).addError(Mockito.anyString());
+        verify(logAppenderMock, never()).appendLogEntry(any(), eq(LogStatus.WARNING), anyString());
+        verify(logAppenderMock, never()).appendLogEntry(any(), eq(LogStatus.ERROR), anyString());
     }
 
     @Test
@@ -95,8 +90,8 @@ class TaskContextTest {
         assertEquals("any-other", nk.getKey());
         assertEquals(ExternalResourceType.ANY, nk.getResourceType());
         assertEquals("other:any-other", nk.getPlainKey());
-        Mockito.verify(globalContext).addWarning("my-namespace: hello test 42");
-        Mockito.verify(globalContext, Mockito.never()).addError(Mockito.anyString());
+        verify(logAppenderMock).appendLogEntry(any(), eq(LogStatus.WARNING), eq("my-namespace: hello test 42"));
+        verify(logAppenderMock, never()).appendLogEntry(any(), eq(LogStatus.ERROR), anyString());
     }
 
     @Test
@@ -106,8 +101,8 @@ class TaskContextTest {
         assertEquals("any-other", nk.getKey());
         assertEquals(ExternalResourceType.APPLICATION_PROPERTIES, nk.getResourceType());
         assertEquals("my-namespace:any-other", nk.getPlainKey());
-        Mockito.verify(globalContext, Mockito.never()).addWarning(Mockito.anyString());
-        Mockito.verify(globalContext, Mockito.never()).addError(Mockito.anyString());
+        verify(logAppenderMock, never()).appendLogEntry(any(), eq(LogStatus.WARNING), anyString());
+        verify(logAppenderMock, never()).appendLogEntry(any(), eq(LogStatus.ERROR), anyString());
     }
 
     @Test
@@ -117,8 +112,8 @@ class TaskContextTest {
         assertEquals("any-other.xxx", nk.getKey());
         assertEquals(ExternalResourceType.ANY, nk.getResourceType());
         assertEquals("my-namespace:any-other.xxx", nk.getPlainKey());
-        Mockito.verify(globalContext, Mockito.never()).addWarning(Mockito.anyString());
-        Mockito.verify(globalContext, Mockito.never()).addError(Mockito.anyString());
+        verify(logAppenderMock, never()).appendLogEntry(any(), eq(LogStatus.WARNING), anyString());
+        verify(logAppenderMock, never()).appendLogEntry(any(), eq(LogStatus.ERROR), anyString());
     }
 
     @Test
@@ -128,8 +123,8 @@ class TaskContextTest {
         assertEquals("any-other.xxx", nk.getKey());
         assertEquals(ExternalResourceType.ANY, nk.getResourceType());
         assertEquals("other:any-other.xxx", nk.getPlainKey());
-        Mockito.verify(globalContext, Mockito.never()).addWarning(Mockito.anyString());
-        Mockito.verify(globalContext, Mockito.never()).addError(Mockito.anyString());
+        verify(logAppenderMock, never()).appendLogEntry(any(), eq(LogStatus.WARNING), anyString());
+        verify(logAppenderMock, never()).appendLogEntry(any(), eq(LogStatus.ERROR), anyString());
     }
 
     @Test
@@ -142,16 +137,16 @@ class TaskContextTest {
     void getValueWithType() {
         taskContext.setValue("test1", 100);
         assertEquals(new Integer(100), taskContext.getValue("test1", Integer.class));
-        Mockito.verify(globalContext, Mockito.never()).addWarning(Mockito.anyString());
-        Mockito.verify(globalContext, Mockito.never()).addError(Mockito.anyString());
+        verify(logAppenderMock, never()).appendLogEntry(any(), eq(LogStatus.WARNING), anyString());
+        verify(logAppenderMock, never()).appendLogEntry(any(), eq(LogStatus.ERROR), anyString());
     }
 
     @Test
     void getValueWithWrongType() {
         taskContext.setValue("test1", 100);
         assertNull(taskContext.getValue("test1", String.class));
-        Mockito.verify(globalContext).addWarning(Mockito.anyString());
-        Mockito.verify(globalContext, Mockito.never()).addError(Mockito.anyString());
+        verify(logAppenderMock).appendLogEntry(any(), eq(LogStatus.WARNING), anyString());
+        verify(logAppenderMock, never()).appendLogEntry(any(), eq(LogStatus.ERROR), anyString());
     }
 
     @Test
@@ -159,43 +154,44 @@ class TaskContextTest {
         taskContext.setValue("test1", 100);
         assertEquals(new Integer(100), taskContext.getValue("test1", 0));
         assertEquals(new Integer(0), taskContext.getValue("test2", 0));
-        Mockito.verify(globalContext, Mockito.never()).addWarning(Mockito.anyString());
-        Mockito.verify(globalContext, Mockito.never()).addError(Mockito.anyString());
+        verify(logAppenderMock, never()).appendLogEntry(any(), eq(LogStatus.WARNING), anyString());
+        verify(logAppenderMock, never()).appendLogEntry(any(), eq(LogStatus.ERROR), anyString());
     }
 
     @Test
     void getValueWithWrongDefaultType1() {
         taskContext.setValue("test1", 100);
         assertEquals("something", taskContext.getValue("test1", "something"));
-        Mockito.verify(globalContext).addWarning(Mockito.anyString());
-        Mockito.verify(globalContext, Mockito.never()).addError(Mockito.anyString());
+        verify(logAppenderMock, atLeastOnce()).appendLogEntry(any(), eq(LogStatus.WARNING), anyString());
+        verify(logAppenderMock, never()).appendLogEntry(any(), eq(LogStatus.ERROR), anyString());
+
     }
 
     @Test
     void getValueWithWrongDefaultType2() {
         taskContext.setType("test1", Integer.class);
         assertEquals("something", taskContext.getValue("test1", "something"));
-        Mockito.verify(globalContext).addWarning(Mockito.anyString());
-        Mockito.verify(globalContext, Mockito.never()).addError(Mockito.anyString());
+        verify(logAppenderMock, atLeastOnce()).appendLogEntry(any(), eq(LogStatus.WARNING), anyString());
+        verify(logAppenderMock, never()).appendLogEntry(any(), eq(LogStatus.ERROR), anyString());
     }
 
     @Test
     void setValue() {
         taskContext.setValue("test1", "Hello");
         assertEquals("Hello", taskContext.getValue("test1", "something"));
-        Mockito.verify(globalContext, Mockito.never()).addWarning(Mockito.anyString());
-        Mockito.verify(globalContext, Mockito.never()).addError(Mockito.anyString());
+        verify(logAppenderMock, never()).appendLogEntry(any(), eq(LogStatus.WARNING), anyString());
+        verify(logAppenderMock, never()).appendLogEntry(any(), eq(LogStatus.ERROR), anyString());
 
-//        assertEquals(Collections.singleton("test1"), pipelineConfiguration.keySet(MY_NAMESPACE));
-//        assertEquals("Hello", pipelineConfiguration.getValue(MY_NAMESPACE, "test1", ExternalResourceType.ANY));
+        assertEquals(Collections.singleton("test1"), pipelineConfiguration.keySet(MY_NAMESPACE));
+        assertEquals("Hello", pipelineConfiguration.getValue(MY_NAMESPACE, "test1", ExternalResourceType.ANY));
     }
 
     @Test
     void setValueWithWrongType() {
         taskContext.setType("test1", Integer.class);
         taskContext.setValue("test1", "Hello");
-        Mockito.verify(globalContext).addWarning(Mockito.anyString());
-        Mockito.verify(globalContext, Mockito.never()).addError(Mockito.anyString());
+        verify(logAppenderMock).appendLogEntry(any(), eq(LogStatus.WARNING), anyString());
+        verify(logAppenderMock, never()).appendLogEntry(any(), eq(LogStatus.ERROR), anyString());
     }
 
     @Test
@@ -204,12 +200,11 @@ class TaskContextTest {
         taskContext.setType("test1", Integer.class);
         assertEquals(Integer.class, taskContext.getType("test1"));
 
-        Mockito.verify(globalContext, Mockito.never()).addWarning(Mockito.anyString());
-        Mockito.verify(globalContext, Mockito.never()).addError(Mockito.anyString());
+        verify(logAppenderMock, never()).appendLogEntry(any(), any(), anyString());
 
         taskContext.setType("test1", String.class);
-        Mockito.verify(globalContext, Mockito.never()).addWarning(Mockito.anyString());
-        Mockito.verify(globalContext).addError(Mockito.anyString());
+        verify(logAppenderMock, never()).appendLogEntry(any(), eq(LogStatus.WARNING), anyString());
+        verify(logAppenderMock).appendLogEntry(any(), eq(LogStatus.ERROR), anyString());
     }
 
     @Test
@@ -231,26 +226,13 @@ class TaskContextTest {
         assertEquals("World!", taskContext.getValue("test2"));
         taskContext.setValue("test2", "Changed value");
         assertEquals("Changed value", taskContext.getValue("test2"));
-        Mockito.verify(globalContext, Mockito.never()).addWarning(Mockito.anyString());
-        Mockito.verify(globalContext, Mockito.never()).addError(Mockito.anyString());
+        verify(logAppenderMock, never()).appendLogEntry(any(), eq(LogStatus.WARNING), anyString());
+        verify(logAppenderMock, never()).appendLogEntry(any(), eq(LogStatus.ERROR), anyString());
 
         taskContext.setValue("test3", "new key");
         assertNull(taskContext.getValue("test3"));
-        Mockito.verify(globalContext).addWarning(Mockito.anyString());
-        Mockito.verify(globalContext, Mockito.never()).addError(Mockito.anyString());
-    }
-
-    @Test
-    void formatMessage() {
-        assertEquals("hello", taskContext.formatMessage("hello"));
-        assertEquals("hello world 42", taskContext.formatMessage("hello %s %d", "world", 42));
-        assertEquals("hello", taskContext.formatMessage("hello", "world"));
-        assertEquals("hello %a [world]", taskContext.formatMessage("hello %a", "world"));
-    }
-
-    @Test
-    void getResourceLoader() {
-        assertSame(resourceLoaderMock, taskContext.getResourceLoader());
+        verify(logAppenderMock).appendLogEntry(any(), eq(LogStatus.WARNING), anyString());
+        verify(logAppenderMock, never()).appendLogEntry(any(), eq(LogStatus.ERROR), anyString());
     }
 
     @Test
@@ -269,8 +251,8 @@ class TaskContextTest {
         assertEquals("Now running...", executionTaskContext.getValue("test"));
         assertEquals("Hello World!", taskContext.getValue("test"));
 
-        Mockito.verify(globalContext, Mockito.never()).addWarning(Mockito.anyString());
-        Mockito.verify(globalContext, Mockito.never()).addError(Mockito.anyString());
+        verify(logAppenderMock, never()).appendLogEntry(any(), eq(LogStatus.WARNING), anyString());
+        verify(logAppenderMock, never()).appendLogEntry(any(), eq(LogStatus.ERROR), anyString());
     }
 
     @Test
@@ -282,8 +264,8 @@ class TaskContextTest {
         taskContext.setValue("test", "Hello World!");
 
         assertEquals("Hello World!", executionTaskContext.getValue("test"));
-        Mockito.verify(executionTaskContext).addWarning(Mockito.anyString());
-        Mockito.verify(executionTaskContext, Mockito.never()).addError(Mockito.anyString());
+        verify(logAppenderMock).appendLogEntry(any(), eq(LogStatus.WARNING), anyString());
+        verify(logAppenderMock, never()).appendLogEntry(any(), eq(LogStatus.ERROR), anyString());
     }
 
     @Test
@@ -294,7 +276,7 @@ class TaskContextTest {
         taskContext.setValue("test", "Hello World!");
         executionTaskContext.setValue("test", 10);
 
-        Mockito.verify(executionTaskContext).addWarning(Mockito.anyString(), Mockito.any());
-        Mockito.verify(executionTaskContext, Mockito.never()).addError(Mockito.anyString(), Mockito.any());
+        verify(logAppenderMock).appendLogEntry(any(), eq(LogStatus.WARNING), anyString());
+        verify(logAppenderMock, never()).appendLogEntry(any(), eq(LogStatus.ERROR), anyString());
     }
 }

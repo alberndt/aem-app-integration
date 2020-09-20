@@ -1,7 +1,7 @@
 package com.alexanderberndt.appintegration.pipeline.task;
 
+import com.alexanderberndt.appintegration.engine.context.TaskContext;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
-import com.alexanderberndt.appintegration.pipeline.context.TaskContext;
 
 import javax.annotation.Nonnull;
 

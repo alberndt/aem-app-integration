@@ -1,10 +1,10 @@
 package com.alexanderberndt.appintegration.aem.engine;
 
+import com.alexanderberndt.appintegration.engine.context.GlobalContext;
+import com.alexanderberndt.appintegration.engine.context.TaskContext;
 import com.alexanderberndt.appintegration.engine.logging.TaskLogger;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
 import com.alexanderberndt.appintegration.pipeline.configuration.Ranking;
-import com.alexanderberndt.appintegration.pipeline.context.GlobalContext;
-import com.alexanderberndt.appintegration.pipeline.context.TaskContext;
 import com.alexanderberndt.appintegration.utils.DataMap;
 
 import javax.annotation.Nonnull;

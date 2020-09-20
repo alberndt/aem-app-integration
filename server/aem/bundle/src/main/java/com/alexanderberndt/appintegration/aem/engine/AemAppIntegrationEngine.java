@@ -2,10 +2,8 @@ package com.alexanderberndt.appintegration.aem.engine;
 
 import com.alexanderberndt.appintegration.aem.engine.logging.AemLogAppender;
 import com.alexanderberndt.appintegration.engine.AppIntegrationEngine;
-import com.alexanderberndt.appintegration.engine.AppIntegrationFactory;
-import com.alexanderberndt.appintegration.engine.ExternalResourceCache;
 import com.alexanderberndt.appintegration.engine.logging.LogAppender;
-import com.alexanderberndt.appintegration.engine.utils.VerifiedApplication;
+import com.alexanderberndt.appintegration.engine.logging.appender.Slf4jLogAppender;
 import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
 import org.apache.sling.api.resource.*;
 import org.osgi.service.component.annotations.Component;
@@ -17,6 +15,7 @@ import javax.annotation.Nonnull;
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.GregorianCalendar;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static org.apache.sling.api.resource.ResourceResolverFactory.SUBSERVICE;
@@ -34,21 +33,14 @@ public class AemAppIntegrationEngine extends AppIntegrationEngine<SlingApplicati
     @Reference
     private ResourceResolverFactory resolverFactory;
 
-    @Nonnull
-    @Override
-    public AppIntegrationFactory<SlingApplicationInstance, AemGlobalContext> getFactory() {
-        return factory;
-    }
 
     @Override
-    protected <R> R callWithGlobalContext(@Nonnull VerifiedApplication application, @Nonnull Function<AemGlobalContext, R> function) {
-
+    protected <R> R callRuntimeMethodWithContext(@Nonnull String applicationId, @Nonnull Function<AemGlobalContext, R> function) {
         try (ResourceResolver resolver = resolverFactory.getServiceResourceResolver(Collections.singletonMap(SUBSERVICE, SUB_SERVICE_ID))) {
-
-            final AemGlobalContext context = new AemGlobalContext(createLogAppender(resolver, application.getApplicationId()), application, this, resolver);
+            final LogAppender logAppender = new Slf4jLogAppender();
+            final AemGlobalContext context = new AemGlobalContext(applicationId, factory, logAppender, resolver);
 
             final R result = function.apply(context);
-
             resolver.commit();
 
             return result;
@@ -59,11 +51,18 @@ public class AemAppIntegrationEngine extends AppIntegrationEngine<SlingApplicati
     }
 
     @Override
-    protected <R> R callWithExternalResourceCache(String applicationId, Function<ExternalResourceCache, R> function) {
-        return null;
+    protected void callBackgroundMethodWithContext(@Nonnull String applicationId, @Nonnull Consumer<AemGlobalContext> consumer) {
+        try (ResourceResolver resolver = resolverFactory.getServiceResourceResolver(Collections.singletonMap(SUBSERVICE, SUB_SERVICE_ID))) {
+            final LogAppender logAppender = createLogAppender(resolver, applicationId);
+            final AemGlobalContext context = new AemGlobalContext(applicationId, factory, logAppender, resolver);
+
+            consumer.accept(context);
+            resolver.commit();
+
+        } catch (LoginException | PersistenceException e) {
+            throw new AppIntegrationException("Cannot login to service user session!", e);
+        }
     }
-
-
 
     public LogAppender createLogAppender(@Nonnull ResourceResolver resolver, @Nonnull String applicationId) throws PersistenceException {
 
@@ -79,4 +78,5 @@ public class AemAppIntegrationEngine extends AppIntegrationEngine<SlingApplicati
 
         return new AemLogAppender(logRes);
     }
+
 }

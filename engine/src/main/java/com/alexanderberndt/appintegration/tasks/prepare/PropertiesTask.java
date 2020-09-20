@@ -1,7 +1,7 @@
 package com.alexanderberndt.appintegration.tasks.prepare;
 
+import com.alexanderberndt.appintegration.engine.context.TaskContext;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
-import com.alexanderberndt.appintegration.pipeline.context.TaskContext;
 import com.alexanderberndt.appintegration.pipeline.task.PreparationTask;
 import org.osgi.service.component.annotations.Component;
 

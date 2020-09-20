@@ -1,13 +1,13 @@
 package com.alexanderberndt.appintegration.pipeline;
 
+import com.alexanderberndt.appintegration.engine.context.GlobalContext;
+import com.alexanderberndt.appintegration.engine.context.TaskContext;
 import com.alexanderberndt.appintegration.engine.logging.ResourceLogger;
 import com.alexanderberndt.appintegration.engine.logging.TaskLogger;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
 import com.alexanderberndt.appintegration.pipeline.configuration.Ranking;
-import com.alexanderberndt.appintegration.pipeline.context.GlobalContext;
-import com.alexanderberndt.appintegration.pipeline.context.TaskContext;
 import com.alexanderberndt.appintegration.pipeline.task.LoadingTask;
 import com.alexanderberndt.appintegration.pipeline.task.PreparationTask;
 import com.alexanderberndt.appintegration.pipeline.task.ProcessingTask;
@@ -53,7 +53,7 @@ public class ProcessingPipeline {
         this.processingTasks = Optional.ofNullable(processingTasks).orElse(Collections.emptyList());
     }
 
-    public void initContextWithTaskDefaults(@Nonnull GlobalContext context) {
+    public void initContextWithTaskDefaults(@Nonnull GlobalContext<?, ?> context) {
         final ResourceLogger logger = context.getIntegrationLog().createResourceLogger("defaults");
         final DataMap processingData = new DataMap();
         preparationTasks.forEach(taskWrapper ->
@@ -75,7 +75,7 @@ public class ProcessingPipeline {
                         }));
     }
 
-    public void initContextWithPipelineConfig(@Nonnull GlobalContext context) {
+    public void initContextWithPipelineConfig(@Nonnull GlobalContext<?, ?> context) {
         final ResourceLogger logger = context.getIntegrationLog().createResourceLogger("pipeline config");
         final DataMap processingData = new DataMap();
         preparationTasks.forEach(taskWrapper ->
@@ -100,7 +100,7 @@ public class ProcessingPipeline {
     }
 
 
-    public ExternalResource loadAndProcessResourceRef(@Nonnull GlobalContext context, @Nonnull ExternalResourceRef resourceRef) {
+    public ExternalResource loadAndProcessResourceRef(@Nonnull GlobalContext<?, ?> context, @Nonnull ExternalResourceRef resourceRef) {
 
         final ResourceLogger log = context.getIntegrationLog().createResourceLogger(resourceRef);
         final DataMap processingData = new DataMap();
@@ -137,9 +137,10 @@ public class ProcessingPipeline {
         return resource;
     }
 
+
     protected <T, R> R applyWithContext(
             @Nonnull TaskWrapper<T> taskWrapper,
-            @Nonnull GlobalContext context,
+            @Nonnull GlobalContext<?, ?> context,
             @Nonnull ResourceLogger logger,
             @Nonnull Ranking ranking,
             @Nonnull ExternalResourceType resourceType,

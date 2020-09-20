@@ -1,19 +1,17 @@
 package com.alexanderberndt.appintegration.tasks.prepare;
 
-import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
+import com.alexanderberndt.appintegration.engine.logging.appender.Slf4jLogAppender;
 import com.alexanderberndt.appintegration.engine.testsupport.TestAppIntegrationEngine;
+import com.alexanderberndt.appintegration.engine.testsupport.TestAppIntegrationFactory;
 import com.alexanderberndt.appintegration.engine.testsupport.TestApplication;
 import com.alexanderberndt.appintegration.engine.testsupport.TestLoadingTask;
 import com.alexanderberndt.appintegration.pipeline.ProcessingPipeline;
 import com.alexanderberndt.appintegration.pipeline.builder.simple.SimplePipelineBuilder;
-import com.alexanderberndt.appintegration.pipeline.context.TaskContext;
-import com.alexanderberndt.appintegration.pipeline.task.ProcessingTask;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import javax.annotation.Nonnull;
 import java.util.Collections;
 
 import static com.alexanderberndt.appintegration.engine.testsupport.TestAppIntegrationFactory.SYSTEM_RESOURCE_LOADER_NAME;
@@ -42,18 +40,17 @@ class PropertiesTaskTest {
                 .withTaskParam("verify:hello.css", "This is a CSS value!")
                 .withTaskParam("verify:the-number", 42)
                 .addLoadingTask("load", new TestLoadingTask("Hello World!"))
-                .addProcessingTask("verify", new ProcessingTask() {
-                    @Override
-                    public void process(@Nonnull TaskContext context, @Nonnull ExternalResource resource) {
-                        stringValue.value = context.getValue("hello", String.class);
-                        numberValue.value = context.getValue("the-number", Integer.class);
-                    }
+                .addProcessingTask("verify", (context, resource) -> {
+                    stringValue.value = context.getValue("hello", String.class);
+                    numberValue.value = context.getValue("the-number", Integer.class);
                 })
                 .build();
 
-        engine = new TestAppIntegrationEngine();
-        engine.getFactory().registerApplication(testApplication);
-        engine.getFactory().registerPipeline("custom", pipeline);
+        final TestAppIntegrationFactory factory = new TestAppIntegrationFactory();
+        factory.registerApplication(testApplication);
+        factory.registerPipeline("custom", pipeline);
+
+        engine = new TestAppIntegrationEngine(factory, Slf4jLogAppender::new);
 
         stringValue = new TestValue<>();
         numberValue = new TestValue<>();

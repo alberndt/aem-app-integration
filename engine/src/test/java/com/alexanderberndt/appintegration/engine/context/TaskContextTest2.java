@@ -1,8 +1,8 @@
-package com.alexanderberndt.appintegration.pipeline.context;
+package com.alexanderberndt.appintegration.engine.context;
 
-import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
-import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
+import com.alexanderberndt.appintegration.engine.logging.appender.Slf4jLogAppender;
 import com.alexanderberndt.appintegration.engine.testsupport.TestAppIntegrationEngine;
+import com.alexanderberndt.appintegration.engine.testsupport.TestAppIntegrationFactory;
 import com.alexanderberndt.appintegration.engine.testsupport.TestApplication;
 import com.alexanderberndt.appintegration.engine.testsupport.TestLoadingTask;
 import com.alexanderberndt.appintegration.pipeline.ProcessingPipeline;
@@ -47,10 +47,11 @@ class TaskContextTest2 {
                 .withTaskParam("number", 42)
                 .build();
 
+        final TestAppIntegrationFactory factory = new TestAppIntegrationFactory();
+        factory.registerApplication(testApplication);
+        factory.registerPipeline("custom", pipeline);
 
-        engine = new TestAppIntegrationEngine();
-        engine.getFactory().registerApplication(testApplication);
-        engine.getFactory().registerPipeline("custom", pipeline);
+        engine = new TestAppIntegrationEngine(factory, Slf4jLogAppender::new);
 
         stringValue = new TestValue<>();
         numberValue = new TestValue<>();
@@ -59,7 +60,6 @@ class TaskContextTest2 {
 
     @Test
     void testTextRes() {
-        final ExternalResourceRef resourceRef = ExternalResourceRef.create("/test.txt", ExternalResourceType.TEXT);
         engine.getStaticResource(TEST_APP, "/test.txt");
         assertEquals("Hello World!", stringValue.value);
         assertEquals(new Integer(42), numberValue.value);
@@ -67,7 +67,6 @@ class TaskContextTest2 {
 
     @Test
     void prepareCssRes() {
-        final ExternalResourceRef resourceRef = ExternalResourceRef.create("/test.css", ExternalResourceType.CSS);
         engine.getStaticResource(TEST_APP, "/test.css");
         assertEquals("This is a CSS value!", stringValue.value);
         assertEquals(new Integer(42), numberValue.value);
