@@ -36,15 +36,6 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
 
     protected abstract void callBackgroundMethodWithContext(@Nonnull String applicationId, @Nonnull Consumer<C> consumer);
 
-    // ToDo: Allow async pre-fetching, globally limited thread pool
-
-    // ToDo: Support A/B Switch
-
-    // ToDo: Support Persistent Cache
-
-    // ToDo: Support Cache Headers
-
-
     /* Runtime methods */
 
     public ExternalResource getHtmlSnippet(@Nonnull I instance) {
@@ -156,10 +147,6 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
 
         }
 
-
-        // ToDo: Implement Cache Provider
-
-        // ToDo: Error handling or logging
     }
 
 
