@@ -1,9 +1,11 @@
 package com.alexanderberndt.appintegration.aem.engine;
 
 import com.alexanderberndt.appintegration.aem.engine.logging.AemLogAppender;
+import com.alexanderberndt.appintegration.engine.AbstractAppIntegrationEngine;
 import com.alexanderberndt.appintegration.engine.AppIntegrationEngine;
 import com.alexanderberndt.appintegration.engine.logging.LogAppender;
 import com.alexanderberndt.appintegration.engine.logging.appender.Slf4jLogAppender;
+import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
 import org.apache.sling.api.resource.*;
 import org.osgi.service.component.annotations.Component;
@@ -15,13 +17,14 @@ import javax.annotation.Nonnull;
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static org.apache.sling.api.resource.ResourceResolverFactory.SUBSERVICE;
 
 @Component(service = AemAppIntegrationEngine.class)
-public class AemAppIntegrationEngine extends AppIntegrationEngine<SlingApplicationInstance, AemGlobalContext> {
+public class AemAppIntegrationEngine extends AbstractAppIntegrationEngine<SlingApplicationInstance, AemGlobalContext> implements AppIntegrationEngine<SlingApplicationInstance> {
 
     private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -35,7 +38,34 @@ public class AemAppIntegrationEngine extends AppIntegrationEngine<SlingApplicati
 
 
     @Override
-    protected <R> R callRuntimeMethodWithContext(@Nonnull String applicationId, @Nonnull Function<AemGlobalContext, R> function) {
+    public ExternalResource getHtmlSnippet(@Nonnull SlingApplicationInstance instance) {
+        return callRuntimeMethodWithContext(instance.getApplicationId(), context -> super.getHtmlSnippet(context, instance));
+    }
+
+    @Override
+    public ExternalResource getStaticResource(@Nonnull String applicationId, @Nonnull String relativePath) {
+        return callRuntimeMethodWithContext(applicationId, context -> super.getStaticResource(context, relativePath));
+    }
+
+    @Override
+    public boolean isDynamicPath(@Nonnull String applicationId, String relativePath) {
+        return callRuntimeMethodWithContext(applicationId, context -> super.isDynamicPath(context, relativePath));
+    }
+
+    @Override
+    public List<String> getDynamicPaths(@Nonnull String applicationId) {
+        return callRuntimeMethodWithContext(applicationId, context -> super.getDynamicPaths(context));
+    }
+
+    @Override
+    public void prefetch(@Nonnull List<SlingApplicationInstance> applicationInstanceList) {
+        groupInstancesByApplicationId(applicationInstanceList,
+                (applicationId, groupedInstanceList) ->
+                        callBackgroundMethodWithContext(applicationId, context -> super.prefetch(context, groupedInstanceList))
+        );
+    }
+
+    private <R> R callRuntimeMethodWithContext(@Nonnull String applicationId, @Nonnull Function<AemGlobalContext, R> function) {
         try (ResourceResolver resolver = resolverFactory.getServiceResourceResolver(Collections.singletonMap(SUBSERVICE, SUB_SERVICE_ID))) {
             final LogAppender logAppender = new Slf4jLogAppender();
             final AemGlobalContext context = new AemGlobalContext(applicationId, factory, logAppender, resolver);
@@ -50,10 +80,9 @@ public class AemAppIntegrationEngine extends AppIntegrationEngine<SlingApplicati
         }
     }
 
-    @Override
-    protected void callBackgroundMethodWithContext(@Nonnull String applicationId, @Nonnull Consumer<AemGlobalContext> consumer) {
+    private void callBackgroundMethodWithContext(@Nonnull String applicationId, @Nonnull Consumer<AemGlobalContext> consumer) {
         try (ResourceResolver resolver = resolverFactory.getServiceResourceResolver(Collections.singletonMap(SUBSERVICE, SUB_SERVICE_ID))) {
-            final LogAppender logAppender = createLogAppender(resolver, applicationId);
+            final LogAppender logAppender = createPersistentLogAppender(resolver, applicationId);
             final AemGlobalContext context = new AemGlobalContext(applicationId, factory, logAppender, resolver);
 
             consumer.accept(context);
@@ -64,7 +93,7 @@ public class AemAppIntegrationEngine extends AppIntegrationEngine<SlingApplicati
         }
     }
 
-    public LogAppender createLogAppender(@Nonnull ResourceResolver resolver, @Nonnull String applicationId) throws PersistenceException {
+    public LogAppender createPersistentLogAppender(@Nonnull ResourceResolver resolver, @Nonnull String applicationId) throws PersistenceException {
 
         final GregorianCalendar now = new GregorianCalendar();
         final String rootPath = String.format("/var/aem-app-integration/logs/%1$s/%2$TY/%2$Tm/%2$Td/%2$TH/%2$TM", applicationId, now);

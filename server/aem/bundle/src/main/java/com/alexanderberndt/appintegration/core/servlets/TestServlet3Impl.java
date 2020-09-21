@@ -1,8 +1,8 @@
 package com.alexanderberndt.appintegration.core.servlets;
 
 import com.alexanderberndt.appintegration.aem.engine.AemAppIntegrationEngine;
-import com.alexanderberndt.appintegration.engine.logging.LogAppender;
 import com.alexanderberndt.appintegration.engine.logging.IntegrationLogger;
+import com.alexanderberndt.appintegration.engine.logging.LogAppender;
 import com.alexanderberndt.appintegration.engine.logging.LogStatus;
 import com.alexanderberndt.appintegration.engine.logging.ResourceLogger;
 import com.google.common.io.LineReader;
@@ -73,7 +73,7 @@ public class TestServlet3Impl extends SlingSafeMethodsServlet {
 
             LOG.info("Create Log-Appender");
 
-            LogAppender appender = integrationEngine.createLogAppender(resolver, "test-app");
+            LogAppender appender = integrationEngine.createPersistentLogAppender(resolver, "test-app");
             IntegrationLogger logger = new IntegrationLogger(appender);
             logger.addWarning("something went wrong with %s!", "test-servlet");
 

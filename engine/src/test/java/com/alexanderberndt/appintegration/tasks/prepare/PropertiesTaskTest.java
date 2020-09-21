@@ -1,5 +1,6 @@
 package com.alexanderberndt.appintegration.tasks.prepare;
 
+import com.alexanderberndt.appintegration.engine.AppIntegrationEngine;
 import com.alexanderberndt.appintegration.engine.logging.appender.Slf4jLogAppender;
 import com.alexanderberndt.appintegration.engine.testsupport.TestAppIntegrationEngine;
 import com.alexanderberndt.appintegration.engine.testsupport.TestAppIntegrationFactory;
@@ -22,7 +23,7 @@ class PropertiesTaskTest {
 
     private static final String TEST_APP = "test-app";
 
-    private TestAppIntegrationEngine engine;
+    private AppIntegrationEngine engine;
 
     private TestValue<String> stringValue;
 
