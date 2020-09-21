@@ -4,6 +4,7 @@ import com.alexanderberndt.appintegration.engine.context.GlobalContext;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
+import com.alexanderberndt.appintegration.engine.resources.ExternalResourcesSet;
 import com.alexanderberndt.appintegration.engine.resourcetypes.appinfo.ApplicationInfoJson;
 import com.alexanderberndt.appintegration.engine.resourcetypes.appinfo.ComponentInfoJson;
 import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
@@ -31,10 +32,18 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
     // Cache for application-infos.json objects
     private final Map<URI, TimestampValue<ApplicationInfoJson>> applicationInfoCache = Collections.synchronizedMap(new HashMap<>());
 
-    // ToDo: Integration-Log should differ by type (only save for pre-fetch)
     protected abstract <R> R callRuntimeMethodWithContext(@Nonnull String applicationId, @Nonnull Function<C, R> function);
 
     protected abstract void callBackgroundMethodWithContext(@Nonnull String applicationId, @Nonnull Consumer<C> consumer);
+
+    // ToDo: Allow async pre-fetching, globally limited thread pool
+
+    // ToDo: Support A/B Switch
+
+    // ToDo: Support Persistent Cache
+
+    // ToDo: Support Cache Headers
+
 
     /* Runtime methods */
 
@@ -123,8 +132,7 @@ public abstract class AppIntegrationEngine<I extends ApplicationInstance, C exte
 
 
         // Load all resolved snippets
-        // ToDo: Replace with ExternalResourceSet
-        final Set<ExternalResourceRef> referencedResourcesSet = new LinkedHashSet<>();
+        final ExternalResourcesSet referencedResourcesSet = new ExternalResourcesSet();
         for (URI snippetUri : resolvedSnippetsSet) {
             final ExternalResourceRef snippetRef = new ExternalResourceRef(snippetUri, ExternalResourceType.HTML_SNIPPET);
             try {
