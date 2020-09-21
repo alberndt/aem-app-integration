@@ -9,6 +9,7 @@ import com.alexanderberndt.appintegration.engine.resourcetypes.appinfo.Applicati
 import com.alexanderberndt.appintegration.engine.resourcetypes.appinfo.ComponentInfoJson;
 import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
 import com.alexanderberndt.appintegration.pipeline.ProcessingPipeline;
+import com.alexanderberndt.appintegration.utils.HashMapWithTimeout;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.slf4j.Logger;
@@ -29,7 +30,7 @@ public abstract class AbstractAppIntegrationEngine<I extends ApplicationInstance
     private final Map<String, Map<I, URI>> instanceToSnippetUriMapCache = Collections.synchronizedMap(new HashMap<>());
 
     // Cache for application-infos.json objects
-    private final Map<URI, TimestampValue<ApplicationInfoJson>> applicationInfoCache = Collections.synchronizedMap(new HashMap<>());
+    private final Map<URI, ApplicationInfoJson> applicationInfoCache = Collections.synchronizedMap(new HashMapWithTimeout<>());
 
     /* Runtime methods */
 
@@ -56,13 +57,20 @@ public abstract class AbstractAppIntegrationEngine<I extends ApplicationInstance
 
     }
 
-    @SuppressWarnings("unused")
     protected boolean isDynamicPath(@Nonnull C context, String relativePath) {
-        throw new UnsupportedOperationException("Not yet implemented!");
+        for (String dynamicPath : getDynamicPaths(context)) {
+            if (dynamicPath.startsWith(relativePath)) {
+                return true;
+            }
+        }
+        return false;
     }
 
+    @Nonnull
     protected List<String> getDynamicPaths(@Nonnull C context) {
-        throw new UnsupportedOperationException("method not implemented!");
+        final ApplicationInfoJson applicationInfoJson = getApplicationInfo(context, false);
+        final List<String> dynamicPathsList = applicationInfoJson.getDynamicPaths();
+        return (dynamicPathsList != null) ? dynamicPathsList : Collections.emptyList();
     }
 
     /* Prefetch methods */
@@ -153,9 +161,9 @@ public abstract class AbstractAppIntegrationEngine<I extends ApplicationInstance
 
         // try from cache
         if (!forceReload) {
-            final TimestampValue<ApplicationInfoJson> cachedAppInfoJson = applicationInfoCache.get(appInfoUri);
-            if ((cachedAppInfoJson != null) && cachedAppInfoJson.isFresh()) {
-                return cachedAppInfoJson.getValue();
+            final ApplicationInfoJson cachedAppInfoJson = applicationInfoCache.get(appInfoUri);
+            if (cachedAppInfoJson != null) {
+                return cachedAppInfoJson;
             }
         }
 
@@ -171,7 +179,7 @@ public abstract class AbstractAppIntegrationEngine<I extends ApplicationInstance
                 final ExternalResource loadedAppInfoResource = pipeline.loadAndProcessResourceRef(context, appInfoResourceRef);
                 final ApplicationInfoJson appInfoJson = loadedAppInfoResource.getContentAsParsedObject(ApplicationInfoJson.class);
                 Objects.requireNonNull(appInfoJson);
-                applicationInfoCache.put(appInfoUri, new TimestampValue<>(appInfoJson));
+                applicationInfoCache.put(appInfoUri, appInfoJson);
                 return appInfoJson;
             } catch (IOException e) {
                 throw new AppIntegrationException("Cannot load application-info.json", e);
@@ -222,26 +230,4 @@ public abstract class AbstractAppIntegrationEngine<I extends ApplicationInstance
         }
     }
 
-
-    private static class TimestampValue<T> {
-
-        private static final long CACHE_TIMEOUT_MILLIS = 1000L * 60L * 5L;
-
-        private final T value;
-
-        private final long timestamp;
-
-        public TimestampValue(T value) {
-            this.value = value;
-            this.timestamp = System.currentTimeMillis();
-        }
-
-        public T getValue() {
-            return value;
-        }
-
-        public boolean isFresh() {
-            return (timestamp + CACHE_TIMEOUT_MILLIS) < System.currentTimeMillis();
-        }
-    }
 }
