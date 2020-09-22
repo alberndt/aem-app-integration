@@ -15,7 +15,6 @@ import java.io.Reader;
 import java.io.Serializable;
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.function.Supplier;
@@ -49,7 +48,7 @@ public class ExternalResource {
     public ExternalResource(
             @Nonnull URI uri,
             @Nullable ExternalResourceType type,
-            @Nullable InputStream content,
+            @Nonnull InputStream content,
             @Nullable Map<String, Object> metadataMap,
             @Nullable TextParserSupplier textParserSupplier) {
         this.type = (type != null) ? type : ExternalResourceType.ANY;
@@ -59,13 +58,7 @@ public class ExternalResource {
     }
 
     public ExternalResource(
-            @Nonnull ExternalResourceRef resourceRef,
-            @Nonnull TextParserSupplier textParserSupplier) {
-        this(resourceRef.getUri(), resourceRef.getExpectedType(), null, null, textParserSupplier);
-    }
-
-    public ExternalResource(
-            @Nullable InputStream content,
+            @Nonnull InputStream content,
             @Nonnull ExternalResourceRef resourceRef,
             @Nullable TextParserSupplier textParserSupplier) {
         this(resourceRef.getUri(), resourceRef.getExpectedType(), content, null, textParserSupplier);
@@ -136,10 +129,7 @@ public class ExternalResource {
     }
 
     public Charset getCharset() {
-        Charset charset = content.getCharset();
-        // ToDo: Rethink charset handling
-        if (charset != null) return charset;
-        return (type != null) ? type.getDefaultCharset() : Charset.defaultCharset();
+        return content.getCharset();
     }
 
     public void setCharset(Charset charset) {
@@ -148,13 +138,12 @@ public class ExternalResource {
     }
 
 
-    public void addReference(String relativeUrl) throws URISyntaxException {
+    public void addReference(String relativeUrl) {
         this.addReference(relativeUrl, ExternalResourceType.ANY);
     }
 
-    public void addReference(String relativeUrl, ExternalResourceType expectedType) throws URISyntaxException {
+    public void addReference(String relativeUrl, ExternalResourceType expectedType) {
         LOG.debug("addReference({},{})", relativeUrl, expectedType);
-        // ToDo: Use ExternalResourceSet to identify duplicate resource references
         final URI referenceUri = this.getUri().resolve(relativeUrl);
         referencedResources.add(new ExternalResourceRef(referenceUri, expectedType));
     }
