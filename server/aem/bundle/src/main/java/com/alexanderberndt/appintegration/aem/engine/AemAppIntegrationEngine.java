@@ -68,7 +68,8 @@ public class AemAppIntegrationEngine extends AbstractAppIntegrationEngine<SlingA
     private <R> R callRuntimeMethodWithContext(@Nonnull String applicationId, @Nonnull Function<AemGlobalContext, R> function) {
         try (ResourceResolver resolver = resolverFactory.getServiceResourceResolver(Collections.singletonMap(SUBSERVICE, SUB_SERVICE_ID))) {
             final LogAppender logAppender = new Slf4jLogAppender();
-            final AemGlobalContext context = new AemGlobalContext(applicationId, factory, logAppender, resolver);
+            final AemExternalResourceCache cache = new AemExternalResourceCache(resolver, applicationId);
+            final AemGlobalContext context = new AemGlobalContext(applicationId, factory, cache, logAppender, resolver);
 
             final R result = function.apply(context);
             resolver.commit();
@@ -83,7 +84,8 @@ public class AemAppIntegrationEngine extends AbstractAppIntegrationEngine<SlingA
     private void callBackgroundMethodWithContext(@Nonnull String applicationId, @Nonnull Consumer<AemGlobalContext> consumer) {
         try (ResourceResolver resolver = resolverFactory.getServiceResourceResolver(Collections.singletonMap(SUBSERVICE, SUB_SERVICE_ID))) {
             final LogAppender logAppender = createPersistentLogAppender(resolver, applicationId);
-            final AemGlobalContext context = new AemGlobalContext(applicationId, factory, logAppender, resolver);
+            final AemExternalResourceCache cache = new AemExternalResourceCache(resolver, applicationId);
+            final AemGlobalContext context = new AemGlobalContext(applicationId, factory, cache, logAppender, resolver);
 
             consumer.accept(context);
             resolver.commit();

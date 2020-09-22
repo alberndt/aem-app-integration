@@ -1,6 +1,7 @@
 package com.alexanderberndt.appintegration.engine.testsupport;
 
 import com.alexanderberndt.appintegration.engine.AppIntegrationFactory;
+import com.alexanderberndt.appintegration.engine.ExternalResourceCache;
 import com.alexanderberndt.appintegration.engine.context.GlobalContext;
 import com.alexanderberndt.appintegration.engine.context.TaskContext;
 import com.alexanderberndt.appintegration.engine.logging.LogAppender;
@@ -14,8 +15,8 @@ import javax.annotation.Nullable;
 
 public class TestGlobalContext extends GlobalContext<TestAppInstance, TestGlobalContext> {
 
-    public TestGlobalContext(@Nonnull String applicationId, @Nonnull AppIntegrationFactory<TestAppInstance, TestGlobalContext> factory, @Nullable LogAppender logAppender) {
-        super(applicationId, factory, logAppender);
+    public TestGlobalContext(@Nonnull String applicationId, @Nonnull AppIntegrationFactory<TestAppInstance, TestGlobalContext> factory, @Nonnull ExternalResourceCache externalResourceCache, @Nullable LogAppender logAppender) {
+        super(applicationId, factory, externalResourceCache, logAppender);
     }
 
     @Nonnull

@@ -7,16 +7,21 @@ import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
 import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
 import com.alexanderberndt.appintegration.utils.DataMap;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class TestExternalResourceCache implements ExternalResourceCache {
 
@@ -24,10 +29,11 @@ public class TestExternalResourceCache implements ExternalResourceCache {
 
     private String writeVersionId;
 
-    private final Map<CacheKey, CacheValue> resourceCache = new HashMap<>();
+    private final Map<CacheKey, CacheValue> resourceCache = new LinkedHashMap<>();
 
+    @Nonnull
     @Override
-    public void storeResource(@Nonnull ExternalResource resource) {
+    public Supplier<InputStream> storeResource(@Nonnull ExternalResource resource) {
         final CacheKey key = new CacheKey(resource.getUri(), this.writeVersionId);
 
         final ByteArrayOutputStream tempContent = new ByteArrayOutputStream();
@@ -37,8 +43,9 @@ public class TestExternalResourceCache implements ExternalResourceCache {
             throw new AppIntegrationException("Couldn't read content of resource", e);
         }
         final CacheValue value = new CacheValue(tempContent.toByteArray(), new DataMap(resource.getMetadataMap()));
-
         resourceCache.put(key, value);
+
+        return () -> new ByteArrayInputStream(value.content);
     }
 
     @Override
@@ -93,6 +100,13 @@ public class TestExternalResourceCache implements ExternalResourceCache {
         } else {
             throw new AppIntegrationException("Cannot rollback long-running write, as it was not started yet.");
         }
+    }
+
+    public List<URI> getCacheKeys() {
+        return resourceCache.keySet().stream()
+                .filter(key -> (key.versionId == null) || StringUtils.equals(readVersionId, key.versionId))
+                .map(key -> key.uri)
+                .collect(Collectors.toList());
     }
 
     private static class CacheKey {

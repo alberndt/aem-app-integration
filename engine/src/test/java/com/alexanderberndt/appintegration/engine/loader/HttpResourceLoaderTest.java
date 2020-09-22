@@ -72,7 +72,7 @@ class HttpResourceLoaderTest {
                 new ByteArrayInputStream("Cached data".getBytes()), null);
 
         ExternalResourceRef ref = ExternalResourceRef.create("http://localhost:8089/test-url", ExternalResourceType.TEXT);
-        ref.setCachedExternalRes(() -> cachedRes);
+        ref.setCachedExternalRes(cachedRes);
         ref.setMetadata("HttpHeader.ETag", "12345");
 
 

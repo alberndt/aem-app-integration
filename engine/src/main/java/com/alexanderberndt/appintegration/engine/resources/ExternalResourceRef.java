@@ -9,7 +9,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.function.Supplier;
 
 public class ExternalResourceRef {
 
@@ -23,7 +22,7 @@ public class ExternalResourceRef {
     private final DataMap metadataMap = new DataMap();
 
     @Nullable
-    private Supplier<ExternalResource> cachedExternalRes;
+    private ExternalResource cachedExternalRes;
 
 
     public ExternalResourceRef(@Nonnull URI uri, @Nullable ExternalResourceType expectedType) {
@@ -76,11 +75,11 @@ public class ExternalResourceRef {
     }
 
     @Nullable
-    public Supplier<ExternalResource> getCachedExternalRes() {
+    public ExternalResource getCachedExternalRes() {
         return cachedExternalRes;
     }
 
-    public void setCachedExternalRes(@Nullable Supplier<ExternalResource> cachedExternalRes) {
+    public void setCachedExternalRes(@Nullable ExternalResource cachedExternalRes) {
         this.cachedExternalRes = cachedExternalRes;
     }
 

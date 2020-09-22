@@ -21,7 +21,7 @@ public class TestAppIntegrationEngine extends AbstractAppIntegrationEngine<TestA
     @Nonnull
     private final Supplier<LogAppender> appenderSupplier;
 
-    private final Map<String, ExternalResourceCache> resourceCacheMap = new HashMap<>();
+    private final Map<String, TestExternalResourceCache> resourceCacheMap = new HashMap<>();
 
     public TestAppIntegrationEngine() {
         this(new TestAppIntegrationFactory(), Slf4jLogAppender::new);
@@ -34,48 +34,44 @@ public class TestAppIntegrationEngine extends AbstractAppIntegrationEngine<TestA
 
     @Override
     public ExternalResource getHtmlSnippet(@Nonnull TestAppInstance instance) {
-        final String applicationId = instance.getApplicationId();
-        final TestGlobalContext context = new TestGlobalContext(applicationId, factory, appenderSupplier.get());
-        return super.getHtmlSnippet(context, instance);
+        return super.getHtmlSnippet(createGlobalContext(instance.getApplicationId()), instance);
     }
 
     @Override
     public ExternalResource getStaticResource(@Nonnull String applicationId, @Nonnull String relativePath) {
-        final TestGlobalContext context = new TestGlobalContext(applicationId, factory, appenderSupplier.get());
-        return super.getStaticResource(context, relativePath);
+        return super.getStaticResource(createGlobalContext(applicationId), relativePath);
     }
 
     @Override
     public boolean isDynamicPath(@Nonnull String applicationId, String relativePath) {
-        final TestGlobalContext context = new TestGlobalContext(applicationId, factory, appenderSupplier.get());
-        return super.isDynamicPath(context, relativePath);
+        return super.isDynamicPath(createGlobalContext(applicationId), relativePath);
     }
 
     @Override
     public List<String> getDynamicPaths(@Nonnull String applicationId) {
-        final TestGlobalContext context = new TestGlobalContext(applicationId, factory, appenderSupplier.get());
-        return super.getDynamicPaths(context);
+        return super.getDynamicPaths(createGlobalContext(applicationId));
     }
 
     @Override
     public void prefetch(@Nonnull List<TestAppInstance> applicationInstanceList) {
         groupInstancesByApplicationId(applicationInstanceList,
-                (applicationId, groupedInstanceList) -> {
-                    final TestGlobalContext context = new TestGlobalContext(applicationId, factory, appenderSupplier.get());
-                    super.prefetch(context, groupedInstanceList);
-                });
+                (applicationId, groupedInstanceList) ->
+                        super.prefetch(createGlobalContext(applicationId), groupedInstanceList));
     }
 
-    public void setExternalResourceCache(String applicationId, ExternalResourceCache cache) {
-        resourceCacheMap.put(applicationId, cache);
-    }
-
-    public ExternalResourceCache getExternalResourceCache(String applicationId) {
-        return resourceCacheMap.get(applicationId);
+    public TestExternalResourceCache getExternalResourceCache(String applicationId) {
+        return resourceCacheMap.computeIfAbsent(applicationId, id -> new TestExternalResourceCache());
     }
 
     @Nonnull
     public TestAppIntegrationFactory getFactory() {
         return factory;
     }
+
+    @Nonnull
+    protected TestGlobalContext createGlobalContext(String applicationId) {
+        final ExternalResourceCache cache = getExternalResourceCache(applicationId);
+        return new TestGlobalContext(applicationId, factory, cache, appenderSupplier.get());
+    }
+
 }

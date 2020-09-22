@@ -8,12 +8,14 @@ import javax.annotation.concurrent.Immutable;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.Collection;
+import java.util.Objects;
+import java.util.function.Supplier;
 
 @Immutable
 public final class ConvertibleValue<T> {
 
-    @Nullable
-    private final T value;
+    @Nonnull
+    private final LazyValue<T> lazyValue;
 
     @Nonnull
     private final Charset charset;
@@ -21,15 +23,20 @@ public final class ConvertibleValue<T> {
     @Nonnull
     private final TextParserSupplier textParsersSupplier;
 
-    public ConvertibleValue(@Nullable T value, @Nonnull Charset charset, @Nullable TextParserSupplier textParsersSupplier) {
-        this.value = value;
+
+    private ConvertibleValue(@Nonnull LazyValue<T> lazyValue, @Nonnull Charset charset, @Nullable TextParserSupplier textParsersSupplier) {
+        this.lazyValue = lazyValue;
         this.charset = charset;
         this.textParsersSupplier = (textParsersSupplier != null) ? textParsersSupplier : () -> null;
     }
 
-    @Nullable
+    public ConvertibleValue(@Nonnull T value, @Nonnull Charset charset, @Nullable TextParserSupplier textParsersSupplier) {
+        this(new LazyValue<>(value), charset, textParsersSupplier);
+    }
+
+    @Nonnull
     public T get() {
-        return value;
+        return lazyValue.get();
     }
 
     @Nonnull
@@ -37,20 +44,19 @@ public final class ConvertibleValue<T> {
         return charset;
     }
 
-    @Nullable
-    @SuppressWarnings("unchecked")
-    public Class<T> getValueType() {
-        return (value != null) ? (Class<T>) value.getClass() : null;
-    }
-
     @Nonnull
     public ConvertibleValue<T> recreateWithNewCharset(@Nonnull Charset newCharset) {
-        return new ConvertibleValue<>(value, newCharset, textParsersSupplier);
+        return new ConvertibleValue<>(lazyValue, newCharset, textParsersSupplier);
     }
 
     @Nonnull
-    public <C> ConvertibleValue<C> recreateWithNewContent(@Nullable C newValue) {
+    public <C> ConvertibleValue<C> recreateWithNewContent(@Nonnull C newValue) {
         return new ConvertibleValue<>(newValue, charset, textParsersSupplier);
+    }
+
+    @Nonnull
+    public <C> ConvertibleValue<C> recreateWithSupplier(@Nonnull Supplier<C> valueSupplier, @Nonnull Class<C> type) {
+        return new ConvertibleValue<>(new LazyValue<>(valueSupplier, type), charset, textParsersSupplier);
     }
 
     @Nonnull
@@ -68,27 +74,27 @@ public final class ConvertibleValue<T> {
     public <C> ConvertibleValue<C> convertTo(@Nonnull Class<C> targetClass) throws IOException {
 
         // is no conversion needed? (plus null checking, to avoid warnings)
-        if ((this.value == null) || (this.getValueType() == null) || targetClass.isInstance(value)) {
+        if (targetClass.isAssignableFrom(lazyValue.getType())) {
             return (ConvertibleValue<C>) this;
         }
 
-        if (this.value instanceof InputStream) {
+        if (lazyValue.isInstanceOf(InputStream.class)) {
             // convert to Reader
-            ConvertibleValue<Reader> readerValue = recreateWithNewContent(new InputStreamReader((InputStream) this.value, charset));
+            ConvertibleValue<Reader> readerValue = recreateWithNewContent(new InputStreamReader((InputStream) this.lazyValue.get(), charset));
             if (targetClass.equals(Reader.class)) {
                 return (ConvertibleValue<C>) readerValue;
             } else {
                 return readerValue.convertTo(targetClass);
             }
-        } else if (this.value instanceof Reader) {
+        } else if (lazyValue.isInstanceOf(Reader.class)) {
             if (targetClass.equals(InputStream.class)) {
-                return (ConvertibleValue<C>) recreateWithNewContent(new ReaderInputStream((Reader) this.value, this.charset));
+                return (ConvertibleValue<C>) recreateWithNewContent(new ReaderInputStream((Reader) this.lazyValue.get(), this.charset));
             } else {
-                final C parsedObj = parse((Reader) this.value, targetClass);
+                final C parsedObj = parse((Reader) this.lazyValue.get(), targetClass);
                 return recreateWithNewContent(parsedObj);
             }
         } else {
-            final Reader reader = serialize(this.value);
+            final Reader reader = serialize(this.lazyValue.get());
             return recreateWithNewContent(reader).convertTo(targetClass);
         }
     }
@@ -106,15 +112,11 @@ public final class ConvertibleValue<T> {
         }
     }
 
+    @Nonnull
     private Reader serialize(T value) throws IOException {
-        final Class<T> sourceClass = this.getValueType();
-        if (sourceClass != null) {
-            final TextParser textParser = requireTextSerializer(sourceClass);
-            final String content = textParser.serialize(value);
-            return new StringReader(content);
-        } else {
-            return null;
-        }
+        final TextParser textParser = requireTextSerializer(lazyValue.getType());
+        final String content = textParser.serialize(value);
+        return new StringReader(content);
     }
 
     @Nonnull
@@ -137,6 +139,50 @@ public final class ConvertibleValue<T> {
             }
         }
         throw new ConversionException("Cannot serialize " + sourceClass);
+    }
+
+    private static class LazyValue<T> {
+
+        @Nullable
+        private Supplier<T> valueSupplier;
+
+        @Nullable
+        private T resolvedValue;
+
+        @Nonnull
+        private final Class<T> type;
+
+
+        public LazyValue(@Nonnull Supplier<T> valueSupplier, @Nonnull Class<T> type) {
+            this.valueSupplier = valueSupplier;
+            this.resolvedValue = null;
+            this.type = type;
+        }
+
+        @SuppressWarnings("unchecked")
+        public LazyValue(@Nonnull T value) {
+            this.valueSupplier = null;
+            this.resolvedValue = value;
+            this.type = (Class<T>) value.getClass();
+        }
+
+        @Nonnull
+        public T get() {
+            if (valueSupplier != null) {
+                resolvedValue = valueSupplier.get();
+                valueSupplier = null;
+            }
+            return Objects.requireNonNull(resolvedValue);
+        }
+
+        @Nonnull
+        public Class<T> getType() {
+            return type;
+        }
+
+        public boolean isInstanceOf(@Nonnull Class<?> targetType) {
+            return targetType.isAssignableFrom(type);
+        }
     }
 
 }

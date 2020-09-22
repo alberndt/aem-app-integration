@@ -12,7 +12,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class ConvertibleValueTest {
 
@@ -29,34 +30,7 @@ class ConvertibleValueTest {
                 Arguments.of("String Value", new ConvertibleValue<>(TEST_DATA, StandardCharsets.UTF_8, CONVERSION_SUPPLIER)),
                 Arguments.of("Parsed Text", new ConvertibleValue<>(new ParsedText5(TEST_DATA), StandardCharsets.UTF_8, CONVERSION_SUPPLIER)),
                 Arguments.of("Reader Value", new ConvertibleValue<>(new StringReader(TEST_DATA), StandardCharsets.UTF_8, CONVERSION_SUPPLIER)),
-//                Arguments.of("ByteArray Value", new ConvertibleValue<>(TEST_DATA.getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8)),
                 Arguments.of("InputStream Value", new ConvertibleValue<>(new ByteArrayInputStream(TEST_DATA.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8, CONVERSION_SUPPLIER))
-//                Arguments.of("Object Value with String-TextParser", new ConvertibleValue<>(
-//                        42, StandardCharsets.UTF_8, i -> (i == 42) ? TEST_DATA : "something else")),
-//                Arguments.of("Object Value with Reader-TextParser", new ConvertibleValue<>(
-//                        42, StandardCharsets.UTF_8, i -> new StringReader((i == 42) ? TEST_DATA : "something else"))),
-//                Arguments.of("Object Value with ByteArray-TextParser", new ConvertibleValue<>(
-//                        42, StandardCharsets.UTF_8, i -> ((i == 42) ? TEST_DATA : "something else").getBytes(StandardCharsets.UTF_8))),
-//                Arguments.of("Object Value with InputStream-TextParser", new ConvertibleValue<>(
-//                        42, StandardCharsets.UTF_8, i -> new ByteArrayInputStream(((i == 42) ? TEST_DATA : "something else").getBytes(StandardCharsets.UTF_8))))
-        );
-    }
-
-    private static Stream<Arguments> provideNullValues() {
-        return Stream.of(
-                Arguments.of("Null Value", new ConvertibleValue<>(null, StandardCharsets.UTF_8, CONVERSION_SUPPLIER))
-//                Arguments.of("String Value", new ConvertibleValue<>(null, StandardCharsets.UTF_8)),
-//                Arguments.of("Reader Value", new ConvertibleValue<>(null, StandardCharsets.UTF_8)),
-//                Arguments.of("ByteArray Value", new ConvertibleValue<>(null, StandardCharsets.UTF_8)),
-//                Arguments.of("InputStream Value", new ConvertibleValue<>(null, StandardCharsets.UTF_8))
-//                Arguments.of("Object Value with String-TextParser", new ConvertibleObjectValue<Integer>(
-//                        null, StandardCharsets.UTF_8, i -> "something else")),
-//                Arguments.of("Object Value with Reader-TextParser", new ConvertibleObjectValue<Integer>(
-//                        null, StandardCharsets.UTF_8, i -> new StringReader((i == null) ? null : "something else"))),
-//                Arguments.of("Object Value with ByteArray-TextParser", new ConvertibleObjectValue<Integer>(
-//                        null, StandardCharsets.UTF_8, i -> ((i == null) ? TEST_DATA : "something else").getBytes(StandardCharsets.UTF_8))),
-//                Arguments.of("Object Value with InputStream-TextParser", new ConvertibleObjectValue<Integer>(
-//                        null, StandardCharsets.UTF_8, i -> new ByteArrayInputStream(((i == 42) ? TEST_DATA : "something else").getBytes(StandardCharsets.UTF_8))))
         );
     }
 
@@ -103,39 +77,6 @@ class ConvertibleValueTest {
         assertNotNull(resource, "conversion of " + inputTypeName + " should return something");
         assertEquals(TEST_DATA, resource.get().getText(), "conversion of " + inputTypeName + " should return expected result");
     }
-
-    @ParameterizedTest(name = "{index} {0}")
-    @MethodSource("provideNullValues")
-    void convertNullToString(String inputTypeName, ConvertibleValue<?> inputResource) throws IOException {
-        ConvertibleValue<String> resource = inputResource.convertTo(String.class);
-        assertNotNull(resource, "conversion of " + inputTypeName + " should return something");
-        assertNull(resource.get(), "conversion of " + inputTypeName + " should return a null-value");
-    }
-
-    @ParameterizedTest(name = "{index} {0}")
-    @MethodSource("provideNullValues")
-    void convertNullToReader(String inputTypeName, ConvertibleValue<?> inputResource) throws IOException {
-        ConvertibleValue<Reader> resource = inputResource.convertToReaderValue();
-        assertNotNull(resource, "conversion of " + inputTypeName + " should return something");
-        assertNull(resource.get(), "conversion of " + inputTypeName + " should return a null-value");
-    }
-
-//    @ParameterizedTest(name = "{index} {0}")
-//    @MethodSource("provideNullValues")
-//    void convertNullToByteArray(String inputTypeName, ConvertibleValue<?> inputResource) throws IOException {
-//        ConvertibleValue<byte[]> resource = inputResource.convertToByteArrayValue();
-//        assertNotNull(resource, "conversion of " + inputTypeName + " should return something");
-//        assertNull(resource.get(), "conversion of " + inputTypeName + " should return a null-value");
-//    }
-
-    @ParameterizedTest(name = "{index} {0}")
-    @MethodSource("provideNullValues")
-    void convertNullToInputStream(String inputTypeName, ConvertibleValue<?> inputResource) throws IOException {
-        ConvertibleValue<InputStream> resource = inputResource.convertToInputStreamValue();
-        assertNotNull(resource, "conversion of " + inputTypeName + " should return something");
-        assertNull(resource.get(), "conversion of " + inputTypeName + " should return a null-value");
-    }
-
 
     private static class ParsedText {
 

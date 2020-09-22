@@ -1,5 +1,6 @@
 package com.alexanderberndt.appintegration.engine.context;
 
+import com.alexanderberndt.appintegration.engine.ExternalResourceCache;
 import com.alexanderberndt.appintegration.engine.ResourceLoader;
 import com.alexanderberndt.appintegration.engine.logging.AbstractLogger;
 import com.alexanderberndt.appintegration.engine.logging.TaskLogger;
@@ -89,6 +90,12 @@ public class TaskContext {
     public ExternalResourceFactory getResourceFactory() {
         return globalContext.getResourceFactory();
     }
+
+    @Nonnull
+    public ExternalResourceCache getExternalResourceCache() {
+        return globalContext.getExternalResourceCache();
+    }
+
 
     public Object getValue(@Nonnull String key) {
         final NamespaceKey nk = parseNamespaceKey(key, false,

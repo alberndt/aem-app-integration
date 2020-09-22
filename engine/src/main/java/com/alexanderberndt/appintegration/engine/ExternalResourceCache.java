@@ -6,10 +6,13 @@ import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.io.InputStream;
+import java.util.function.Supplier;
 
 public interface ExternalResourceCache {
 
-    void storeResource(@Nonnull ExternalResource resource);
+    @Nonnull
+    Supplier<InputStream> storeResource(@Nonnull ExternalResource resource);
 
     void markResourceRefreshed(@Nonnull ExternalResource resource);
 

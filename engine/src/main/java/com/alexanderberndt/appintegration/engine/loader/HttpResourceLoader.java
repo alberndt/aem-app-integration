@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 import static java.net.HttpURLConnection.*;
 
@@ -103,7 +102,6 @@ public class HttpResourceLoader implements ResourceLoader {
                     LOG.info("Not modified - take the cached version");
                     final ExternalResource cachedResource = Optional.of(resourceRef)
                             .map(ExternalResourceRef::getCachedExternalRes)
-                            .map(Supplier::get)
                             .orElse(null);
 
                     if (cachedResource != null) {

@@ -18,6 +18,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
 public class ExternalResource {
@@ -112,11 +113,15 @@ public class ExternalResource {
         this.content = this.content.recreateWithNewContent(reader);
     }
 
+    public <C> void setContentSupplier(@Nonnull Supplier<C> supplier, @Nonnull Class<C> type) {
+        LOG.debug("setContent(Supplier<{}> = {})", type, supplier);
+        this.content = this.content.recreateWithSupplier(supplier, type);
+    }
+
     public void appendInputStreamFilter(UnaryOperator<InputStream> filterGenerator) {
         final InputStream inputStream = this.getContentAsInputStream();
         this.setContent(filterGenerator.apply(inputStream));
     }
-
 
 
     public <C> C getContentAsParsedObject(@Nonnull Class<C> expectedType) throws IOException {

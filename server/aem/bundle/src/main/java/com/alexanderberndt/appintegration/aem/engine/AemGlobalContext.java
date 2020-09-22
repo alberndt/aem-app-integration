@@ -1,6 +1,7 @@
 package com.alexanderberndt.appintegration.aem.engine;
 
 import com.alexanderberndt.appintegration.engine.AppIntegrationFactory;
+import com.alexanderberndt.appintegration.engine.ExternalResourceCache;
 import com.alexanderberndt.appintegration.engine.context.GlobalContext;
 import com.alexanderberndt.appintegration.engine.context.TaskContext;
 import com.alexanderberndt.appintegration.engine.logging.LogAppender;
@@ -18,8 +19,8 @@ public class AemGlobalContext extends GlobalContext<SlingApplicationInstance, Ae
     @Nonnull
     private final ResourceResolver resourceResolver;
 
-    public AemGlobalContext(@Nonnull String applicationId, @Nonnull AppIntegrationFactory<SlingApplicationInstance, AemGlobalContext> factory, @Nullable LogAppender logAppender, @Nonnull ResourceResolver resourceResolver) {
-        super(applicationId, factory, logAppender);
+    public AemGlobalContext(@Nonnull String applicationId, @Nonnull AppIntegrationFactory<SlingApplicationInstance, AemGlobalContext> factory, @Nonnull ExternalResourceCache externalResourceCache, @Nullable LogAppender logAppender, @Nonnull ResourceResolver resourceResolver) {
+        super(applicationId, factory, externalResourceCache, logAppender);
         this.resourceResolver = resourceResolver;
     }
 

@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Iterator;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -40,33 +39,18 @@ class ExternalResourcesSetTest {
         externalResourcesSet.add(new ExternalResourceRef(cssUri, ExternalResourceType.TEXT));
         assertEquals(2, externalResourcesSet.size());
 
-        Iterator<ExternalResourceRef> iterator = externalResourcesSet.iterator();
 
-        assertTrue(iterator.hasNext());
-        ExternalResourceRef ref1 = iterator.next();
+        assertTrue(externalResourcesSet.hasMoreUnprocessed());
+        ExternalResourceRef ref1 = externalResourcesSet.nextUnprocessed();
         assertEquals(imageUri, ref1.getUri());
         assertEquals(ExternalResourceType.BINARY, ref1.getExpectedType());
 
 
-        assertTrue(iterator.hasNext());
-        ExternalResourceRef ref2 = iterator.next();
+        assertTrue(externalResourcesSet.hasMoreUnprocessed());
+        ExternalResourceRef ref2 = externalResourcesSet.nextUnprocessed();
         assertEquals(cssUri, ref2.getUri());
         assertEquals(ExternalResourceType.CSS, ref2.getExpectedType());
 
-        assertFalse(iterator.hasNext());
-    }
-
-    @Test
-    void equals() {
-        externalResourcesSet.add(new ExternalResourceRef(imageUri, ExternalResourceType.BINARY));
-        externalResourcesSet.add(new ExternalResourceRef(cssUri, ExternalResourceType.CSS));
-
-        final ExternalResourcesSet externalResourcesSet2 = new ExternalResourcesSet();
-        externalResourcesSet2.add(new ExternalResourceRef(imageUri, ExternalResourceType.ANY));
-        externalResourcesSet2.add(new ExternalResourceRef(cssUri, ExternalResourceType.TEXT));
-
-        assertEquals(externalResourcesSet.hashCode(), externalResourcesSet2.hashCode());
-        assertEquals(externalResourcesSet2, externalResourcesSet);
-        assertEquals(externalResourcesSet, externalResourcesSet2);
+        assertFalse(externalResourcesSet.hasMoreUnprocessed());
     }
 }

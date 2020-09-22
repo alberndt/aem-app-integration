@@ -20,6 +20,7 @@ import java.net.URISyntaxException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static org.apache.jackrabbit.JcrConstants.*;
@@ -75,6 +76,8 @@ public class AemExternalResourceCache implements ExternalResourceCache {
         }
     }
 
+
+    // ToDo: Make continueLongRunningWrite implicit
     @Override
     public void continueLongRunningWrite() {
         if (versionId == null) {
@@ -157,8 +160,9 @@ public class AemExternalResourceCache implements ExternalResourceCache {
     }
 
 
+    @Nonnull
     @Override
-    public void storeResource(@Nonnull ExternalResource resource) {
+    public Supplier<InputStream> storeResource(@Nonnull ExternalResource resource) {
 
         try {
             // find existing entry
@@ -190,6 +194,8 @@ public class AemExternalResourceCache implements ExternalResourceCache {
             propertiesMap.put(JCR_MIMETYPE, "text/plain");
             propertiesMap.put(JCR_DATA, resource.getContentAsInputStream());
             resolver.create(res, JCR_CONTENT, propertiesMap);
+
+            return () -> res.adaptTo(InputStream.class);
 
         } catch (IOException e) {
             throw new AppIntegrationException("Cannot store resource " + resource.getUri(), e);

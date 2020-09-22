@@ -34,6 +34,9 @@ public abstract class GlobalContext<I extends ApplicationInstance, C extends Glo
     private final AppIntegrationFactory<I, C> factory;
 
     @Nonnull
+    private final ExternalResourceCache externalResourceCache;
+
+    @Nonnull
     private final IntegrationLogger logger;
 
     private final PipelineConfiguration processingParams = new PipelineConfiguration();
@@ -48,9 +51,16 @@ public abstract class GlobalContext<I extends ApplicationInstance, C extends Glo
 
     private final LazyValue<List<ContextProvider<I>>> contextProviderListLazyValue = new LazyValue<>();
 
-    protected GlobalContext(@Nonnull String applicationId, @Nonnull AppIntegrationFactory<I, C> factory, @Nullable LogAppender logAppender) {
+
+    protected GlobalContext(
+            @Nonnull String applicationId,
+            @Nonnull AppIntegrationFactory<I, C> factory,
+            @Nonnull ExternalResourceCache externalResourceCache,
+            @Nullable LogAppender logAppender) {
+
         this.applicationId = applicationId;
         this.factory = factory;
+        this.externalResourceCache = externalResourceCache;
         this.logger = new IntegrationLogger((logAppender != null) ? logAppender : new Slf4jLogAppender());
     }
 
@@ -170,6 +180,11 @@ public abstract class GlobalContext<I extends ApplicationInstance, C extends Glo
     @Nonnull
     public IntegrationLogger getIntegrationLog() {
         return logger;
+    }
+
+    @Nonnull
+    public ExternalResourceCache getExternalResourceCache() {
+        return externalResourceCache;
     }
 
 

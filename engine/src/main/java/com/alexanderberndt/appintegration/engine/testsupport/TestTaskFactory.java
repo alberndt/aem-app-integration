@@ -4,6 +4,8 @@ import com.alexanderberndt.appintegration.pipeline.TaskFactory;
 import com.alexanderberndt.appintegration.pipeline.task.LoadingTask;
 import com.alexanderberndt.appintegration.pipeline.task.PreparationTask;
 import com.alexanderberndt.appintegration.pipeline.task.ProcessingTask;
+import com.alexanderberndt.appintegration.tasks.cache.ReadFromCacheTask;
+import com.alexanderberndt.appintegration.tasks.cache.StoreInCacheTask;
 import com.alexanderberndt.appintegration.tasks.load.DownloadTask;
 import com.alexanderberndt.appintegration.tasks.prepare.PropertiesTask;
 import com.alexanderberndt.appintegration.tasks.process.AddReferencedResourceTask;
@@ -29,6 +31,9 @@ public class TestTaskFactory implements TaskFactory {
         registerTask("add-referenced-resources", new AddReferencedResourceTask());
         registerTask("file-size-validation", new FileSizeValidationTask());
         registerTask("regex-validation", new RegexValidationTask());
+        registerTask("store-in-cache", new StoreInCacheTask());
+        registerTask("read-from-cache", new ReadFromCacheTask());
+
     }
 
     @Nullable

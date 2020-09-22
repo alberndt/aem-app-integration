@@ -1,5 +1,7 @@
 prepare:
 
+  read-from-cache:
+
 load:
   download:
 
@@ -20,3 +22,6 @@ process:
       level-default.html: warn
       level.text: "${stacktrace-in-html.error-level}"
       level-default.text: warn
+
+  store-in-cache:
+

@@ -19,6 +19,8 @@ import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.BiConsumer;
 
@@ -80,8 +82,11 @@ public abstract class AbstractAppIntegrationEngine<I extends ApplicationInstance
 
         LOG.info("prefetch {} instances for application {}", applicationInstanceList.size(), context.getApplicationId());
 
-        // build processing pipeline
-        final ProcessingPipeline pipeline = context.getProcessingPipeline();
+        final String curJobName = "prefetch_" + DateTimeFormatter.ISO_DATE_TIME.format(LocalDateTime.now());
+        if (!context.getExternalResourceCache().startLongRunningWrite(curJobName)) {
+            context.getIntegrationLog().addWarning("Couldn't lock resource-cache. Abort prefetch-operation!");
+            return;
+        }
 
         // load application-properties.json
         final ApplicationInfoJson applicationInfo = getApplicationInfo(context, true);
@@ -93,14 +98,14 @@ public abstract class AbstractAppIntegrationEngine<I extends ApplicationInstance
             resolvedSnippetsSet.add(snippetUri);
         }
 
-
-        // Load all resolved snippets
+        final ProcessingPipeline pipeline = context.getProcessingPipeline();
         final ExternalResourcesSet referencedResourcesSet = new ExternalResourcesSet();
         for (URI snippetUri : resolvedSnippetsSet) {
             final ExternalResourceRef snippetRef = new ExternalResourceRef(snippetUri, ExternalResourceType.HTML_SNIPPET);
             try {
                 final ExternalResource snippetRes = pipeline.loadAndProcessResourceRef(context, snippetRef);
                 referencedResourcesSet.addAll(snippetRes.getReferencedResources());
+                context.getExternalResourceCache().continueLongRunningWrite();
             } catch (AppIntegrationException e) {
                 LOG.error("cannot load", e);
             }
@@ -108,16 +113,21 @@ public abstract class AbstractAppIntegrationEngine<I extends ApplicationInstance
 
 
         // load all referenced resources (which may could load more)
-        for (ExternalResourceRef resourceRef : referencedResourcesSet) {
+        while (referencedResourcesSet.hasMoreUnprocessed()) {
+            final ExternalResourceRef resourceRef = referencedResourcesSet.nextUnprocessed();
             final ExternalResource resource;
             try {
                 resource = pipeline.loadAndProcessResourceRef(context, resourceRef);
                 referencedResourcesSet.addAll(resource.getReferencedResources());
+                context.getExternalResourceCache().continueLongRunningWrite();
             } catch (AppIntegrationException e) {
                 LOG.error("cannot load", e);
             }
 
         }
+
+        context.getExternalResourceCache().commitLongRunningWrite();
+
 
     }
 
