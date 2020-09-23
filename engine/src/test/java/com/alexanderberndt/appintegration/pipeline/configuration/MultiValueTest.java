@@ -1,7 +1,6 @@
 package com.alexanderberndt.appintegration.pipeline.configuration;
 
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -33,14 +32,6 @@ class MultiValueTest {
     }
 
     @Test
-    @Disabled
-    @SuppressWarnings("ConstantConditions")
-    void createByValue3() {
-        assertThrows(IllegalArgumentException.class, () -> MultiValue.createByValue(null, ExternalResourceType.ANY, 100));
-        assertThrows(IllegalArgumentException.class, () -> MultiValue.createByValue(null, ExternalResourceType.ANY, null));
-    }
-
-    @Test
     void setValue1() throws ConfigurationException {
         MultiValue value = new MultiValue();
         value.setValue(Ranking.PIPELINE_DEFINITION, ExternalResourceType.ANY, 100);
@@ -60,17 +51,7 @@ class MultiValueTest {
         assertNull(value.getTypeName());
     }
 
-    @Test
-    @Disabled
-    @SuppressWarnings("ConstantConditions")
-    void setValue3() {
-        MultiValue value = new MultiValue();
-
-        assertThrows(IllegalArgumentException.class, () -> value.setValue(null, ExternalResourceType.ANY, 100));
-        assertThrows(IllegalArgumentException.class, () -> value.setValue(null, ExternalResourceType.ANY, null));
-    }
-
-    @Test
+      @Test
     void setStringTypeToNull() {
         MultiValue value1 = MultiValue.createByType(String.class);
         assertDoesNotThrow(() -> value1.setValue(Ranking.PIPELINE_DEFINITION, ExternalResourceType.ANY, null));
@@ -141,15 +122,7 @@ class MultiValueTest {
     }
 
     @Test
-    @Disabled
-    @SuppressWarnings("ConstantConditions")
-    void createByType3() {
-        assertThrows(IllegalArgumentException.class, () -> MultiValue.createByValue(null, ExternalResourceType.ANY, 100));
-        assertThrows(IllegalArgumentException.class, () -> MultiValue.createByValue(null, ExternalResourceType.ANY, null));
-    }
-
-    @Test
-    void setType1() throws ConfigurationException {
+    void setType() throws ConfigurationException {
         MultiValue value = new MultiValue();
         value.setType(Integer.class);
 
@@ -158,28 +131,6 @@ class MultiValueTest {
         assertEquals("Integer", value.getTypeName());
     }
 
-    @Test
-    @Disabled
-    @SuppressWarnings("ConstantConditions")
-    void setType2() {
-        MultiValue value = new MultiValue();
-        assertThrows(IllegalArgumentException.class, () -> value.setType(null));
-
-        assertNull(value.getValue(ExternalResourceType.ANY));
-        assertNull(value.getType());
-        assertNull(value.getTypeName());
-    }
-
-    @Test
-    @Disabled
-    @SuppressWarnings("ConstantConditions")
-    void setType3() throws ConfigurationException {
-        MultiValue value = new MultiValue();
-        value.setType(String.class);
-        assertThrows(IllegalArgumentException.class, () -> value.setType(null));
-    }
-
-    // ToDo: Refactor - makes no sense anymore
     @Test
     void setTypesWithDifferentRanks() throws ConfigurationException {
         MultiValue value = new MultiValue();
