@@ -20,10 +20,6 @@ public abstract class LineFilterReader extends Reader {
 
     /**
      * if null, then line is skipped in output. if empty string, then the line-end of the current line is in output.
-     *
-     * @param line
-     * @return
-     * @throws IOException
      */
     protected abstract String filterLine(String line) throws IOException;
 
@@ -51,14 +47,14 @@ public abstract class LineFilterReader extends Reader {
                 return -1;
             } else {
                 curFilteredLinePos = 0;
-                isBeforeLineEnd = curFilteredLine.getLine().length() > 0;
+                isBeforeLineEnd = curFilteredLine.getLineContent().length() > 0;
             }
         }
 
         final int nextChar;
         if (isBeforeLineEnd) {
-            nextChar = curFilteredLine.getLine().charAt(curFilteredLinePos++);
-            if (curFilteredLinePos >= curFilteredLine.getLine().length()) {
+            nextChar = curFilteredLine.getLineContent().charAt(curFilteredLinePos++);
+            if (curFilteredLinePos >= curFilteredLine.getLineContent().length()) {
                 isBeforeLineEnd = false;
                 curFilteredLinePos = 0;
             }
@@ -84,7 +80,7 @@ public abstract class LineFilterReader extends Reader {
             if (inputLine == null) {
                 return null;
             }
-            filteredLine = filterLine(inputLine.getLine());
+            filteredLine = filterLine(inputLine.getLineContent());
         } while (filteredLine == null);
 
         return new Line(filteredLine, inputLine.getLineEnd());
@@ -132,16 +128,16 @@ public abstract class LineFilterReader extends Reader {
 
     private static class Line {
 
-        private final String line;
+        private final String lineContent;
         private final String lineEnd;
 
-        public Line(String line, String lineEnd) {
-            this.line = line;
+        public Line(String lineContent, String lineEnd) {
+            this.lineContent = lineContent;
             this.lineEnd = lineEnd;
         }
 
-        public String getLine() {
-            return line;
+        public String getLineContent() {
+            return lineContent;
         }
 
         public String getLineEnd() {

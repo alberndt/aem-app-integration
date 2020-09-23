@@ -18,7 +18,23 @@ import javax.annotation.Nonnull;
  */
 public interface ProcessingTask {
 
+    enum Status {
+        NOTHING_DONE,
+        SKIPPED,
+        OK,
+        WARNING,
+        ERROR;
 
+        public Status mergeStatus(Status newStatus) {
+            if ((newStatus != null) && (this.ordinal() < newStatus.ordinal())) {
+                return newStatus;
+            } else {
+                return this;
+            }
+        }
+    }
+
+    // ToDo: Add Status as process result
     void process(@Nonnull TaskContext taskContext, @Nonnull ExternalResource resource);
 
     /**
@@ -36,22 +52,7 @@ public interface ProcessingTask {
 
     // ToDo: Input-Combinations or Alternatives
 
-
-    //    /**
-//     * Only validates a potential configuration. It shall NOT store the config, as it might me changed later.
-//     * Returns null or an empty OperationResult.
-//     *
-//     * @param configuration configuration
-//     */
-//    IntegrationStepResult<?> validateConfiguration(Map<String, Object> configuration);
-//
-//
-//    void setApplicableResourceTypes(List<IntegrationResourceType> applicableResourceTypes);
-//
-//    List<IntegrationResourceType> getApplicableResourceTypes();
-//
-
-
     // ToDo: getAcceptableCachingStrategy() -> FORCE_RELOAD, USE_CACHE
 
+    // ToDo: getApplicableResourceTypes
 }

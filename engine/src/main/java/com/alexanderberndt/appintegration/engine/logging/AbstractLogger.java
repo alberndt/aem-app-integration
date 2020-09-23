@@ -90,16 +90,9 @@ public abstract class AbstractLogger {
         }
     }
 
+    @Nullable
     public AbstractLogger getParentLogger() {
         return parentLogger;
     }
 
-
-    //    public MessageEntry addSubMessage(@Nonnull final LogStatus status, @Nonnull String message, Object... args) {
-//        MessageEntry newEntry = new MessageEntry();
-//        newEntry.setSummaryStatus(status);
-//        newEntry.setSummary(message, args);
-//        addEntry(newEntry);
-//        return newEntry;
-//    }
 }

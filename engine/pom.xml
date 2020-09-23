@@ -14,33 +14,14 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <properties>
-        <surefireLogLevel>debug</surefireLogLevel>
-    </properties>
-
-
     <build>
         <plugins>
-
-            <!--            <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-jar-plugin</artifactId>
-                            <configuration>
-                                <archive>
-                                    <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
-                                </archive>
-                            </configuration>
-                        </plugin>-->
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <argLine>-Dfile.encoding=UTF-8 @{argLine}</argLine>
-                    <systemPropertyVariables>
-                        <org.slf4j.simpleLogger.defaultLogLevel>${surefireLogLevel}
-                        </org.slf4j.simpleLogger.defaultLogLevel>
-                    </systemPropertyVariables>
                 </configuration>
             </plugin>
 
