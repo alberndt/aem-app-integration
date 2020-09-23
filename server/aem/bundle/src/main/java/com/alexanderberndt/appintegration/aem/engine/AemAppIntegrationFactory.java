@@ -65,7 +65,7 @@ public class AemAppIntegrationFactory implements AppIntegrationFactory<SlingAppl
      * Create a new instance of an processing pipeline, and updates the context with the default task configuration
      * and logging information.
      *
-     * @param context
+     * @param context Global Context
      * @param name    Name of the pipeline
      * @return A processing pipeline, and a initialized context
      * @throws AppIntegrationException In case the pipeline could not be created, an exception shall be thrown.
@@ -73,7 +73,7 @@ public class AemAppIntegrationFactory implements AppIntegrationFactory<SlingAppl
      */
     @Nonnull
     @Override
-    public ProcessingPipeline createProcessingPipeline(@Nonnull AemGlobalContext context, @Nonnull String name) throws AppIntegrationException {
+    public ProcessingPipeline createProcessingPipeline(@Nonnull AemGlobalContext context, @Nonnull String name) {
         return processingPipelineFactory.createProcessingPipeline(context.getResourceResolver(), name);
     }
 
@@ -143,8 +143,7 @@ public class AemAppIntegrationFactory implements AppIntegrationFactory<SlingAppl
         final String fullName = (nameObj != null) ? nameObj.toString() : component.getClass().getName();
         final String name = StringUtils.substringAfterLast(fullName, ".");
         final String shortedName = StringUtils.removeEnd(name, ignorableSuffix);
-        final String kebabCaseName = shortedName.replaceAll("([a-z])([A-Z])", "$1-$2").toLowerCase();
-        return kebabCaseName;
+        return shortedName.replaceAll("([a-z])([A-Z])", "$1-$2").toLowerCase();
     }
 
     private static <T> void removeValueFromMap(Map<String, T> map, T value) {

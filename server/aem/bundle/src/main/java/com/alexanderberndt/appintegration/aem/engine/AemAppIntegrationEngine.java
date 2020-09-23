@@ -54,7 +54,7 @@ public class AemAppIntegrationEngine extends AbstractAppIntegrationEngine<SlingA
 
     @Override
     public List<String> getDynamicPaths(@Nonnull String applicationId) {
-        return callRuntimeMethodWithContext(applicationId, context -> super.getDynamicPaths(context));
+        return callRuntimeMethodWithContext(applicationId, super::getDynamicPaths);
     }
 
     @Override
