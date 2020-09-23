@@ -29,4 +29,10 @@ public class ApplicationInfoJsonParser implements TextParser {
             throw new ConversionException(String.format("Cannot parse application-info.json, due to: %s", e.getMessage()), e);
         }
     }
+
+    @Override
+    public String serialize(@Nonnull Object source) throws IOException {
+        return objectMapper.writerFor(ApplicationInfoJson.class).writeValueAsString(source);
+    }
+
 }

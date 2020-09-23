@@ -19,7 +19,7 @@ import javax.annotation.Nonnull;
 public interface ProcessingTask {
 
 
-    void process(@Nonnull TaskContext context, @Nonnull ExternalResource resource);
+    void process(@Nonnull TaskContext taskContext, @Nonnull ExternalResource resource);
 
     /**
      * <p>Implementing classes should define a set of task-properties. This should be done by calling

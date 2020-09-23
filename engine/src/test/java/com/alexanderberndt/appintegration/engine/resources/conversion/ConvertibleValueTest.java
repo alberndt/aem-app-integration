@@ -109,12 +109,10 @@ class ConvertibleValueTest {
         }
     }
 
-    private static class MyParser implements TextParser {
+    private static class MyParser extends AbstractTextParser<ParsedText2> {
 
-        @Nonnull
-        @Override
-        public Class<ParsedText2> getTargetType() {
-            return ParsedText2.class;
+        public MyParser() {
+            super(ParsedText2.class);
         }
 
         @Override
@@ -125,16 +123,9 @@ class ConvertibleValueTest {
         }
 
         @Override
-        public boolean isSerializeSupported() {
-            return true;
+        protected String serializeType(@Nonnull ParsedText2 source) throws IOException {
+            return source.getText();
         }
-
-        @Override
-        public String serialize(@Nonnull Object source) throws ConversionException {
-            return requireSourceType(source, ParsedText2.class).getText();
-        }
-
-
     }
 
 }

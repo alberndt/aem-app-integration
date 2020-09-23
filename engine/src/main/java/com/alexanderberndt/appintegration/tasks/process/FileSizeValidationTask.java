@@ -28,12 +28,12 @@ public class FileSizeValidationTask implements ProcessingTask {
     }
 
     @Override
-    public void process(@Nonnull TaskContext context, @Nonnull ExternalResource resource) {
-        final int minSize = context.getValue(MIN_SIZE_PROP, Integer.class);
-        final String errorLevel = context.getValue(ERROR_LEVEL_PROP, String.class);
-        final String message = context.getValue(MESSAGE_PROP, String.class);
+    public void process(@Nonnull TaskContext taskContext, @Nonnull ExternalResource resource) {
+        final int minSize = taskContext.getValue(MIN_SIZE_PROP, Integer.class);
+        final String errorLevel = taskContext.getValue(ERROR_LEVEL_PROP, String.class);
+        final String message = taskContext.getValue(MESSAGE_PROP, String.class);
 
-        resource.appendInputStreamFilter(in -> new ByteCountingInputStream(in, context, minSize, errorLevel, message));
+        resource.appendInputStreamFilter(in -> new ByteCountingInputStream(in, taskContext, minSize, errorLevel, message));
     }
 
 

@@ -23,5 +23,10 @@ process:
       level.text: "${stacktrace-in-html.error-level}"
       level-default.text: warn
 
+  extract-html-snippet:
+    fileTypes: html-snippet
+    configuration:
+
+
   store-in-cache:
 

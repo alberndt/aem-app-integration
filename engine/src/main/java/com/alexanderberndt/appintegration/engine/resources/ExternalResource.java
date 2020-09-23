@@ -9,10 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.Serializable;
+import java.io.*;
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.nio.charset.Charset;
@@ -106,6 +103,12 @@ public class ExternalResource {
         this.content = this.content.recreateWithNewContent(reader);
     }
 
+    public void setContent(String content) {
+        LOG.debug("setContent(String = {})", content);
+        this.content = this.content.recreateWithNewContent(new StringReader(content));
+    }
+
+
     public <C> void setContentSupplier(@Nonnull Supplier<C> supplier, @Nonnull Class<C> type) {
         LOG.debug("setContent(Supplier<{}> = {})", type, supplier);
         this.content = this.content.recreateWithSupplier(supplier, type);
@@ -115,7 +118,6 @@ public class ExternalResource {
         final InputStream inputStream = this.getContentAsInputStream();
         this.setContent(filterGenerator.apply(inputStream));
     }
-
 
     public <C> C getContentAsParsedObject(@Nonnull Class<C> expectedType) throws IOException {
         final C parsedObject = content.convertTo(expectedType).get();

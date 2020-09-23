@@ -14,7 +14,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 public interface AppIntegrationFactory<I extends ApplicationInstance, C extends GlobalContext<I, C>> {
@@ -29,7 +29,7 @@ public interface AppIntegrationFactory<I extends ApplicationInstance, C extends 
     Map<String, ContextProvider<I>> getAllContextProvider();
 
     @Nonnull
-    Collection<TextParser> getAllTextParsers();
+    List<TextParser> getAllTextParsers();
 
     /**
      * Create a new instance of an processing pipeline, and updates the context with the default task configuration

@@ -9,6 +9,7 @@ import com.alexanderberndt.appintegration.engine.loader.SystemResourceLoader;
 import com.alexanderberndt.appintegration.engine.resources.conversion.StringConverter;
 import com.alexanderberndt.appintegration.engine.resources.conversion.TextParser;
 import com.alexanderberndt.appintegration.engine.resourcetypes.appinfo.ApplicationInfoJsonParser;
+import com.alexanderberndt.appintegration.engine.resourcetypes.html.HtmlParser;
 import com.alexanderberndt.appintegration.pipeline.ProcessingPipeline;
 import com.alexanderberndt.appintegration.pipeline.SystemResourcePipelineFactory;
 
@@ -48,6 +49,7 @@ public class TestAppIntegrationFactory implements AppIntegrationFactory<TestAppI
         textParsers = new ArrayList<>();
         textParsers.add(new StringConverter());
         textParsers.add(new ApplicationInfoJsonParser());
+        textParsers.add(new HtmlParser());
     }
 
     @Override
@@ -89,7 +91,7 @@ public class TestAppIntegrationFactory implements AppIntegrationFactory<TestAppI
 
     @Nonnull
     @Override
-    public Collection<TextParser> getAllTextParsers() {
+    public List<TextParser> getAllTextParsers() {
         return textParsers;
     }
 

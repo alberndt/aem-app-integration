@@ -11,6 +11,7 @@ import com.alexanderberndt.appintegration.tasks.prepare.PropertiesTask;
 import com.alexanderberndt.appintegration.tasks.process.AddReferencedResourceTask;
 import com.alexanderberndt.appintegration.tasks.process.FileSizeValidationTask;
 import com.alexanderberndt.appintegration.tasks.process.RegexValidationTask;
+import com.alexanderberndt.appintegration.tasks.process.html.ExtractHtmlSnippetTask;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -26,14 +27,14 @@ public class TestTaskFactory implements TaskFactory {
     private final Map<String, ProcessingTask> processingTaskMap = new HashMap<>();
 
     public TestTaskFactory() {
-        registerTask("properties", new PropertiesTask());
-        registerTask("download", new DownloadTask());
-        registerTask("add-referenced-resources", new AddReferencedResourceTask());
-        registerTask("file-size-validation", new FileSizeValidationTask());
-        registerTask("regex-validation", new RegexValidationTask());
-        registerTask("store-in-cache", new StoreInCacheTask());
-        registerTask("read-from-cache", new ReadFromCacheTask());
-
+        registerTask(new PropertiesTask());
+        registerTask(new DownloadTask());
+        registerTask(new AddReferencedResourceTask());
+        registerTask(new FileSizeValidationTask());
+        registerTask(new RegexValidationTask());
+        registerTask(new StoreInCacheTask());
+        registerTask(new ReadFromCacheTask());
+        registerTask(new ExtractHtmlSnippetTask());
     }
 
     @Nullable
@@ -54,15 +55,15 @@ public class TestTaskFactory implements TaskFactory {
         return processingTaskMap.get(name);
     }
 
-    public void registerTask(String name, PreparationTask task) {
-        this.preparationTaskMap.put(name, task);
+    public void registerTask(PreparationTask task) {
+        this.preparationTaskMap.put(getDefaultTaskName(task.getClass()), task);
     }
 
-    public void registerTask(String name, LoadingTask task) {
-        this.loadingTaskMap.put(name, task);
+    public void registerTask(LoadingTask task) {
+        this.loadingTaskMap.put(getDefaultTaskName(task.getClass()), task);
     }
 
-    public void registerTask(String name, ProcessingTask task) {
-        this.processingTaskMap.put(name, task);
+    public void registerTask(ProcessingTask task) {
+        this.processingTaskMap.put(getDefaultTaskName(task.getClass()), task);
     }
 }

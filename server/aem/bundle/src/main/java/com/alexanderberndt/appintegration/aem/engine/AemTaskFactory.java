@@ -95,11 +95,7 @@ public class AemTaskFactory implements TaskFactory {
             }
         }
 
-        // derive task-name from the implementing class
-        // (remove ending Task, and convert camel-case to kebab-case
-        return taskClass.getSimpleName()
-                .replaceAll("Task$", "")
-                .replaceAll("([a-z])([A-Z])", "$1-$2")
-                .toLowerCase();
+        // fallback on default task-name
+        return getDefaultTaskName(taskClass);
     }
 }

@@ -13,7 +13,7 @@ import java.io.Reader;
 public class TextSnippetExtractor implements ProcessingTask {
 
     @Override
-    public void process(@Nonnull TaskContext context, @Nonnull ExternalResource resource)  {
+    public void process(@Nonnull TaskContext taskContext, @Nonnull ExternalResource resource)  {
         resource.setContent(new TextSnippetExtractingReader(resource.getContentAsReader()));
         // ToDo: Implement error handling
     }

@@ -18,4 +18,12 @@ public interface TaskFactory {
     @Nullable
     ProcessingTask getProcessingTask(@Nonnull String name);
 
+    default String getDefaultTaskName(Class<?> taskClass) {
+        // derive task-name from the implementing class
+        // (remove ending Task, and convert camel-case to kebab-case
+        return taskClass.getSimpleName()
+                .replaceAll("Task$", "")
+                .replaceAll("([a-z])([A-Z])", "$1-$2")
+                .toLowerCase();
+    }
 }

@@ -13,7 +13,7 @@ import java.io.Reader;
 public class SearchReplaceFilter implements ProcessingTask {
 
     @Override
-    public void process(@Nonnull TaskContext context, @Nonnull ExternalResource resource)  {
+    public void process(@Nonnull TaskContext taskContext, @Nonnull ExternalResource resource)  {
         resource.setContent(new SearchReplaceReader(resource.getContentAsReader()));
         // ToDo: Implement error handling
     }

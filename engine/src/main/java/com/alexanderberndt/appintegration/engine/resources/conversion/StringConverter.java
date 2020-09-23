@@ -7,12 +7,10 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringWriter;
 
-public class StringConverter implements TextParser {
+public class StringConverter extends AbstractTextParser<String> {
 
-    @Nonnull
-    @Override
-    public Class<?> getTargetType() {
-        return String.class;
+    public StringConverter() {
+        super(String.class);
     }
 
     @Override
@@ -23,17 +21,8 @@ public class StringConverter implements TextParser {
     }
 
     @Override
-    public boolean isSerializeSupported() {
-        return true;
+    protected String serializeType(@Nonnull String source) throws IOException {
+        return source;
     }
 
-    @Override
-    public String serialize(@Nonnull Object source) throws ConversionException {
-        if (source instanceof String) {
-            return (String) source;
-        } else {
-            throw new ConversionException("Object to serialize must instance of String, but is " + source);
-        }
-
-    }
 }

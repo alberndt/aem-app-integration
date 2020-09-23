@@ -134,7 +134,7 @@ public final class ConvertibleValue<T> {
     private TextParser requireTextSerializer(@Nonnull Class<?> sourceClass) throws ConversionException {
         final Collection<TextParser> textParsers = textParsersSupplier.get();
         for (TextParser textParser : textParsers) {
-            if (textParser.isSerializeSupported() && textParser.getTargetType().isAssignableFrom(sourceClass)) {
+            if (textParser.getTargetType().isAssignableFrom(sourceClass)) {
                 return textParser;
             }
         }

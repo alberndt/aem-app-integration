@@ -14,9 +14,9 @@ import java.io.Reader;
 public class RegexReplaceFilter implements ProcessingTask {
 
     @Override
-    public void process(@Nonnull TaskContext context, @Nonnull ExternalResource resource) {
-        final String regex = context.getValue("regex", String.class);
-        final String replacement = context.getValue("replacement", String.class);
+    public void process(@Nonnull TaskContext taskContext, @Nonnull ExternalResource resource) {
+        final String regex = taskContext.getValue("regex", String.class);
+        final String replacement = taskContext.getValue("replacement", String.class);
 
         if (StringUtils.isNotBlank(regex) && (replacement != null)) {
             resource.setContent(new SearchReplaceReader(resource.getContentAsReader(), regex, replacement));

@@ -11,9 +11,9 @@ import javax.annotation.Nonnull;
 public class AddReferencedResourceTask implements ProcessingTask {
 
     @Override
-    public void process(@Nonnull TaskContext context, @Nonnull ExternalResource resource) {
-        String relativeUrl = context.getValue("relativeUrl", String.class);
-        String expectedTypeAsString = context.getValue("expectedType", String.class);
+    public void process(@Nonnull TaskContext taskContext, @Nonnull ExternalResource resource) {
+        String relativeUrl = taskContext.getValue("relativeUrl", String.class);
+        String expectedTypeAsString = taskContext.getValue("expectedType", String.class);
 
         final ExternalResourceType expectedType;
         if (StringUtils.isNotBlank(expectedTypeAsString)) {

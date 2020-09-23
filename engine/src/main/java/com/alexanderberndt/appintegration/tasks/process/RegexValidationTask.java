@@ -25,8 +25,8 @@ public class RegexValidationTask implements ProcessingTask {
     public static final String REGEX_PARAM = "regex";
 
     @Override
-    public void process(@Nonnull TaskContext context, @Nonnull ExternalResource resource) {
-        final String regexString = context.getValue(REGEX_PARAM, String.class);
+    public void process(@Nonnull TaskContext taskContext, @Nonnull ExternalResource resource) {
+        final String regexString = taskContext.getValue(REGEX_PARAM, String.class);
         if (StringUtils.isBlank(regexString)) {
             throw new AppIntegrationException("No regex provided!");
         }
@@ -46,14 +46,14 @@ public class RegexValidationTask implements ProcessingTask {
             m = pattern.matcher(resource.getContentAsParsedObject(String.class));
             if (m.find()) {
                 LOG.info("Found pattern");
-                context.addWarning(String.format("Found pattern %s", pattern.pattern()));
+                taskContext.addWarning(String.format("Found pattern %s", pattern.pattern()));
             }
 //        } else {
 //            LOG.warn("Resource {} is not text data!", resource);
 //            context.addWarning("Resource {} is not text data!", resource);
 //        }
         } catch (IOException e) {
-            context.addError(e.getMessage());
+            taskContext.addError(e.getMessage());
         }
     }
 

@@ -21,16 +21,16 @@ public class StoreInCacheTask implements ProcessingTask {
     }
 
     @Override
-    public void process(@Nonnull TaskContext context, @Nonnull ExternalResource resource) {
+    public void process(@Nonnull TaskContext taskContext, @Nonnull ExternalResource resource) {
 
-        final boolean cachingEnabled = context.getValue(CACHING_ENABLED_PROP, true);
+        final boolean cachingEnabled = taskContext.getValue(CACHING_ENABLED_PROP, true);
 
         if (cachingEnabled) {
-            final ExternalResourceCache cache = context.getExternalResourceCache();
+            final ExternalResourceCache cache = taskContext.getExternalResourceCache();
             final Supplier<InputStream> cachedDataSupplier = cache.storeResource(resource);
             resource.setContentSupplier(cachedDataSupplier, InputStream.class);
         } else {
-            context.addWarning("Caching disabled!");
+            taskContext.addWarning("Caching disabled!");
         }
     }
 

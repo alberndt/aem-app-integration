@@ -81,10 +81,12 @@ class AbstractAppIntegrationEngineTest {
         final TestExternalResourceCache cache = engine.getExternalResourceCache(APPLICATION_ID);
         final List<URI> keyList = cache.getCacheKeys();
 
-        assertEquals(3, keyList.size());
+        assertEquals(5, keyList.size());
         assertEquals(new URI("classpath://system/simple-app1/server/application-info.json"), keyList.get(0));
         assertEquals(new URI("classpath://system/simple-app1/server/subscribe.product-news.de.html"), keyList.get(1));
         assertEquals(new URI("classpath://system/simple-app1/server/subscribe.product-news.en.html"), keyList.get(2));
+        assertEquals(new URI("classpath://system/simple-app1/server/js/registration.js"), keyList.get(3));
+        assertEquals(new URI("classpath://system/simple-app1/server/css/style.css"), keyList.get(4));
     }
 
     @Test
@@ -95,7 +97,8 @@ class AbstractAppIntegrationEngineTest {
         final String content = htmlSnippet.getContentAsParsedObject(String.class);
         assertTrue(StringUtils.isNotBlank(content));
         assertNotEquals("Fake content!", content);
-        assertTrue(content.trim().startsWith("<html>"), content);
+        final String strippedContent = content.trim().replaceAll(">[\\s\\r\\n]*<", "><");
+        assertTrue(strippedContent.startsWith("<div><h1>Abonniere die Product News</h1>"), strippedContent);
 
         final TestExternalResourceCache cache = engine.getExternalResourceCache(APPLICATION_ID);
         final List<URI> keyList = cache.getCacheKeys();

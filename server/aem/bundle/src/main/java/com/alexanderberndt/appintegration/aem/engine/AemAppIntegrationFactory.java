@@ -57,7 +57,7 @@ public class AemAppIntegrationFactory implements AppIntegrationFactory<SlingAppl
 
     @Nonnull
     @Override
-    public Collection<TextParser> getAllTextParsers() {
+    public List<TextParser> getAllTextParsers() {
         return textParserList;
     }
 
