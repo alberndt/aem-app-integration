@@ -1,5 +1,6 @@
 package com.alexanderberndt.appintegration.aem.engine;
 
+import com.alexanderberndt.appintegration.aem.engine.model.SlingApplicationInstance;
 import com.alexanderberndt.appintegration.engine.AppIntegrationFactory;
 import com.alexanderberndt.appintegration.engine.ExternalResourceCache;
 import com.alexanderberndt.appintegration.engine.context.GlobalContext;

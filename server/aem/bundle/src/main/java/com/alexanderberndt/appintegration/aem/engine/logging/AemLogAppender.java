@@ -3,6 +3,7 @@ package com.alexanderberndt.appintegration.aem.engine.logging;
 import com.alexanderberndt.appintegration.engine.logging.AbstractLogger;
 import com.alexanderberndt.appintegration.engine.logging.LogStatus;
 import com.alexanderberndt.appintegration.engine.logging.appender.AbstractLogAppender;
+import com.day.cq.commons.jcr.JcrUtil;
 import org.apache.sling.api.resource.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +42,7 @@ public class AemLogAppender extends AbstractLogAppender<AemLogAppender.AemLogEnt
 
         try {
             // create log-resource
-            final String entryName = ResourceUtil.createUniqueChildName(parentRes, logger.getLoggerName());
+            final String entryName = ResourceUtil.createUniqueChildName(parentRes, JcrUtil.escapeIllegalJcrChars(logger.getLoggerName()));
             final Resource logRes = resolver.create(parentRes, entryName, Collections.singletonMap(TYPE_PROP, logger.getType()));
             return new AemLogEntry(logRes);
         } catch (PersistenceException e) {

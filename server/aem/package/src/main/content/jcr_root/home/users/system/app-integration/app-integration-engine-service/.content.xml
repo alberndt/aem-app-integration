@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:rep="internal"
+          jcr:primaryType="rep:SystemUser"
+          jcr:uuid="8d7fdf22-5759-35a8-8a99-43fad47dfe2a"
+          rep:authorizableId="app-integration-engine-service"
+          rep:principalName="app-integration-engine-service"/>

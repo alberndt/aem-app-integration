@@ -1,9 +1,11 @@
 package com.alexanderberndt.appintegration.aem.engine;
 
 import com.alexanderberndt.appintegration.aem.engine.logging.AemLogAppender;
+import com.alexanderberndt.appintegration.aem.engine.model.SlingApplicationInstance;
 import com.alexanderberndt.appintegration.engine.AbstractAppIntegrationEngine;
 import com.alexanderberndt.appintegration.engine.AppIntegrationEngine;
 import com.alexanderberndt.appintegration.engine.logging.LogAppender;
+import com.alexanderberndt.appintegration.engine.logging.LogStatus;
 import com.alexanderberndt.appintegration.engine.logging.appender.Slf4jLogAppender;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
@@ -54,7 +56,7 @@ public class AemAppIntegrationEngine extends AbstractAppIntegrationEngine<SlingA
 
     @Override
     public List<String> getDynamicPaths(@Nonnull String applicationId) {
-        return callRuntimeMethodWithContext(applicationId, super::getDynamicPaths);
+        return callRuntimeMethodWithContext(applicationId, context -> super.getDynamicPaths(context));
     }
 
     @Override
@@ -82,20 +84,42 @@ public class AemAppIntegrationEngine extends AbstractAppIntegrationEngine<SlingA
     }
 
     private void callBackgroundMethodWithContext(@Nonnull String applicationId, @Nonnull Consumer<AemGlobalContext> consumer) {
-        try (ResourceResolver resolver = resolverFactory.getServiceResourceResolver(Collections.singletonMap(SUBSERVICE, SUB_SERVICE_ID))) {
-            final LogAppender logAppender = createPersistentLogAppender(resolver, applicationId);
-            final AemExternalResourceCache cache = new AemExternalResourceCache(resolver, applicationId);
-            final AemGlobalContext context = new AemGlobalContext(applicationId, factory, cache, logAppender, resolver);
+        try (ResourceResolver logResolver = resolverFactory.getServiceResourceResolver(Collections.singletonMap(SUBSERVICE, SUB_SERVICE_ID))) {
+            final LogAppender logAppender = createPersistentLogAppender(logResolver, applicationId);
 
-            consumer.accept(context);
-            resolver.commit();
+            try (ResourceResolver processingResolver = resolverFactory.getServiceResourceResolver(Collections.singletonMap(SUBSERVICE, SUB_SERVICE_ID))) {
+
+                final AemExternalResourceCache cache = new AemExternalResourceCache(processingResolver, applicationId);
+                final AemGlobalContext context = new AemGlobalContext(applicationId, factory, cache, logAppender, processingResolver);
+
+                callBackgroundMethod(context, cache, consumer);
+                processingResolver.commit();
+
+            } finally {
+                logResolver.commit();
+            }
 
         } catch (LoginException | PersistenceException e) {
             throw new AppIntegrationException("Cannot login to service user session!", e);
         }
     }
 
-    public LogAppender createPersistentLogAppender(@Nonnull ResourceResolver resolver, @Nonnull String applicationId) throws PersistenceException {
+    private void callBackgroundMethod(AemGlobalContext context, AemExternalResourceCache cache, @Nonnull Consumer<AemGlobalContext> consumer) {
+        try {
+            consumer.accept(context);
+        } catch (Exception e) {
+
+            // write error to log
+            LOG.error("Prefetch aborted with exception", e);
+            context.getIntegrationLog().setSummary(LogStatus.FAILED, "Prefetch aborted with exception: %s", e.getMessage());
+
+            if (cache.isLongRunningWrite()) {
+                cache.rollbackLongRunningWrite();
+            }
+        }
+    }
+
+    protected LogAppender createPersistentLogAppender(@Nonnull ResourceResolver resolver, @Nonnull String applicationId) throws PersistenceException {
 
         final GregorianCalendar now = new GregorianCalendar();
         final String rootPath = String.format("/var/aem-app-integration/logs/%1$s/%2$TY/%2$Tm/%2$Td/%2$TH/%2$TM", applicationId, now);

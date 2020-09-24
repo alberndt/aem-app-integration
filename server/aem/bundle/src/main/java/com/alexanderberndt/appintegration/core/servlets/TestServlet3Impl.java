@@ -1,11 +1,7 @@
 package com.alexanderberndt.appintegration.core.servlets;
 
 import com.alexanderberndt.appintegration.aem.engine.AemAppIntegrationEngine;
-import com.alexanderberndt.appintegration.engine.logging.IntegrationLogger;
-import com.alexanderberndt.appintegration.engine.logging.LogAppender;
-import com.alexanderberndt.appintegration.engine.logging.LogStatus;
-import com.alexanderberndt.appintegration.engine.logging.ResourceLogger;
-import com.google.common.io.LineReader;
+import com.alexanderberndt.appintegration.aem.engine.model.SlingApplicationInstance;
 import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.SlingHttpServletResponse;
 import org.apache.sling.api.resource.Resource;
@@ -18,15 +14,18 @@ import org.osgi.service.component.propertytypes.ServiceDescription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.jcr.query.Query;
 import javax.servlet.Servlet;
-import javax.servlet.ServletException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
 
-@Component(service = { Servlet.class })
+@Component(service = {Servlet.class})
 @SlingServletPaths({"/bin/servlets/TestAlex3"})
 @ServiceDescription("Simple Demo Servlet")
 public class TestServlet3Impl extends SlingSafeMethodsServlet {
@@ -36,55 +35,32 @@ public class TestServlet3Impl extends SlingSafeMethodsServlet {
     private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Reference
-    private AemAppIntegrationEngine integrationEngine;
+    private transient AemAppIntegrationEngine integrationEngine;
 
     @Override
-    protected void doGet(final SlingHttpServletRequest req,
-                         final SlingHttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(final SlingHttpServletRequest request, final SlingHttpServletResponse response) throws IOException {
 
         LOG.info("Servlet");
-        resp.setContentType("text/plain");
-        PrintWriter out = resp.getWriter();
+        response.setContentType("text/plain");
+        PrintWriter out = response.getWriter();
 
         try {
+            out.println("Hello world v3");
+            final ResourceResolver resolver = request.getResourceResolver();
 
-            out.write("Hello world v3");
+            final List<String> resourceTypesList = Arrays.asList("aem-app-integration/components/component", "unknown");
+            final String resourceTypesSet = resourceTypesList.stream().map(rt -> "'" + rt + "'").collect(Collectors.joining(","));
+            final String query = "SELECT * FROM [nt:base] WHERE [sling:resourceType] IN (" + resourceTypesSet + ") AND ISDESCENDANTNODE('/content')";
 
-
-            String path = "/apps/aem-app-integration/clientlibs/clientlib-grid/less/grid.less";
-            ResourceResolver resolver = req.getResourceResolver();
-
-            Resource res = resolver.getResource(path);
-            out.println(res);
-
-            InputStream in = res.adaptTo(InputStream.class);
-            out.println(res);
-
-
-            if (in != null) {
-
-                LineReader lr = new LineReader(new InputStreamReader(in));
-                String lastLine;
-                while ((lastLine = lr.readLine()) != null) {
-                    out.println(lastLine);
-                }
-
+            final List<SlingApplicationInstance> instanceList = new ArrayList<>();
+            final Iterator<Resource> iter = resolver.findResources(query, Query.JCR_SQL2);
+            while (iter.hasNext()) {
+                final Resource instanceRes = iter.next();
+                SlingApplicationInstance instance = instanceRes.adaptTo(SlingApplicationInstance.class);
+                if (instance != null) instanceList.add(instance);
             }
 
-            LOG.info("Create Log-Appender");
-
-            LogAppender appender = integrationEngine.createPersistentLogAppender(resolver, "test-app");
-            IntegrationLogger logger = new IntegrationLogger(appender);
-            logger.addWarning("something went wrong with %s!", "test-servlet");
-
-            ResourceLogger resourceLogger = logger.createResourceLogger("application-info.json");
-            resourceLogger.setStatus(LogStatus.FAILED);
-            resourceLogger.setSize("100kb");
-            resourceLogger.setLoadStatus("loaded");
-
-            LOG.info("Before commit");
-
-            resolver.commit();
+            integrationEngine.prefetch(instanceList);
             LOG.info("done");
 
         } catch (Exception e) {

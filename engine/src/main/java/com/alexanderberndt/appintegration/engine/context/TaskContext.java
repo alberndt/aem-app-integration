@@ -208,7 +208,7 @@ public class TaskContext {
         for (Map.Entry<String, MultiValue> entry : configurationValues.entrySet()) {
             Object value;
             try {
-                final Object execValue = executionDataMap.get(entry.getKey());
+                final Object execValue = (executionDataMap != null) ? executionDataMap.get(entry.getKey()) : null;
                 if (execValue != null) {
                     value = entry.getValue().getValue(resourceType, execValue);
                 } else {

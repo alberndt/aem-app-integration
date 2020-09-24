@@ -39,7 +39,7 @@ class AemExternalResourceCacheTest {
     @Test
     void storeResource() throws URISyntaxException {
         final AemExternalResourceCache cache = new AemExternalResourceCache(context.resourceResolver(), "test-app");
-        final Resource rootRes = context.create().resource("/var");
+        final Resource rootRes = context.create().resource("/var/aem-app-integration");
 
 
         final ExternalResourceRef resourceRef = new ExternalResourceRef(new URI("http://www.example.com/txt/hello-world.txt"), ExternalResourceType.TEXT);

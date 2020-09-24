@@ -6,16 +6,22 @@ import javax.annotation.Nonnull;
 
 public class TaskLogger extends AbstractLogger {
 
+    private final String taskId;
+
     private String parentInstanceName;
 
     public TaskLogger(@Nonnull AbstractLogger parentLogger, @Nonnull String taskId, @Nonnull String taskName) {
         super(parentLogger);
+        this.taskId = taskId;
         this.parentInstanceName = parentLogger.loggerInstanceName;
+        this.appender.appendLogger(this);
         initProperties(taskId, taskName);
     }
 
     public TaskLogger(@Nonnull LogAppender appender, @Nonnull String taskId, @Nonnull String taskName) {
         super(appender);
+        this.taskId = taskId;
+        this.appender.appendLogger(this);
         initProperties(taskId, taskName);
     }
 
@@ -23,6 +29,12 @@ public class TaskLogger extends AbstractLogger {
     @Override
     public String getType() {
         return "task";
+    }
+
+    @Nonnull
+    @Override
+    public String getLoggerName() {
+        return taskId;
     }
 
     private void initProperties(@Nonnull String taskId, @Nonnull String taskName) {

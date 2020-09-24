@@ -6,6 +6,7 @@ public class DetailsLogger extends AbstractLogger {
 
     public DetailsLogger(@Nonnull AbstractLogger parentLogger) {
         super(parentLogger);
+        this.appender.appendLogger(this);
     }
 
     @Nonnull

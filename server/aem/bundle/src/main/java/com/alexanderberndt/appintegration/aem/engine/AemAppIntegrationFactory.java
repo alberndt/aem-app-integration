@@ -1,5 +1,6 @@
 package com.alexanderberndt.appintegration.aem.engine;
 
+import com.alexanderberndt.appintegration.aem.engine.model.SlingApplicationInstance;
 import com.alexanderberndt.appintegration.engine.AppIntegrationFactory;
 import com.alexanderberndt.appintegration.engine.Application;
 import com.alexanderberndt.appintegration.engine.ContextProvider;
@@ -31,8 +32,7 @@ public class AemAppIntegrationFactory implements AppIntegrationFactory<SlingAppl
 
     private final Map<String, AemContextProvider> contextProviderMap = new HashMap<>();
 
-    @Reference
-    private AemProcessingPipelineFactory processingPipelineFactory;
+    private final List<AemProcessingPipelineFactory> processingPipelineFactoryList = new ArrayList<>();
 
     private final List<TextParser> textParserList = new ArrayList<>();
 
@@ -74,7 +74,12 @@ public class AemAppIntegrationFactory implements AppIntegrationFactory<SlingAppl
     @Nonnull
     @Override
     public ProcessingPipeline createProcessingPipeline(@Nonnull AemGlobalContext context, @Nonnull String name) {
-        return processingPipelineFactory.createProcessingPipeline(context.getResourceResolver(), name);
+        for (AemProcessingPipelineFactory factory : processingPipelineFactoryList) {
+            if (factory.canProvidePipeline(context.getResourceResolver(), name)){
+                return  factory.createProcessingPipeline(context.getResourceResolver(), name);
+            }
+        }
+        throw new AppIntegrationException(String.format("Processing-pipeline %s is not defined!", name));
     }
 
 
@@ -103,6 +108,7 @@ public class AemAppIntegrationFactory implements AppIntegrationFactory<SlingAppl
         applicationMap.put(application.getApplicationId(), application);
     }
 
+    @SuppressWarnings("unused")
     protected void unbindApplication(final AemApplication application) {
         applicationMap.remove(application.getApplicationId());
     }
@@ -113,6 +119,7 @@ public class AemAppIntegrationFactory implements AppIntegrationFactory<SlingAppl
         resourceLoaderMap.put(getKebabComponentName(resourceLoader, properties, "ResourceLoader"), resourceLoader);
     }
 
+    @SuppressWarnings("unused")
     protected void unbindResourceLoader(final ResourceLoader resourceLoader) {
         removeValueFromMap(resourceLoaderMap, resourceLoader);
     }
@@ -123,8 +130,20 @@ public class AemAppIntegrationFactory implements AppIntegrationFactory<SlingAppl
         contextProviderMap.put(getKebabComponentName(contextProvider, properties, "ContextProvider"), contextProvider);
     }
 
+    @SuppressWarnings("unused")
     protected void unbindContextProvider(final AemContextProvider contextProvider) {
         removeValueFromMap(contextProviderMap, contextProvider);
+    }
+
+    @Reference(name = "aemProcessingPipelineFactory", cardinality = ReferenceCardinality.MULTIPLE,
+            policy = ReferencePolicy.DYNAMIC, policyOption = ReferencePolicyOption.GREEDY)
+    protected void bindAemProcessingPipelineFactory(final AemProcessingPipelineFactory pipelineFactory) {
+        processingPipelineFactoryList.add(pipelineFactory);
+    }
+
+    @SuppressWarnings("unused")
+    protected void unbindAemProcessingPipelineFactory(final AemProcessingPipelineFactory pipelineFactory) {
+        processingPipelineFactoryList.remove(pipelineFactory);
     }
 
     @Reference(name = "textParser", cardinality = ReferenceCardinality.MULTIPLE,
@@ -133,6 +152,7 @@ public class AemAppIntegrationFactory implements AppIntegrationFactory<SlingAppl
         textParserList.add(textParser);
     }
 
+    @SuppressWarnings("unused")
     protected void unbindTextParser(final TextParser textParser) {
         textParserList.remove(textParser);
     }

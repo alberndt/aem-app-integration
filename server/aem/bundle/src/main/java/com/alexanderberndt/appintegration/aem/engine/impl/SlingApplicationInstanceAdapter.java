@@ -1,6 +1,6 @@
 package com.alexanderberndt.appintegration.aem.engine.impl;
 
-import com.alexanderberndt.appintegration.aem.engine.SlingApplicationInstance;
+import com.alexanderberndt.appintegration.aem.engine.model.SlingApplicationInstance;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.sling.api.adapter.AdapterFactory;
 import org.apache.sling.api.resource.Resource;
@@ -13,7 +13,7 @@ import javax.annotation.Nonnull;
 @Component(
         property = {
                 AdapterFactory.ADAPTABLE_CLASSES + "=org.apache.sling.api.resource.Resource",
-                AdapterFactory.ADAPTER_CLASSES + "=com.alexanderberndt.appintegration.aem.engine.SlingApplicationInstance"
+                AdapterFactory.ADAPTER_CLASSES + "=com.alexanderberndt.appintegration.aem.engine.model.SlingApplicationInstance"
         })
 public class SlingApplicationInstanceAdapter implements AdapterFactory {
 

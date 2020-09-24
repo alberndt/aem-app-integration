@@ -19,6 +19,8 @@ public interface ExternalResourceCache {
     @Nullable
     ExternalResource getCachedResource(@Nonnull ExternalResourceRef resourceRef, @Nonnull ExternalResourceFactory resourceFactory);
 
+    boolean isLongRunningWrite();
+
     boolean startLongRunningWrite(@Nullable String nameHint);
 
     void continueLongRunningWrite();

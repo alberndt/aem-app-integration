@@ -1,7 +1,7 @@
 package com.alexanderberndt.appintegration.aem.engine.context;
 
 import com.alexanderberndt.appintegration.aem.engine.AemContextProvider;
-import com.alexanderberndt.appintegration.aem.engine.SlingApplicationInstance;
+import com.alexanderberndt.appintegration.aem.engine.model.SlingApplicationInstance;
 import com.day.cq.wcm.api.Page;
 import com.day.cq.wcm.api.PageManager;
 import org.apache.sling.api.resource.Resource;

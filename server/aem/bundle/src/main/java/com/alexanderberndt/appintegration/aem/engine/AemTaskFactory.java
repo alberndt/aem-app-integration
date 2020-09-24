@@ -54,6 +54,7 @@ public class AemTaskFactory implements TaskFactory {
         preparationTaskMap.put(taskName, task);
     }
 
+    @SuppressWarnings("unused")
     protected void unbindPreparationTask(final PreparationTask task) {
         preparationTaskMap.entrySet().removeIf(entry -> (entry.getValue() == task));
     }
@@ -66,6 +67,7 @@ public class AemTaskFactory implements TaskFactory {
         loadingTaskMap.put(taskName, task);
     }
 
+    @SuppressWarnings("unused")
     protected void unbindLoadingTask(final LoadingTask task) {
         loadingTaskMap.entrySet().removeIf(entry -> (entry.getValue() == task));
     }
@@ -78,6 +80,7 @@ public class AemTaskFactory implements TaskFactory {
         processingTaskMap.put(taskName, task);
     }
 
+    @SuppressWarnings("unused")
     protected void unbindProcessingTask(final ProcessingTask task) {
         processingTaskMap.entrySet().removeIf(entry -> (entry.getValue() == task));
     }

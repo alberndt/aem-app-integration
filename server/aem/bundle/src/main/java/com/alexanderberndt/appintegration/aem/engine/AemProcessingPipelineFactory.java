@@ -15,10 +15,13 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.metatype.annotations.AttributeDefinition;
 import org.osgi.service.metatype.annotations.Designate;
 import org.osgi.service.metatype.annotations.ObjectClassDefinition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.invoke.MethodHandles;
 
 @Component(service = AemProcessingPipelineFactory.class, configurationPolicy = ConfigurationPolicy.REQUIRE)
 @Designate(ocd = AemProcessingPipelineFactory.Configuration.class, factory = true)
@@ -35,6 +38,8 @@ public class AemProcessingPipelineFactory {
         String path();
     }
 
+    private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     private final ProcessingPipelineBuilder builder;
 
     private final String path;
@@ -43,6 +48,15 @@ public class AemProcessingPipelineFactory {
     public AemProcessingPipelineFactory(@Nonnull Configuration configuration, @Reference TaskFactory taskFactory) {
         this.path = configuration.path();
         this.builder = new ProcessingPipelineBuilder(taskFactory);
+    }
+
+    public boolean canProvidePipeline(@Nonnull ResourceResolver resolver, @Nonnull String name) {
+        final Resource rootRes = resolver.getResource(this.path);
+        if (rootRes == null) {
+            LOG.warn("Root-path {} not found! Cannot create processing pipeline!", this.path);
+            return false;
+        }
+        return (rootRes.getChild(name + ".yaml") != null);
     }
 
     /**
@@ -78,7 +92,7 @@ public class AemProcessingPipelineFactory {
             final PipelineDefinition pipelineDefinition = YamlPipelineParser.parsePipelineDefinitionYaml(yamlInputStream);
             return builder.createProcessingPipeline(pipelineDefinition);
         } catch (IOException | RuntimeException e) {
-            throw new AppIntegrationException("Cannot load pipeline " + name, e);
+            throw new AppIntegrationException(String.format("Cannot load pipeline %s, due to %s!", name, e.getMessage()), e);
         }
     }
 

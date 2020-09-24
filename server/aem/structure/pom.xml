@@ -38,6 +38,11 @@
                     </properties>
                     <filters>
 
+                        <!-- system-users root -->
+                        <filter>
+                            <root>/home/users/system</root>
+                        </filter>
+
                         <!-- /apps root -->
                         <filter>
                             <root>/apps</root>

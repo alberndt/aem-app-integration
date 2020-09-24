@@ -2,4 +2,4 @@
 <jcr:root xmlns:sling="http://sling.apache.org/jcr/sling/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0"
     jcr:primaryType="sling:OsgiConfig"
     service.ranking="0"
-    user.mapping="aem-appintegration-bundle:engine=aem-app-integration-engine-service"/>
+    user.mapping="aem-appintegration-bundle:engine=app-integration-engine-service"/>

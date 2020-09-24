@@ -2,7 +2,7 @@ package com.alexanderberndt.appintegration.core.servlets;
 
 import com.alexanderberndt.appintegration.aem.engine.AemAppIntegrationEngine;
 import com.alexanderberndt.appintegration.aem.engine.AemAppIntegrationFactory;
-import com.alexanderberndt.appintegration.aem.engine.SlingApplicationInstance;
+import com.alexanderberndt.appintegration.aem.engine.model.SlingApplicationInstance;
 import com.alexanderberndt.appintegration.engine.resources.conversion.ConversionException;
 import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.SlingHttpServletResponse;

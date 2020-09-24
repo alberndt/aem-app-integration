@@ -1,12 +1,14 @@
 package com.alexanderberndt.appintegration.engine.resources.conversion;
 
 import org.apache.commons.io.IOUtils;
+import org.osgi.service.component.annotations.Component;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringWriter;
 
+@Component(service = TextParser.class)
 public class StringConverter extends AbstractTextParser<String> {
 
     public StringConverter() {
@@ -21,7 +23,7 @@ public class StringConverter extends AbstractTextParser<String> {
     }
 
     @Override
-    protected String serializeType(@Nonnull String source) throws IOException {
+    protected String serializeType(@Nonnull String source) {
         return source;
     }
 

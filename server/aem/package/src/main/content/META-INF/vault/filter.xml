@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <workspaceFilter version="1.0">
+    <filter root="/home/users/system/app-integration"/>
+    <filter root="/apps/rep:policy"/>
     <filter root="/apps/aem-app-integration"/>
+    <filter root="/var/aem-app-integration">
+        <include pattern="/var/aem-app-integration(/rep:policy)?" />
+    </filter>
 </workspaceFilter>

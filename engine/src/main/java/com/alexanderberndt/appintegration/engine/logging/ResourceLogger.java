@@ -9,14 +9,18 @@ import java.net.URL;
 
 public class ResourceLogger extends AbstractLogger {
 
+    private String name;
+
     public ResourceLogger(@Nonnull LogAppender appender, @Nonnull String url) {
         super(appender);
         this.setUrl(url);
+        this.appender.appendLogger(this);
     }
 
     public ResourceLogger(@Nonnull IntegrationLogger parentLogger, @Nonnull String url) {
         super(parentLogger);
         this.setUrl(url);
+        appender.appendLogger(this);
     }
 
     public ResourceLogger(@Nonnull LogAppender appender, @Nonnull ExternalResourceRef resourceRef) {
@@ -34,20 +38,32 @@ public class ResourceLogger extends AbstractLogger {
     }
 
     @Nonnull
+    @Override
+    public String getLoggerName() {
+        if (StringUtils.isNotBlank(this.name)) {
+            return this.name;
+        } else {
+            return "xy" + super.getLoggerName();
+        }
+    }
+
+    @Nonnull
     public TaskLogger createTaskLogger(String taskId, String taskName) {
         return new TaskLogger(this, taskId, taskName);
     }
 
-    public void setUrl(String url) {
+    private void setUrl(String url) {
         setProperty("url", url);
         setLoggerInstanceName(url);
         try {
             final URL urlObj = new URL(url);
             final String fullPath = urlObj.getPath();
-            setProperty("name", StringUtils.substringAfterLast(fullPath, "/"));
+            this.name = StringUtils.substringAfterLast(fullPath, "/");
+            setProperty("name", this.name);
             setProperty("path", urlObj.getHost() + StringUtils.substringBeforeLast(fullPath, "/"));
         } catch (MalformedURLException e) {
-            setProperty("name", url);
+            this.name = url;
+            setProperty("name", this.name);
             setProperty("path", null);
         }
     }

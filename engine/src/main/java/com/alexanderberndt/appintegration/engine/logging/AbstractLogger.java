@@ -24,7 +24,6 @@ public abstract class AbstractLogger {
     private AbstractLogger(@Nullable AbstractLogger parentLogger, @Nonnull LogAppender appender) {
         this.parentLogger = parentLogger;
         this.appender = appender;
-        this.appender.appendLogger(this);
     }
 
     protected AbstractLogger(@Nonnull AbstractLogger parentLogger) {

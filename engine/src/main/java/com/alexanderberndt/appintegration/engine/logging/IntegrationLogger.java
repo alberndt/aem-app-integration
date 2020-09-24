@@ -8,10 +8,12 @@ public class IntegrationLogger extends AbstractLogger {
 
     public IntegrationLogger(@Nonnull AbstractLogger parentLogger) {
         super(parentLogger);
+        this.appender.appendLogger(this);
     }
 
     public IntegrationLogger(@Nonnull LogAppender appender) {
         super(appender);
+        this.appender.appendLogger(this);
     }
 
     @Nonnull

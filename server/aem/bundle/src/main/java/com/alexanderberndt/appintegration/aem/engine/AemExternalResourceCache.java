@@ -17,8 +17,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -29,7 +27,7 @@ public class AemExternalResourceCache implements ExternalResourceCache {
 
     public static final String CACHE_ROOT = "/var/aem-app-integration/%s/files";
 
-    public static final int MINUTES_UNTIL_LOCKS_EXPIRE = 5;
+    public static final int MILLIS_UNTIL_LOCKS_EXPIRE = 5 * 60 * 1000; // 5 minutes to expire
 
     public static final String LOCK_ATTR = "lock";
     public static final String LOCKED_SINCE_ATTR = "lockedSince";
@@ -47,6 +45,7 @@ public class AemExternalResourceCache implements ExternalResourceCache {
 
     private final Random random = new Random();
 
+    @Nullable
     private String versionId;
 
 
@@ -54,6 +53,13 @@ public class AemExternalResourceCache implements ExternalResourceCache {
         this.resolver = resolver;
         this.rootPath = String.format(CACHE_ROOT, applicationId);
     }
+
+
+    @Override
+    public boolean isLongRunningWrite() {
+        return (this.versionId != null);
+    }
+
 
     @Override
     public boolean startLongRunningWrite(@Nullable String nameHint) {
@@ -64,7 +70,7 @@ public class AemExternalResourceCache implements ExternalResourceCache {
                 final String tempVersionId = StringUtils.defaultIfBlank(nameHint, Long.toHexString((long) Math.floor(Math.random() * 0x100000000L)));
                 final ModifiableValueMap valueMap = Objects.requireNonNull(rootRes.adaptTo(ModifiableValueMap.class));
                 valueMap.put(LOCK_ATTR, nameHint);
-                valueMap.put(LOCKED_SINCE_ATTR, LocalDateTime.now());
+                valueMap.put(LOCKED_SINCE_ATTR, Calendar.getInstance());
                 resolver.commit();
                 this.versionId = tempVersionId;
                 return true;
@@ -91,7 +97,7 @@ public class AemExternalResourceCache implements ExternalResourceCache {
 
         final ModifiableValueMap valueMap = Objects.requireNonNull(rootRes.adaptTo(ModifiableValueMap.class));
         if (versionId.equals(valueMap.get(LOCK_ATTR, String.class))) {
-            valueMap.put(LOCKED_SINCE_ATTR, LocalDateTime.now());
+            valueMap.put(LOCKED_SINCE_ATTR, Calendar.getInstance());
             try {
                 resolver.commit();
             } catch (PersistenceException e) {
@@ -107,15 +113,25 @@ public class AemExternalResourceCache implements ExternalResourceCache {
             throw new AppIntegrationException("cannot find root-path " + rootPath + " to set active version");
         }
         final String curVersion = rootRes.getValueMap().get(VERSION_ATTR, String.class);
+        final ModifiableValueMap modifiableValueMap = Objects.requireNonNull(rootRes.adaptTo(ModifiableValueMap.class));
+
         if (!StringUtils.equals(curVersion, versionId)) {
-            final ModifiableValueMap modifiableValueMap = Objects.requireNonNull(rootRes.adaptTo(ModifiableValueMap.class));
             if (StringUtils.isNotBlank(versionId)) {
                 modifiableValueMap.put(VERSION_ATTR, versionId);
             } else {
                 modifiableValueMap.remove(VERSION_ATTR);
             }
         }
+        modifiableValueMap.remove(LOCK_ATTR);
+        modifiableValueMap.remove(LOCKED_SINCE_ATTR);
+
+        try {
+            resolver.commit();
+        } catch (PersistenceException e) {
+            throw new AppIntegrationException("Cannot commit long-running write", e);
+        }
     }
+
 
     @Override
     public void rollbackLongRunningWrite() {
@@ -149,14 +165,19 @@ public class AemExternalResourceCache implements ExternalResourceCache {
         }
 
         // is resource locked by ourselves
-        if (this.versionId.equals(currentLockId)) {
+        if (StringUtils.equals(this.versionId, currentLockId)) {
             return true;
         }
 
         // is lock expired?
-        final LocalDateTime now = LocalDateTime.now();
-        final LocalDateTime lockedSince = valueMap.get(LOCKED_SINCE_ATTR, LocalDateTime.class);
-        return (lockedSince == null) || Duration.between(lockedSince, now).toMinutes() >= MINUTES_UNTIL_LOCKS_EXPIRE;
+        final Calendar now = GregorianCalendar.getInstance();
+        final Calendar lockedSince = valueMap.get(LOCKED_SINCE_ATTR, Calendar.class);
+        if (lockedSince != null) {
+            final long diff = now.getTimeInMillis() - lockedSince.getTimeInMillis();
+            return diff >= MILLIS_UNTIL_LOCKS_EXPIRE;
+        } else {
+            return true;
+        }
     }
 
 
@@ -166,7 +187,8 @@ public class AemExternalResourceCache implements ExternalResourceCache {
 
         try {
             // find existing entry
-            final Resource cachePathRes = getOrCreateResource(getCachePath(resource.getUri()));
+            final String cachePath = getCachePath(resource.getUri());
+            final Resource cachePathRes = getOrCreateResource(cachePath);
             final String hashCode = Integer.toHexString(resource.getUri().toString().hashCode());
 
             // find new cache-entry name
@@ -187,10 +209,12 @@ public class AemExternalResourceCache implements ExternalResourceCache {
                 modifiableValueMap.put(VERSION_ATTR, versionId);
             }
 
-            Resource res = resolver.create(targetCacheRes, "data", Collections.singletonMap(JCR_PRIMARYTYPE, NT_FILE));
+            final String fileName = StringUtils.substringAfterLast(cachePath, "/");
+            final Resource res = resolver.create(targetCacheRes, fileName, Collections.singletonMap(JCR_PRIMARYTYPE, NT_FILE));
 
             Map<String, Object> propertiesMap = new HashMap<>();
             propertiesMap.put(JCR_PRIMARYTYPE, NT_RESOURCE);
+            // ToDo: Get correct mime-type
             propertiesMap.put(JCR_MIMETYPE, "text/plain");
             propertiesMap.put(JCR_DATA, resource.getContentAsInputStream());
             resolver.create(res, JCR_CONTENT, propertiesMap);
@@ -232,7 +256,8 @@ public class AemExternalResourceCache implements ExternalResourceCache {
                     final URI uri = new URI(Objects.requireNonNull(valueMap.get(URI_ATTR, String.class)));
                     final ExternalResourceType type = ExternalResourceType.parse(valueMap.get(TYPE_ATTR, String.class));
 
-                    final Resource dataRes = Objects.requireNonNull(res.getChild("data"));
+                    final String fileName = StringUtils.substringAfterLast(cachePath, "/");
+                    final Resource dataRes = Objects.requireNonNull(res.getChild(fileName));
 
                     // ToDo: Implement futures for actual content
                     final InputStream content = Objects.requireNonNull(dataRes.adaptTo(InputStream.class));
@@ -272,14 +297,14 @@ public class AemExternalResourceCache implements ExternalResourceCache {
         }
 
         // handle top-level path-elem
-        final String topLevelPath = JCR_PATH_SEPARATOR + splitPath[1];
+        final String topLevelPath = JCR_PATH_SEPARATOR + splitPath[1] + JCR_PATH_SEPARATOR + splitPath[2];
         Resource curResource = resolver.getResource(topLevelPath);
         if (curResource == null) {
             throw new AppIntegrationException("Cannot create path " + path + ", as top-level paths should already exists: " + topLevelPath);
         }
 
         // handle 2nd-level path-elements and deeper
-        for (int i = 2; i < splitPath.length; i++) {
+        for (int i = 3; i < splitPath.length; i++) {
             curResource = getOrCreateChild(curResource, splitPath[i]);
         }
 
@@ -302,8 +327,8 @@ public class AemExternalResourceCache implements ExternalResourceCache {
             splitPath.add(Integer.toHexString(uri.getQuery().hashCode()));
         }
         for (int i = 0; i < splitPath.size(); i++) {
-            splitPath.set(i, JcrUtil.createValidName(splitPath.get(i)));
+            splitPath.set(i, JcrUtil.escapeIllegalJcrChars(splitPath.get(i)));
         }
-        return rootPath + JCR_PATH_SEPARATOR + String.join(JCR_PATH_SEPARATOR, splitPath) + JCR_PATH_SEPARATOR + "jcr:content";
+        return rootPath + JCR_PATH_SEPARATOR + String.join(JCR_PATH_SEPARATOR, splitPath);
     }
 }

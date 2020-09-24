@@ -67,6 +67,11 @@ public class TestExternalResourceCache implements ExternalResourceCache {
     }
 
     @Override
+    public boolean isLongRunningWrite() {
+        return (this.writeVersionId != null);
+    }
+
+    @Override
     public boolean startLongRunningWrite(@Nullable String nameHint) {
         if (this.writeVersionId == null) {
             this.writeVersionId = nameHint;
