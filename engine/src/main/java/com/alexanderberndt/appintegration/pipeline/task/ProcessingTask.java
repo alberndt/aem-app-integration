@@ -2,6 +2,7 @@ package com.alexanderberndt.appintegration.pipeline.task;
 
 import com.alexanderberndt.appintegration.engine.context.TaskContext;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
+import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
 import com.alexanderberndt.appintegration.pipeline.ProcessingPipeline;
 
 import javax.annotation.Nonnull;
@@ -34,7 +35,10 @@ public interface ProcessingTask {
         }
     }
 
-    // ToDo: Add Status as process result
+    default ExternalResourceType getApplicableResourceType() {
+        return ExternalResourceType.ANY;
+    }
+
     void process(@Nonnull TaskContext taskContext, @Nonnull ExternalResource resource);
 
     /**

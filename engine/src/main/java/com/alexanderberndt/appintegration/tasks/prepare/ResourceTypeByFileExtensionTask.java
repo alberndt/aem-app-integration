@@ -11,7 +11,7 @@ import javax.annotation.Nonnull;
 public class ResourceTypeByFileExtensionTask implements PreparationTask {
 
     @Override
-    public void prepare(@Nonnull final TaskContext context, @Nonnull final ExternalResourceRef resourceRef) {
+    public void prepare(@Nonnull final TaskContext taskContext, @Nonnull final ExternalResourceRef resourceRef) {
         final String path = StringUtils.defaultString(resourceRef.getUri().getPath(), "");
         final String extension = StringUtils.substringAfterLast(path, ".").toLowerCase();
 

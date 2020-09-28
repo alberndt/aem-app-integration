@@ -170,7 +170,7 @@ public class AemExternalResourceCache implements ExternalResourceCache {
         }
 
         // is lock expired?
-        final Calendar now = GregorianCalendar.getInstance();
+        final Calendar now = Calendar.getInstance();
         final Calendar lockedSince = valueMap.get(LOCKED_SINCE_ATTR, Calendar.class);
         if (lockedSince != null) {
             final long diff = now.getTimeInMillis() - lockedSince.getTimeInMillis();

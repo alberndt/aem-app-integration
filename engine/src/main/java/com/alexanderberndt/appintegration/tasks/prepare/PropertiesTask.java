@@ -11,8 +11,8 @@ import javax.annotation.Nonnull;
 public class PropertiesTask implements PreparationTask {
 
     @Override
-    public void prepare(@Nonnull TaskContext context, @Nonnull ExternalResourceRef resourceRef) {
-        context.getConfiguration().forEach(context::setValue);
+    public void prepare(@Nonnull TaskContext taskContext, @Nonnull ExternalResourceRef resourceRef) {
+        taskContext.getConfiguration().forEach(taskContext::setValue);
     }
 
 }
