@@ -1,0 +1,6 @@
+<sly data-sly-use.model="com.alexanderberndt.appintegration.aem.engine.models.AemExternalApplicationModel"/>
+<div data-sly-test.hasInstance="${model.hasInstance}">
+    
+   <pre>instance: ${model.htmlSnippet @ context='unsafe'}</pre>
+</div>
+<div data-sly-test="${!hasInstance}">External App --  ${model.toString} instance: ${model.instance}, integrationEngine: ${model.integrationEngine}</div>

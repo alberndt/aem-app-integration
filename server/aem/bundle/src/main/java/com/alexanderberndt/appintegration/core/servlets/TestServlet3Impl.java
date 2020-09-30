@@ -1,7 +1,7 @@
 package com.alexanderberndt.appintegration.core.servlets;
 
 import com.alexanderberndt.appintegration.aem.engine.AemAppIntegrationEngine;
-import com.alexanderberndt.appintegration.aem.engine.model.SlingApplicationInstance;
+import com.alexanderberndt.appintegration.aem.engine.models.SlingApplicationInstance;
 import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.SlingHttpServletResponse;
 import org.apache.sling.api.resource.Resource;

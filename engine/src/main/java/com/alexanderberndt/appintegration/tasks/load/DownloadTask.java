@@ -18,10 +18,10 @@ public class DownloadTask implements LoadingTask {
     @Override
     public ExternalResource load(@Nonnull TaskContext context, ExternalResourceRef resourceRef) {
 
-        final ExternalResource cachedResource = resourceRef.getCachedExternalRes();
-        if (cachedResource != null) {
-            return cachedResource;
-        }
+//        final ExternalResource cachedResource = resourceRef.getCachedExternalRes();
+//        if (cachedResource != null) {
+//            return cachedResource;
+//        }
 
         // ToDo: Cache-Logic should be part of the resource loader
 

@@ -136,6 +136,9 @@ public class HttpResourceLoader implements ResourceLoader {
                 case "text/javascript":
                     resource.setType(ExternalResourceType.JAVASCRIPT);
                     break;
+                case "text/html":
+                    resource.setType(ExternalResourceType.HTML);
+                    break;
                 default:
                     // do nothing
                     break;

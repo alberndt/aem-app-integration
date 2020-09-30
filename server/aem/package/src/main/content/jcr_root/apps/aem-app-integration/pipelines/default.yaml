@@ -27,6 +27,50 @@ process:
     fileTypes: html-snippet
     configuration:
 
+  image1:
+    name: add-referenced-resource
+    configuration:
+      relativeUrl.html-snippet: "images/signin-image.webp"
+      expectedType.html-snippet: "any"
+
+  font1:
+    name: add-referenced-resource
+    configuration:
+      relativeUrl.html-snippet: "fonts/Material-Design-Iconic-Font.woff2"
+      expectedType.html-snippet: "any"
+
+  font2:
+    name: add-referenced-resource
+    configuration:
+      relativeUrl.html-snippet: "fonts/poppins/poppins-v5-latin-300.eot"
+      expectedType.html-snippet: "any"
+
+  font3:
+    name: add-referenced-resource
+    configuration:
+      relativeUrl.html-snippet: "fonts/poppins/poppins-v5-latin-300italic.eot"
+      expectedType.html-snippet: "any"
+
+  font4:
+    name: add-referenced-resource
+    configuration:
+      relativeUrl.html-snippet: "fonts/poppins/poppins-v5-latin-700.woff2"
+      expectedType.html-snippet: "any"
+
+  font5:
+    name: add-referenced-resource
+    configuration:
+      relativeUrl.html-snippet: "fonts/poppins/poppins-v5-latin-900.woff"
+      expectedType.html-snippet: "any"
+
+  font6:
+    name: add-referenced-resource
+    configuration:
+      relativeUrl.html-snippet: "fonts/poppins/poppins-v5-latin-regular.woff2"
+      expectedType.html-snippet: "any"
+
+
+
 
   store-in-cache:
 

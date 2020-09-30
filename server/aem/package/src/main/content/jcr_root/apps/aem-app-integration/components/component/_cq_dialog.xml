@@ -5,7 +5,7 @@
           xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
           jcr:primaryType="nt:unstructured"
           sling:resourceType="cq/gui/components/authoring/dialog"
-          jcr:title="Product Display"
+          jcr:title="External Application"
           extraClientlibs="[cq.authoring.editor]">
     <content
           granite:class="cq-dialog-content-page"
@@ -19,7 +19,7 @@
                   <settings jcr:primaryType="nt:unstructured"
                             cq:hideOnEdit="false"
                             cq:showOnCreate="true"
-                            jcr:title="Settings"
+                            jcr:title="Application"
                             margin="{Boolean}true"
                             sling:resourceType="granite/ui/components/coral/foundation/container">
                       <items jcr:primaryType="nt:unstructured">
@@ -30,15 +30,55 @@
                                    <application jcr:primaryType="nt:unstructured"
                                                fieldLabel="Application Id"
                                                name="./application"
-                                               sling:resourceType="granite/ui/components/coral/foundation/form/textfield"/>
+                                               sling:resourceType="granite/ui/components/coral/foundation/form/select/">
+                                        <items jcr:primaryType="nt:unstructured">
+                                            <newsletter jcr:primaryType="nt:unstructured"
+                                                  value="newsletter"
+                                                  text="Newsletter-Demo"
+                                                  selected="{Boolean}true"/>
+                                            <registration jcr:primaryType="nt:unstructured"
+                                                  value="registration-demo"
+                                                  text="Registration-Demo"
+                                                  selected="{Boolean}true"/>
+                                        </items>
+                                    </application>
                                     <component jcr:primaryType="nt:unstructured"
                                                fieldLabel="Component Id"
                                                name="./component"
-                                               sling:resourceType="granite/ui/components/coral/foundation/form/textfield"/>
+                                               sling:resourceType="granite/ui/components/coral/foundation/form/select">
+                                        <items jcr:primaryType="nt:unstructured">
+                                        <register jcr:primaryType="nt:unstructured"
+                                                value="register"
+                                                text="Register"
+                                                selected="{Boolean}true"/>
+                                                <list jcr:primaryType="nt:unstructured"
+                                                value="list"
+                                                text="Attendee List"/>
+                                    </items>
+                                    </component>
                                 </items>
                             </column>
                         </items>
                     </settings>
+                    <settings1 jcr:primaryType="nt:unstructured"
+                    cq:hideOnEdit="false"
+                    cq:showOnCreate="true"
+                    jcr:title="Settings"
+                    margin="{Boolean}true"
+                    sling:resourceType="granite/ui/components/coral/foundation/container">
+                        <items jcr:primaryType="nt:unstructured">
+                            <column
+                                    jcr:primaryType="nt:unstructured"
+                                    sling:resourceType="granite/ui/components/coral/foundation/container">
+                                <items jcr:primaryType="nt:unstructured">                               
+                                    <event jcr:primaryType="nt:unstructured"
+                                                fieldLabel="Event"
+                                                name="./event"
+                                                sling:resourceType="granite/ui/components/coral/foundation/form/textfield"/>
+                                </items>
+                            </column>
+                        </items>
+                    </settings1>
                 </items>
             </tabs>
         </items>

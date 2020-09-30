@@ -1,0 +1,14 @@
+{
+  "name": "Event Registration",
+  "version": "1.0.0",
+  "components": {
+    "register": {
+      "name": "Register",
+      "url": "register.php?event=${event}&lang=${language}"
+    },
+    "list": {
+      "name": "Attendee List",
+      "url": "list.php?event=${event}"
+    }
+  }
+}

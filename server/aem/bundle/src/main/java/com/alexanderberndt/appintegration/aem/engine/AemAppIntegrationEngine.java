@@ -1,7 +1,7 @@
 package com.alexanderberndt.appintegration.aem.engine;
 
 import com.alexanderberndt.appintegration.aem.engine.logging.AemLogAppender;
-import com.alexanderberndt.appintegration.aem.engine.model.SlingApplicationInstance;
+import com.alexanderberndt.appintegration.aem.engine.models.SlingApplicationInstance;
 import com.alexanderberndt.appintegration.engine.AbstractAppIntegrationEngine;
 import com.alexanderberndt.appintegration.engine.AppIntegrationEngine;
 import com.alexanderberndt.appintegration.engine.logging.LogAppender;

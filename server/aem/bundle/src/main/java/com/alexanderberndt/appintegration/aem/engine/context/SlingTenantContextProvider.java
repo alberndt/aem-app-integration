@@ -1,7 +1,7 @@
 package com.alexanderberndt.appintegration.aem.engine.context;
 
 import com.alexanderberndt.appintegration.aem.engine.AemContextProvider;
-import com.alexanderberndt.appintegration.aem.engine.model.SlingApplicationInstance;
+import com.alexanderberndt.appintegration.aem.engine.models.SlingApplicationInstance;
 import org.apache.sling.tenant.Tenant;
 import org.osgi.service.component.annotations.Component;
 

@@ -1,4 +1,4 @@
-package com.alexanderberndt.appintegration.aem.engine.model;
+package com.alexanderberndt.appintegration.aem.engine.models;
 
 import com.alexanderberndt.appintegration.engine.ApplicationInstance;
 import org.apache.sling.api.resource.Resource;
@@ -6,8 +6,10 @@ import org.apache.sling.models.annotations.Model;
 import org.apache.sling.models.annotations.injectorspecific.Self;
 
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.Objects;
+import java.util.StringJoiner;
 
 @Model(adaptables = Resource.class)
 public class SlingApplicationInstance implements ApplicationInstance  {
@@ -21,7 +23,8 @@ public class SlingApplicationInstance implements ApplicationInstance  {
     @Nonnull
     private final String componentId;
 
-    public SlingApplicationInstance(@Self Resource resource, @Named("applicationId") String applicationId, @Named("componentId") String componentId) {
+    @Inject
+    public SlingApplicationInstance(@Self Resource resource, @Named("application") String applicationId, @Named("component") String componentId) {
         this.resource = Objects.requireNonNull(resource);
         this.applicationId = Objects.requireNonNull(applicationId);
         this.componentId = Objects.requireNonNull(componentId);
@@ -44,4 +47,11 @@ public class SlingApplicationInstance implements ApplicationInstance  {
         return componentId;
     }
 
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", SlingApplicationInstance.class.getSimpleName() + "[", "]")
+                .add("applicationId='" + applicationId + "'")
+                .add("componentId='" + componentId + "'")
+                .toString();
+    }
 }

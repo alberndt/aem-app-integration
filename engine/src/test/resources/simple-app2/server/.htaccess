@@ -1,0 +1,3 @@
+RewriteEngine On
+RewriteBase /app-integration-demo/simple-app2
+RewriteRule ^register-(.*)-(.*).html$ register.php?lang=$2&event=$1 [L]

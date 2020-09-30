@@ -17,8 +17,11 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -228,7 +231,17 @@ public abstract class AbstractAppIntegrationEngine<I extends ApplicationInstance
         for (final ContextProvider<I> contextProvider : context.getContextProviderList()) {
             final Map<String, String> curCtxMap = contextProvider.getContext(instance);
             if (curCtxMap != null) {
-                contextMap.putAll(curCtxMap);
+                curCtxMap.forEach((key, value) -> {
+                    if (value != null) {
+                        try {
+                            contextMap.put(key, URLEncoder.encode(value, StandardCharsets.UTF_8.toString()));
+                        } catch (UnsupportedEncodingException e) {
+                            contextMap.put(key, value);
+                        }
+                    } else {
+                        contextMap.put(key, value);
+                    }
+                });
             }
         }
         final String resolvedString = StringSubstitutor.replace(inputString, contextMap);
