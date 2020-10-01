@@ -7,7 +7,7 @@ import javax.annotation.Nonnull;
 
 public interface PreparationTask  {
 
-    void prepare(@Nonnull TaskContext context, @Nonnull ExternalResourceRef resourceRef);
+    void prepare(@Nonnull TaskContext taskContext, @Nonnull ExternalResourceRef resourceRef);
 
     /**
      * <p>Implementing classes should define a set of task-properties. This should be done by calling

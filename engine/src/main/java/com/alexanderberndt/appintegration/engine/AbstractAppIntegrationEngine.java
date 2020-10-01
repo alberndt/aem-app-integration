@@ -59,7 +59,6 @@ public abstract class AbstractAppIntegrationEngine<I extends ApplicationInstance
         final ExternalResource snippetRes = pipeline.loadAndProcessResourceRef(context, snippetRef);
 
         return Objects.requireNonNull(snippetRes);
-
     }
 
     protected boolean isDynamicPath(@Nonnull C context, String relativePath) {

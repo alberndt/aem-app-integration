@@ -1,5 +1,6 @@
 package com.alexanderberndt.appintegration.pipeline;
 
+import com.alexanderberndt.appintegration.engine.ExternalResourceCache;
 import com.alexanderberndt.appintegration.engine.context.GlobalContext;
 import com.alexanderberndt.appintegration.engine.context.TaskContext;
 import com.alexanderberndt.appintegration.engine.logging.ResourceLogger;
@@ -19,12 +20,14 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static com.alexanderberndt.appintegration.pipeline.configuration.Ranking.PIPELINE_EXECUTION;
 
@@ -33,16 +36,33 @@ import static com.alexanderberndt.appintegration.pipeline.configuration.Ranking.
  */
 public class ProcessingPipeline {
 
+    public static final String CACHING_ENABLED_PROP = "cache:enabled";
+
     private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Nonnull
     private final List<TaskWrapper<PreparationTask>> preparationTasks;
+
+
+    // ToDo: Remove Loading and caching tasks - they are integral part of the pipeline
+
+    // ToDo:
 
     @Nonnull
     private final TaskWrapper<LoadingTask> loadingTask;
 
     @Nonnull
     private final List<TaskWrapper<ProcessingTask>> processingTasks;
+
+    // ToDo: postCacheProcessingTasks
+
+    @Nonnull
+    private static final TaskWrapper<PreparationTask> loadFromCacheTask = new TaskWrapper<>("load-from-cache", "load-from-cache", ProcessingPipeline::readFromCache, null);
+
+    @Nonnull
+    private static final TaskWrapper<ProcessingTask> storeInCacheTask = new TaskWrapper<>("store-in-cache", "store-in-cache", ProcessingPipeline::storeInCache, null);
+
+
 
     public ProcessingPipeline(
             @Nullable List<TaskWrapper<PreparationTask>> preparationTasks,
@@ -56,12 +76,20 @@ public class ProcessingPipeline {
     public void initContextWithTaskDefaults(@Nonnull GlobalContext<?, ?> context) {
         final ResourceLogger logger = context.getIntegrationLog().createResourceLogger("defaults");
         final DataMap processingData = new DataMap();
+
+        applyWithContext(loadFromCacheTask, context, logger, Ranking.TASK_DEFAULT, ExternalResourceType.ANY, processingData,
+                taskContext -> {
+                    taskContext.setValue(CACHING_ENABLED_PROP, true);
+                    return null;
+                });
+
         preparationTasks.forEach(taskWrapper ->
                 applyWithContext(taskWrapper, context, logger, Ranking.TASK_DEFAULT, ExternalResourceType.ANY, processingData,
                         taskContext -> {
                             taskWrapper.getTask().declareTaskPropertiesAndDefaults(taskContext);
                             return null;
                         }));
+
         applyWithContext(loadingTask, context, logger, Ranking.TASK_DEFAULT, ExternalResourceType.ANY, processingData,
                 taskContext -> {
                     loadingTask.getTask().declareTaskPropertiesAndDefaults(taskContext);
@@ -118,10 +146,25 @@ public class ProcessingPipeline {
                     });
         }
 
+        // try to get from cache
+        applyWithContext(loadFromCacheTask, context, log, PIPELINE_EXECUTION, resourceRef.getExpectedType(), processingData,
+                taskContext -> {
+                    loadFromCacheTask.getTask().prepare(taskContext, resourceRef);
+                    return null;
+                });
+
         // loading task
         final ExternalResource resource =
                 applyWithContext(loadingTask, context, log, PIPELINE_EXECUTION, resourceRef.getExpectedType(), processingData,
                         taskContext -> loadingTask.getTask().load(taskContext, resourceRef));
+
+
+        // directly return a cached resource
+        final ExternalResourceCache cache = context.getExternalResourceCache();
+        if (resource.getLoadStatus() == ExternalResource.LoadStatus.CACHED) {
+            cache.markResourceRefreshed(resource);
+            return resource;
+        }
 
         // processing tasks
         for (TaskWrapper<ProcessingTask> taskWrapper : processingTasks) {
@@ -133,9 +176,45 @@ public class ProcessingPipeline {
                     });
         }
 
+        applyWithContext(storeInCacheTask, context, log, PIPELINE_EXECUTION, resource.getType(), processingData,
+                taskContext -> {
+                    storeInCacheTask.getTask().process(taskContext, resource);
+                    return null;
+                });
+
+        // store resource is cache
+        cache.storeResource(resource);
+
         log.setTime(String.format("%,d ms", stopWatch.getTime(TimeUnit.MILLISECONDS)));
         return resource;
     }
+
+    protected static void readFromCache(@Nonnull TaskContext taskContext, @Nonnull ExternalResourceRef resourceRef) {
+        final boolean cachingEnabled = taskContext.getValue(CACHING_ENABLED_PROP, true);
+        if (cachingEnabled) {
+            final ExternalResourceCache cache = taskContext.getExternalResourceCache();
+            final ExternalResource cachedRes = cache.getCachedResource(resourceRef, taskContext.getResourceFactory());
+            if (cachedRes != null) {
+                resourceRef.setCachedExternalRes(cachedRes);
+            }
+        } else {
+            taskContext.addWarning("Caching disabled!");
+        }
+    }
+
+    protected static void storeInCache(@Nonnull TaskContext taskContext, @Nonnull ExternalResource resource) {
+
+        final boolean cachingEnabled = taskContext.getValue(CACHING_ENABLED_PROP, true);
+
+        if (cachingEnabled) {
+            final ExternalResourceCache cache = taskContext.getExternalResourceCache();
+            final Supplier<InputStream> cachedDataSupplier = cache.storeResource(resource);
+            resource.setContentSupplier(cachedDataSupplier, InputStream.class);
+        } else {
+            taskContext.addWarning("Caching disabled!");
+        }
+    }
+
 
 
     protected <T, R> R applyWithContext(
