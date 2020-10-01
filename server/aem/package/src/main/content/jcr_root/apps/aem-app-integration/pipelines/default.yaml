@@ -69,8 +69,6 @@ process:
       relativeUrl.html-snippet: "fonts/poppins/poppins-v5-latin-regular.woff2"
       expectedType.html-snippet: "any"
 
-
-
-
   store-in-cache:
+  
 

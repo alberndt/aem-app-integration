@@ -32,11 +32,11 @@ public class ExtractHtmlSnippetTask implements ProcessingTask {
 
     @Override
     public void declareTaskPropertiesAndDefaults(TaskContext taskContext) {
-        taskContext.setValue(SNIPPET_QUERY_PARAM, "body *[data-app-integration]=html-snippet]");
+        taskContext.setValue(SNIPPET_QUERY_PARAM, "body *[data-app-integration=html-snippet]");
         taskContext.setValue(FALLBACK_SNIPPET_QUERY, "body");
         taskContext.setValue(JS_REF_QUERY, "script[type=text/javascript][data-app-integration=static][src]");
         taskContext.setValue(CSS_REF_QUERY, "link[rel=stylesheet][data-app-integration=static][href]");
-        taskContext.setValue(MANIFEST_REF_QUERY, "html[data-app-integration-manifest");
+        taskContext.setValue(MANIFEST_REF_QUERY, "html[data-app-integration-manifest]");
     }
 
     @Override
@@ -56,11 +56,12 @@ public class ExtractHtmlSnippetTask implements ProcessingTask {
             return;
         }
 
-        taskContext.setValue(SNIPPET_QUERY_PARAM, "body *[data-app-integration=html-snippet]");
-        taskContext.setValue(FALLBACK_SNIPPET_QUERY, "body");
-        taskContext.setValue(JS_REF_QUERY, "script[type=text/javascript][data-app-integration=static][src]");
-        taskContext.setValue(CSS_REF_QUERY, "link[rel=stylesheet][data-app-integration=static][href]");
-        taskContext.setValue(MANIFEST_REF_QUERY, "html[data-app-integration=manifest]");
+        Elements imgElements = doc.select("img[src]");
+        for (int i = 0; i < imgElements.size(); i++) {
+            Element imgElem = imgElements.get(i);
+            String src = "/ext/" + taskContext.getApplicationId() + "/" + imgElem.attr("src");
+            imgElem.attr("src", src);
+        }
 
 
         final String snippetQuery = taskContext.getValue(SNIPPET_QUERY_PARAM, String.class);

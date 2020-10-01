@@ -30,27 +30,26 @@
                                    <application jcr:primaryType="nt:unstructured"
                                                fieldLabel="Application Id"
                                                name="./application"
+                                               emptyOption="{Boolean}true"
                                                sling:resourceType="granite/ui/components/coral/foundation/form/select/">
                                         <items jcr:primaryType="nt:unstructured">
-                                            <newsletter jcr:primaryType="nt:unstructured"
-                                                  value="newsletter"
-                                                  text="Newsletter-Demo"
-                                                  selected="{Boolean}true"/>
                                             <registration jcr:primaryType="nt:unstructured"
                                                   value="registration-demo"
-                                                  text="Registration-Demo"
-                                                  selected="{Boolean}true"/>
+                                                  text="Registration-Demo"/>
+                                            <newsletter jcr:primaryType="nt:unstructured"
+                                                  value="newsletter"
+                                                  text="Newsletter-Demo"/>
                                         </items>
                                     </application>
                                     <component jcr:primaryType="nt:unstructured"
                                                fieldLabel="Component Id"
                                                name="./component"
+                                               emptyOption="{Boolean}true"
                                                sling:resourceType="granite/ui/components/coral/foundation/form/select">
                                         <items jcr:primaryType="nt:unstructured">
                                         <register jcr:primaryType="nt:unstructured"
                                                 value="register"
-                                                text="Register"
-                                                selected="{Boolean}true"/>
+                                                text="Register"/>
                                                 <list jcr:primaryType="nt:unstructured"
                                                 value="list"
                                                 text="Attendee List"/>

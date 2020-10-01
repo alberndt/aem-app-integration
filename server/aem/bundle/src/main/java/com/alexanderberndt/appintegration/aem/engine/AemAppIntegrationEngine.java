@@ -9,6 +9,7 @@ import com.alexanderberndt.appintegration.engine.logging.LogStatus;
 import com.alexanderberndt.appintegration.engine.logging.appender.Slf4jLogAppender;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
+import org.apache.commons.io.IOUtils;
 import org.apache.sling.api.resource.*;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -16,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.GregorianCalendar;
@@ -49,6 +51,24 @@ public class AemAppIntegrationEngine extends AbstractAppIntegrationEngine<SlingA
         return callRuntimeMethodWithContext(applicationId, context -> super.getStaticResource(context, relativePath));
     }
 
+
+    // ToDo: Replace with ServletResponse
+    public byte[] getStaticResourceAsByteArray(@Nonnull String applicationId, @Nonnull String relativePath) {
+        return callRuntimeMethodWithContext(applicationId, context -> {
+            ExternalResource res = super.getStaticResource(context, relativePath);
+            if (res != null) {
+                try {
+                    return IOUtils.toByteArray(res.getContentAsInputStream());
+                } catch (IOException e) {
+                    LOG.error("cannot get resource", e);
+                    return null;
+                }
+            } else {
+                return null;
+            }
+        });
+    }
+
     @Override
     public boolean isDynamicPath(@Nonnull String applicationId, String relativePath) {
         return callRuntimeMethodWithContext(applicationId, context -> super.isDynamicPath(context, relativePath));
@@ -69,18 +89,23 @@ public class AemAppIntegrationEngine extends AbstractAppIntegrationEngine<SlingA
 
     private <R> R callRuntimeMethodWithContext(@Nonnull String applicationId, @Nonnull Function<AemGlobalContext, R> function) {
         try (ResourceResolver resolver = resolverFactory.getServiceResourceResolver(Collections.singletonMap(SUBSERVICE, SUB_SERVICE_ID))) {
+            return callRuntimeMethodWithContext(resolver, applicationId, function);
+        } catch (LoginException e) {
+            throw new AppIntegrationException("Cannot login to service user session!", e);
+        }
+    }
+
+    private <R> R callRuntimeMethodWithContext(ResourceResolver resolver, @Nonnull String applicationId, @Nonnull Function<AemGlobalContext, R> function) {
             final LogAppender logAppender = new Slf4jLogAppender();
             final AemExternalResourceCache cache = new AemExternalResourceCache(resolver, applicationId);
             final AemGlobalContext context = new AemGlobalContext(applicationId, factory, cache, logAppender, resolver);
-
-            final R result = function.apply(context);
+            R result = function.apply(context);
+        try {
             resolver.commit();
-
-            return result;
-
-        } catch (LoginException | PersistenceException e) {
-            throw new AppIntegrationException("Cannot login to service user session!", e);
+        } catch (PersistenceException e) {
+            LOG.error("failed to commit", e);
         }
+        return result;
     }
 
     private void callBackgroundMethodWithContext(@Nonnull String applicationId, @Nonnull Consumer<AemGlobalContext> consumer) {

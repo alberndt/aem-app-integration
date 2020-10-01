@@ -14,5 +14,42 @@
     limitations under the License.
 */-->
 <sly data-sly-use.clientLib="/libs/granite/sightly/templates/clientlib.html"
-     data-sly-call="${clientlib.css @ categories='aem-app-integration.base'}"/>
-<sly data-sly-resource="${'contexthub' @ resourceType='granite/contexthub/components/contexthub'}"/>
+    data-sly-call="${clientlib.css @ categories='aem-app-integration.base'}" />
+<sly data-sly-resource="${'contexthub' @ resourceType='granite/contexthub/components/contexthub'}" />
+
+<style>
+    .external-app {
+        padding-top: 2.5em;
+        padding-bottom: 2.5em;
+        clear: both;
+    }
+
+    .external-app--missing {
+        border: solid 3px orange;
+        padding-left: 2.5em;
+
+        margin: 1em 0;
+    }
+
+    .image.parbase {
+        max-width: 48%;
+        text-align: right;
+    }
+
+    .image.parbase > img {
+        max-height: 300px;
+        margin-right: 0;
+        margin-left: auto;
+    }
+
+
+    .text.parbase {
+        max-width: 48%;
+        float:left
+    }
+
+</style>
+
+<link rel="stylesheet" type="text/css" data-app-integration="static"
+    href="/ext/registration-demo/css/material-design-iconic-font.min.css">
+<link rel="stylesheet" type="text/css" data-app-integration="static" href="/ext/registration-demo/css/style.css">

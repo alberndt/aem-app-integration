@@ -96,6 +96,9 @@ public class TaskContext {
         return globalContext.getExternalResourceCache();
     }
 
+    public String getApplicationId() {
+        return globalContext.getApplicationId();
+    }
 
     public Object getValue(@Nonnull String key) {
         final NamespaceKey nk = parseNamespaceKey(key, false,

@@ -219,6 +219,10 @@ public class AemExternalResourceCache implements ExternalResourceCache {
             propertiesMap.put(JCR_DATA, resource.getContentAsInputStream());
             resolver.create(res, JCR_CONTENT, propertiesMap);
 
+
+            // ToDo: Re-check the panic commit's. This should follow a real plan
+            resolver.commit();
+
             return () -> res.adaptTo(InputStream.class);
 
         } catch (IOException e) {

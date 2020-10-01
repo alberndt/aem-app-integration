@@ -8,6 +8,7 @@ import org.apache.sling.models.annotations.Model;
 import org.apache.sling.models.annotations.injectorspecific.OSGiService;
 import org.apache.sling.models.annotations.injectorspecific.Self;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.StringJoiner;
 
@@ -15,10 +16,17 @@ import java.util.StringJoiner;
 public class AemExternalApplicationModel  {
 
     @Self
-    private SlingApplicationInstance instance;
+    private Resource resource;
 
     @OSGiService
     private AemAppIntegrationEngine integrationEngine;
+
+    private SlingApplicationInstance instance;
+
+    @PostConstruct
+    public void init() {
+        this.instance = resource.adaptTo(SlingApplicationInstance.class);
+    }
 
     public boolean hasInstance() {
         return instance != null;
