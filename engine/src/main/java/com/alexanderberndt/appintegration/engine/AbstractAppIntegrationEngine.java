@@ -11,7 +11,6 @@ import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
 import com.alexanderberndt.appintegration.pipeline.ProcessingPipeline;
 import com.alexanderberndt.appintegration.utils.HashMapWithTimeout;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.text.StringSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +25,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.BiConsumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public abstract class AbstractAppIntegrationEngine<I extends ApplicationInstance, C extends GlobalContext<I, C>> {
 
@@ -107,7 +108,6 @@ public abstract class AbstractAppIntegrationEngine<I extends ApplicationInstance
             try {
                 final ExternalResource snippetRes = pipeline.loadAndProcessResourceRef(context, snippetRef);
                 referencedResourcesSet.addAll(snippetRes.getReferencedResources());
-                context.getExternalResourceCache().continueLongRunningWrite();
             } catch (AppIntegrationException e) {
                 LOG.error("cannot load", e);
             }
@@ -121,7 +121,6 @@ public abstract class AbstractAppIntegrationEngine<I extends ApplicationInstance
             try {
                 resource = pipeline.loadAndProcessResourceRef(context, resourceRef);
                 referencedResourcesSet.addAll(resource.getReferencedResources());
-                context.getExternalResourceCache().continueLongRunningWrite();
             } catch (AppIntegrationException e) {
                 LOG.error("cannot load", e);
             }
@@ -218,13 +217,48 @@ public abstract class AbstractAppIntegrationEngine<I extends ApplicationInstance
                     String.format("Unknown component %s for application %s", instance.getComponentId(), instance.getApplicationId()));
         }
 
-        final String snippetUrl = resolveStringWithContextVariables(context, instance, componentInfo.getUrl());
+        final Map<String, String> contextMap = evaluateInstanceContext(context, instance);
+        final String snippetUrl = resolveStringWithContextVariables(contextMap, instance, componentInfo.getUrl());
         final URI appInfoUri = context.getApplicationInfoUri();
         return appInfoUri.resolve(snippetUrl).normalize();
     }
 
-    private String resolveStringWithContextVariables(@Nonnull final C context, @Nonnull final I instance, @Nonnull final String inputString) {
+    private static final Pattern VAR_PATTERN = Pattern.compile("\\$\\{(required:)?([\\w.\\-]+)}", Pattern.CASE_INSENSITIVE);
 
+    private String resolveStringWithContextVariables(@Nonnull Map<String, String> contextMap, @Nonnull final I instance, @Nonnull final String inputString) {
+
+        final StringBuilder resolvedString = new StringBuilder();
+        final List<String> unresolvableVariables = new ArrayList<>();
+
+        final Matcher matcher = VAR_PATTERN.matcher(inputString);
+        int pos = 0;
+        while (matcher.find(pos)) {
+            resolvedString.append(inputString, pos, matcher.start());
+            final boolean isRequired = "required:".equalsIgnoreCase(matcher.group(1));
+            final String variable = matcher.group(2);
+            final String value = contextMap.get(variable);
+            if (StringUtils.isNotBlank(value) || !isRequired) {
+                resolvedString.append(StringUtils.defaultString(value));
+            } else {
+                final String fullyQualifiedVariable = matcher.group(0);
+                unresolvableVariables.add(fullyQualifiedVariable);
+                resolvedString.append(fullyQualifiedVariable);
+            }
+            pos = matcher.end();
+        }
+        resolvedString.append(inputString.substring(pos));
+
+        if (!unresolvableVariables.isEmpty()) {
+            throw new AppIntegrationException(String.format(
+                    "Could not resolve variables %s for template \"%s\" for instance %s. It remained \"%s\".", unresolvableVariables, inputString, instance, resolvedString));
+        } else {
+            return resolvedString.toString();
+        }
+
+    }
+
+    @Nonnull
+    private Map<String, String> evaluateInstanceContext(@Nonnull C context, @Nonnull I instance) {
         // evaluate context
         final Map<String, String> contextMap = new HashMap<>();
         for (final ContextProvider<I> contextProvider : context.getContextProviderList()) {
@@ -243,13 +277,7 @@ public abstract class AbstractAppIntegrationEngine<I extends ApplicationInstance
                 });
             }
         }
-        final String resolvedString = StringSubstitutor.replace(inputString, contextMap);
-        if (StringUtils.containsAny(resolvedString, '$', '{', '}')) {
-            throw new AppIntegrationException(String.format(
-                    "Could not fully resolve template \"%s\". It remained \"%s\".", inputString, resolvedString));
-        } else {
-            return resolvedString;
-        }
+        return contextMap;
     }
 
 }
