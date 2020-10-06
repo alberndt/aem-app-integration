@@ -25,7 +25,6 @@ import java.util.Set;
  * for the called task. This object is created everytime when any task-method is called.
  *
  * @see com.alexanderberndt.appintegration.pipeline.task.PreparationTask
- * @see com.alexanderberndt.appintegration.pipeline.task.LoadingTask
  * @see com.alexanderberndt.appintegration.pipeline.task.ProcessingTask
  */
 public class TaskContext {

@@ -1,65 +1,30 @@
 package com.alexanderberndt.appintegration.engine.testsupport;
 
 import com.alexanderberndt.appintegration.pipeline.TaskFactory;
-import com.alexanderberndt.appintegration.pipeline.task.LoadingTask;
 import com.alexanderberndt.appintegration.pipeline.task.PreparationTask;
 import com.alexanderberndt.appintegration.pipeline.task.ProcessingTask;
-import com.alexanderberndt.appintegration.tasks.load.DownloadTask;
 import com.alexanderberndt.appintegration.tasks.prepare.PropertiesTask;
 import com.alexanderberndt.appintegration.tasks.process.AddReferencedResourceTask;
 import com.alexanderberndt.appintegration.tasks.process.FileSizeValidationTask;
 import com.alexanderberndt.appintegration.tasks.process.RegexValidationTask;
 import com.alexanderberndt.appintegration.tasks.process.html.ExtractHtmlSnippetTask;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.HashMap;
-import java.util.Map;
-
-public class TestTaskFactory implements TaskFactory {
-
-    private final Map<String, PreparationTask> preparationTaskMap = new HashMap<>();
-
-    private final Map<String, LoadingTask> loadingTaskMap = new HashMap<>();
-
-    private final Map<String, ProcessingTask> processingTaskMap = new HashMap<>();
+public class TestTaskFactory extends TaskFactory {
 
     public TestTaskFactory() {
-        registerTask(new PropertiesTask());
-        registerTask(new DownloadTask());
-        registerTask(new AddReferencedResourceTask());
-        registerTask(new FileSizeValidationTask());
-        registerTask(new RegexValidationTask());
-        registerTask(new ExtractHtmlSnippetTask());
+        register(new PropertiesTask());
+        register(new AddReferencedResourceTask());
+        register(new FileSizeValidationTask());
+        register(new RegexValidationTask());
+        register(new ExtractHtmlSnippetTask());
     }
 
-    @Nullable
-    @Override
-    public PreparationTask getPreparationTask(@Nonnull String name) {
-        return preparationTaskMap.get(name);
+    public void register(PreparationTask task) {
+        super.register(task, null);
     }
 
-    @Nullable
-    @Override
-    public LoadingTask getLoadingTask(@Nonnull String name) {
-        return loadingTaskMap.get(name);
+    public void register(ProcessingTask task) {
+        super.register(task, null);
     }
 
-    @Nullable
-    @Override
-    public ProcessingTask getProcessingTask(@Nonnull String name) {
-        return processingTaskMap.get(name);
-    }
-
-    public void registerTask(PreparationTask task) {
-        this.preparationTaskMap.put(getDefaultTaskName(task.getClass()), task);
-    }
-
-    public void registerTask(LoadingTask task) {
-        this.loadingTaskMap.put(getDefaultTaskName(task.getClass()), task);
-    }
-
-    public void registerTask(ProcessingTask task) {
-        this.processingTaskMap.put(getDefaultTaskName(task.getClass()), task);
-    }
 }
