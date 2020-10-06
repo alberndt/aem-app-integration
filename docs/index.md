@@ -2,6 +2,35 @@
 title: AEM Application Integration
 ---
 
+Documentation
+==================
+
+- Overview
+
+AEM developers perspective
+-----------------------------
+
+- Setup new application
+- Extension Points 
+
+
+Application developers perspective
+-------------------------------------
+
+- application-info.json
+
+
+
+Dev-Ops perspective
+----------------------
+
+- Status checks
+
+
+
+
+
+
 Purpose / Problem
 ==================
 
@@ -35,3 +64,6 @@ This is a test v5
 This is a framework for  integrating external web-applications into AEM (Adobe Experience Manager)
 
 Currently work in progress!!!
+
+
+

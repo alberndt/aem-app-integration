@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:sling="http://sling.apache.org/jcr/sling/1.0" xmlns:cq="http://www.day.com/jcr/cq/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
+    jcr:primaryType="cq:Page">
+    <jcr:content
+        cq:lastModified="{Date}2020-09-30T16:42:16.935+02:00"
+        cq:lastModifiedBy="admin"
+        cq:template="/apps/aem-app-integration-demo/templates/page"
+        jcr:primaryType="cq:PageContent"
+        jcr:title="Demo Event-Registration Page"
+        sling:resourceType="aem-app-integration-demo/components/page">
+        <par
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="wcm/foundation/components/parsys">
+            <text
+                jcr:created="{Date}2020-09-03T10:55:08.194+02:00"
+                jcr:createdBy="admin"
+                jcr:lastModified="{Date}2020-09-30T13:20:14.383+02:00"
+                jcr:lastModifiedBy="admin"
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="wcm/foundation/components/text"
+                text="&lt;p>This is a simple content-page, to demonstrate application integration.&lt;/p>&#xa;&lt;p>This page contains:&lt;/p>&#xa;&lt;ul>&#xa;&lt;li>Image&lt;/li>&#xa;&lt;li>Text&lt;/li>&#xa;&lt;li>External Application&lt;/li>&#xa;&lt;/ul>&#xa;&lt;p>&amp;nbsp;&lt;/p>&#xa;"
+                textIsRich="true"/>
+            <image
+                jcr:created="{Date}2020-09-30T13:17:08.691+02:00"
+                jcr:createdBy="admin"
+                jcr:lastModified="{Date}2020-09-30T13:22:04.370+02:00"
+                jcr:lastModifiedBy="admin"
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="wcm/foundation/components/image"
+                fileReference="/content/dam/we-retail/en/experiences/arctic-surfing-in-lofoten/surfer-ready-to-go.jpg"/>
+            <component
+                jcr:created="{Date}2020-09-30T16:41:24.347+02:00"
+                jcr:createdBy="admin"
+                jcr:lastModified="{Date}2020-09-30T16:42:16.933+02:00"
+                jcr:lastModifiedBy="admin"
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="aem-app-integration/components/component"
+                application="registration-demo"
+                component="register"
+                event="New Conf"/>
+        </par>
+    </jcr:content>
+</jcr:root>

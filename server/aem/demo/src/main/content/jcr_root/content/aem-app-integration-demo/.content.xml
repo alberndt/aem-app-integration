@@ -5,10 +5,10 @@
         cq:allowedTemplates="/apps/aem-app-integration-demo/templates/.*"
         cq:designPath="/apps/settings/wcm/designs/aem-app-integration-demo"
         cq:deviceGroups="[/etc/mobile/groups/responsive]"
-        cq:lastModified="{Date}2020-09-03T10:42:11.133+02:00"
+        cq:lastModified="{Date}2020-09-30T13:09:22.255+02:00"
         cq:lastModifiedBy="admin"
         jcr:primaryType="cq:PageContent"
-        jcr:title="My Site"
+        jcr:title="Demo"
         sling:redirect="true"
         sling:redirectStatus="{Long}302"
         sling:resourceType="foundation/components/redirect"
@@ -18,4 +18,5 @@
         </image>
     </jcr:content>
     <us/>
+    <de/>
 </jcr:root>

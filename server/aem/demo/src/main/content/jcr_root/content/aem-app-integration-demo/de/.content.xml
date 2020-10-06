@@ -2,17 +2,16 @@
 <jcr:root xmlns:sling="http://sling.apache.org/jcr/sling/1.0" xmlns:cq="http://www.day.com/jcr/cq/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
     jcr:primaryType="cq:Page">
     <jcr:content
-        cq:lastModified="{Date}2020-09-30T13:28:45.421+02:00"
+        cq:lastModified="{Date}2020-09-30T13:28:57.066+02:00"
         cq:lastModifiedBy="admin"
         cq:redirectTarget="/content/aem-app-integration/us/en"
-        jcr:language="en_us"
+        jcr:language="de_de"
         jcr:primaryType="cq:PageContent"
-        jcr:title="USA"
+        jcr:title="Germany"
         sling:resourceType="foundation/components/redirect">
         <image jcr:primaryType="nt:unstructured">
             <file/>
         </image>
     </jcr:content>
     <register/>
-    <newsletter/>
 </jcr:root>

@@ -9,7 +9,7 @@
         cq:parentPath="/content/dam/aem-app-integration-demo"
         dam:assetState="processing"
         dam:relativePath="aem-app-integration-demo/asset.jpg"
-        jcr:lastModified="{Date}2020-09-03T10:13:01.427+02:00"
+        jcr:lastModified="{Date}2020-09-07T10:38:03.291+02:00"
         jcr:lastModifiedBy="workflow-process-service"
         jcr:primaryType="dam:AssetContent"
         status="Error[No Encoding]">
@@ -39,7 +39,7 @@
             exif:ExifVersion="0221"
             exif:PixelXDimension="{Long}940"
             exif:PixelYDimension="{Long}51"
-            jcr:lastModified="{Date}2020-09-03T10:12:37.660+02:00"
+            jcr:lastModified="{Date}2020-09-07T10:37:33.700+02:00"
             jcr:lastModifiedBy="admin"
             jcr:mixinTypes="[cq:Taggable]"
             jcr:primaryType="nt:unstructured"
