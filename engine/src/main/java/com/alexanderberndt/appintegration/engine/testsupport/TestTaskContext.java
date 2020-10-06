@@ -11,7 +11,7 @@ import javax.annotation.Nullable;
 
 public final class TestTaskContext extends TaskContext {
 
-    protected TestTaskContext(GlobalContext globalContext, TaskLogger taskLogger, Ranking rank, String taskNamespace, ExternalResourceType resourceType, @Nullable DataMap executionDataMap) {
+    protected TestTaskContext(GlobalContext<?, ?> globalContext, TaskLogger taskLogger, Ranking rank, String taskNamespace, ExternalResourceType resourceType, @Nullable DataMap executionDataMap) {
         super(globalContext, taskLogger, rank, taskNamespace, resourceType, executionDataMap);
     }
 }

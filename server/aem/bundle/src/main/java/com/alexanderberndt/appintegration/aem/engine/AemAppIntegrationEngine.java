@@ -96,10 +96,10 @@ public class AemAppIntegrationEngine extends AbstractAppIntegrationEngine<SlingA
     }
 
     private <R> R callRuntimeMethodWithContext(ResourceResolver resolver, @Nonnull String applicationId, @Nonnull Function<AemGlobalContext, R> function) {
-            final LogAppender logAppender = new Slf4jLogAppender();
-            final AemExternalResourceCache cache = new AemExternalResourceCache(resolver, applicationId);
-            final AemGlobalContext context = new AemGlobalContext(applicationId, factory, cache, logAppender, resolver);
-            R result = function.apply(context);
+        final LogAppender logAppender = new Slf4jLogAppender();
+        final AemExternalResourceCache cache = new AemExternalResourceCache(resolver, applicationId);
+        final AemGlobalContext context = new AemGlobalContext(applicationId, factory, cache, logAppender, resolver);
+        R result = function.apply(context);
         try {
             resolver.commit();
         } catch (PersistenceException e) {
@@ -129,15 +129,23 @@ public class AemAppIntegrationEngine extends AbstractAppIntegrationEngine<SlingA
         }
     }
 
-    private void callBackgroundMethod(AemGlobalContext context, AemExternalResourceCache cache, @Nonnull Consumer<AemGlobalContext> consumer) {
+    private void callBackgroundMethod(@Nonnull AemGlobalContext context, @Nonnull AemExternalResourceCache cache, @Nonnull Consumer<AemGlobalContext> consumer) {
+
         try {
             consumer.accept(context);
+        } catch (AppIntegrationException e) {
+            if (e.getCause() == null) {
+                LOG.error("Prefetch aborted with exception: {}", e.getMessage());
+            } else {
+                LOG.error("Prefetch aborted with exception", e);
+            }
+            context.getIntegrationLog().setSummary(LogStatus.FAILED, "Prefetch aborted with exception: %s", e.getMessage());
+            if (cache.isLongRunningWrite()) {
+                cache.rollbackLongRunningWrite();
+            }
         } catch (Exception e) {
-
-            // write error to log
             LOG.error("Prefetch aborted with exception", e);
             context.getIntegrationLog().setSummary(LogStatus.FAILED, "Prefetch aborted with exception: %s", e.getMessage());
-
             if (cache.isLongRunningWrite()) {
                 cache.rollbackLongRunningWrite();
             }

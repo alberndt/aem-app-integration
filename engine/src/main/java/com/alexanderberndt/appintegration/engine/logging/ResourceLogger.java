@@ -13,14 +13,14 @@ public class ResourceLogger extends AbstractLogger {
 
     public ResourceLogger(@Nonnull LogAppender appender, @Nonnull String url) {
         super(appender);
-        this.setUrl(url);
         this.appender.appendLogger(this);
+        this.setUrl(url);
     }
 
     public ResourceLogger(@Nonnull IntegrationLogger parentLogger, @Nonnull String url) {
         super(parentLogger);
-        this.setUrl(url);
         appender.appendLogger(this);
+        this.setUrl(url);
     }
 
     public ResourceLogger(@Nonnull LogAppender appender, @Nonnull ExternalResourceRef resourceRef) {

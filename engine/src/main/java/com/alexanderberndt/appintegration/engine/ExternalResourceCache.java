@@ -23,8 +23,6 @@ public interface ExternalResourceCache {
 
     boolean startLongRunningWrite(@Nullable String nameHint);
 
-    void continueLongRunningWrite();
-
     void commitLongRunningWrite();
 
     void rollbackLongRunningWrite();

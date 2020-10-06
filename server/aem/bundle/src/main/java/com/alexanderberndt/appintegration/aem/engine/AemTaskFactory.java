@@ -9,7 +9,7 @@ import org.osgi.service.component.annotations.*;
 import javax.annotation.Nullable;
 import java.util.Map;
 
-@Component
+@Component(service = TaskFactory.class)
 public class AemTaskFactory extends TaskFactory {
 
     public static final String TASK_NAME_PROPERTY = "task-name";
@@ -17,23 +17,23 @@ public class AemTaskFactory extends TaskFactory {
     @Reference(name = "preparationTask", cardinality = ReferenceCardinality.MULTIPLE,
             policy = ReferencePolicy.DYNAMIC, policyOption = ReferencePolicyOption.GREEDY)
     protected void bindPreparationTask(final PreparationTask task, Map<String, ?> properties) {
-        super.register(task, getTaskName(properties));
+        super.registerPreparationTask(task, getTaskName(properties));
     }
 
     @SuppressWarnings("unused")
     protected void unbindPreparationTask(final PreparationTask task) {
-        super.unregister(task);
+        super.unregisterPreparationTask(task);
     }
 
     @Reference(name = "processingTask", cardinality = ReferenceCardinality.MULTIPLE,
             policy = ReferencePolicy.DYNAMIC, policyOption = ReferencePolicyOption.GREEDY)
     protected void bindProcessingTask(final ProcessingTask task, Map<String, ?> properties) {
-        super.register(task, getTaskName(properties));
+        super.registerProcessingTask(task, getTaskName(properties));
     }
 
     @SuppressWarnings("unused")
     protected void unbindProcessingTask(final ProcessingTask task) {
-        super.unregister(task);
+        super.unregisterProcessingTask(task);
     }
 
     private String getTaskName(@Nullable Map<String, ?> properties) {

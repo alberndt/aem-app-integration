@@ -81,7 +81,6 @@ public class TestExternalResourceCache implements ExternalResourceCache {
         }
     }
 
-    @Override
     public void continueLongRunningWrite() {
         if (this.writeVersionId == null) {
             throw new AppIntegrationException("Cannot continue long-running write, as it was not started yet.");

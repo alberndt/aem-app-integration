@@ -50,6 +50,7 @@ public class SlingApplicationInstance implements ApplicationInstance  {
     @Override
     public String toString() {
         return new StringJoiner(", ", SlingApplicationInstance.class.getSimpleName() + "[", "]")
+                .add("path='" + resource.getPath() + "'")
                 .add("applicationId='" + applicationId + "'")
                 .add("componentId='" + componentId + "'")
                 .toString();

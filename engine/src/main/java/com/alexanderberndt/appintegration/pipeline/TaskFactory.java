@@ -30,23 +30,23 @@ public abstract class TaskFactory {
         return processingTaskMap.get(name);
     }
 
-    protected void register(@Nonnull final PreparationTask task, @Nullable final String nameHint) {
+    protected void registerPreparationTask(@Nonnull final PreparationTask task, @Nullable final String nameHint) {
         final String taskName = getTaskName(task.getClass(), nameHint);
         LOG.info("register preparation-task {} of class {}", taskName, task.getClass());
         preparationTaskMap.put(taskName, task);
     }
 
-    protected void register(@Nonnull final ProcessingTask task, @Nullable final String nameHint) {
+    protected void registerProcessingTask(@Nonnull final ProcessingTask task, @Nullable final String nameHint) {
         final String taskName = getTaskName(task.getClass(), nameHint);
         LOG.info("register processing-task {} of class {}", taskName, task.getClass());
         processingTaskMap.put(taskName, task);
     }
 
-    protected void unregister(@Nonnull final PreparationTask task) {
+    protected void unregisterPreparationTask(@Nonnull final PreparationTask task) {
         preparationTaskMap.entrySet().removeIf(entry -> (entry.getValue() == task));
     }
 
-    protected void unregister(@Nonnull final ProcessingTask task) {
+    protected void unregisterProcessingTask(@Nonnull final ProcessingTask task) {
         processingTaskMap.entrySet().removeIf(entry -> (entry.getValue() == task));
     }
 

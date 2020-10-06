@@ -4,7 +4,7 @@
   "components": {
     "register": {
       "name": "Register",
-      "url": "register.php?event=${event}&lang=${language}"
+      "url": "register.php?lang=${required:language}&event=${event}"
     },
     "list": {
       "name": "Attendee List",

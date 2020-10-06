@@ -83,28 +83,6 @@ public class AemExternalResourceCache implements ExternalResourceCache {
     }
 
 
-    // ToDo: Make continueLongRunningWrite implicit
-    @Override
-    public void continueLongRunningWrite() {
-        if (versionId == null) {
-            throw new AppIntegrationException("Cannot refresh lock, as cache is not locked yet!");
-        }
-
-        final Resource rootRes = resolver.getResource(rootPath);
-        if (rootRes == null) {
-            throw new AppIntegrationException("Cannot refresh lock on " + rootPath + ", because path not found!");
-        }
-
-        final ModifiableValueMap valueMap = Objects.requireNonNull(rootRes.adaptTo(ModifiableValueMap.class));
-        if (versionId.equals(valueMap.get(LOCK_ATTR, String.class))) {
-            valueMap.put(LOCKED_SINCE_ATTR, Calendar.getInstance());
-            try {
-                resolver.commit();
-            } catch (PersistenceException e) {
-                throw new AppIntegrationException("Cannot refresh lock on " + rootPath, e);
-            }
-        }
-    }
 
     @Override
     public void commitLongRunningWrite() {
@@ -229,6 +207,30 @@ public class AemExternalResourceCache implements ExternalResourceCache {
             throw new AppIntegrationException("Cannot store resource " + resource.getUri(), e);
         }
     }
+
+    // ToDo: Make continueLongRunningWrite implicit
+    private void continueLongRunningWrite() {
+        if (versionId == null) {
+            throw new AppIntegrationException("Cannot refresh lock, as cache is not locked yet!");
+        }
+
+        final Resource rootRes = resolver.getResource(rootPath);
+        if (rootRes == null) {
+            throw new AppIntegrationException("Cannot refresh lock on " + rootPath + ", because path not found!");
+        }
+
+        final ModifiableValueMap valueMap = Objects.requireNonNull(rootRes.adaptTo(ModifiableValueMap.class));
+        if (versionId.equals(valueMap.get(LOCK_ATTR, String.class))) {
+            valueMap.put(LOCKED_SINCE_ATTR, Calendar.getInstance());
+            try {
+                resolver.commit();
+            } catch (PersistenceException e) {
+                throw new AppIntegrationException("Cannot refresh lock on " + rootPath, e);
+            }
+        }
+    }
+
+
 
 
     @Override

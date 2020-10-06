@@ -9,22 +9,29 @@ import com.alexanderberndt.appintegration.tasks.process.FileSizeValidationTask;
 import com.alexanderberndt.appintegration.tasks.process.RegexValidationTask;
 import com.alexanderberndt.appintegration.tasks.process.html.ExtractHtmlSnippetTask;
 
+import java.util.Arrays;
+
 public class TestTaskFactory extends TaskFactory {
 
     public TestTaskFactory() {
-        register(new PropertiesTask());
-        register(new AddReferencedResourceTask());
-        register(new FileSizeValidationTask());
-        register(new RegexValidationTask());
-        register(new ExtractHtmlSnippetTask());
+        registerPreparationTasks(new PropertiesTask());
+
+        registerProcessingTasks(
+                new AddReferencedResourceTask(),
+                new FileSizeValidationTask(),
+                new RegexValidationTask(),
+                new ExtractHtmlSnippetTask());
     }
 
-    public void register(PreparationTask task) {
-        super.register(task, null);
+    public void registerPreparationTasks(PreparationTask... tasks) {
+        if (tasks != null) {
+            Arrays.stream(tasks).forEach(task -> super.registerPreparationTask(task, null));
+        }
     }
 
-    public void register(ProcessingTask task) {
-        super.register(task, null);
+    public void registerProcessingTasks(ProcessingTask... tasks) {
+        if (tasks != null) {
+            Arrays.stream(tasks).forEach(task -> super.registerProcessingTask(task, null));
+        }
     }
-
 }

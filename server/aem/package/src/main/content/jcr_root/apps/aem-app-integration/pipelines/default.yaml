@@ -1,10 +1,5 @@
 prepare:
 
-  read-from-cache:
-
-load:
-  download:
-
 process:
   file-size-validation:
     fileTypes: html
@@ -69,6 +64,4 @@ process:
       relativeUrl.html-snippet: "fonts/poppins/poppins-v5-latin-regular.woff2"
       expectedType.html-snippet: "any"
 
-  store-in-cache:
-  
 
