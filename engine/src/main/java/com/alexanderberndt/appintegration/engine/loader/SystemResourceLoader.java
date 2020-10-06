@@ -25,6 +25,11 @@ public class SystemResourceLoader implements ResourceLoader {
     @Override
     public ExternalResource load(@Nonnull ExternalResourceRef resourceRef, @Nonnull ExternalResourceFactory factory) throws ResourceLoaderException {
 
+        final ExternalResource cachedRes = resourceRef.getCachedExternalRes();
+        if (cachedRes != null) {
+            return cachedRes;
+        }
+
         final URI uri = resourceRef.getUri();
         if (!StringUtils.equals("classpath", uri.getScheme()) || !StringUtils.equals("system", uri.getHost())) {
             throw new AppIntegrationException("SystemResourceLoader supports only URI's with classpath://system/<path>, but was " + uri.toString());

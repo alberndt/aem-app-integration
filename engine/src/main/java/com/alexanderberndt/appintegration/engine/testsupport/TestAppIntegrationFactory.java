@@ -121,4 +121,7 @@ public class TestAppIntegrationFactory implements AppIntegrationFactory<TestAppI
         applicationMap.put(application.getApplicationId(), application);
     }
 
+    public void registerResourceLoader(String resourceLoaderName, ResourceLoader resourceLoader) {
+        resourceLoaderMap.put(resourceLoaderName, resourceLoader);
+    }
 }

@@ -1,10 +1,5 @@
 prepare:
 
-  read-from-cache:
-
-load:
-  download:
-
 process:
   file-size-validation:
     fileTypes: html
@@ -26,7 +21,4 @@ process:
   extract-html-snippet:
     fileTypes: html-snippet
     configuration:
-
-
-  store-in-cache:
 

@@ -4,7 +4,6 @@ import com.alexanderberndt.appintegration.engine.logging.appender.Slf4jLogAppend
 import com.alexanderberndt.appintegration.engine.testsupport.TestAppIntegrationEngine;
 import com.alexanderberndt.appintegration.engine.testsupport.TestAppIntegrationFactory;
 import com.alexanderberndt.appintegration.engine.testsupport.TestApplication;
-import com.alexanderberndt.appintegration.engine.testsupport.TestLoadingTask;
 import com.alexanderberndt.appintegration.pipeline.ProcessingPipeline;
 import com.alexanderberndt.appintegration.pipeline.builder.simple.SimplePipelineBuilder;
 import com.alexanderberndt.appintegration.tasks.prepare.ResourceTypeByFileExtensionTask;
@@ -37,7 +36,6 @@ class TaskContextTest2 {
 
         final ProcessingPipeline pipeline = new SimplePipelineBuilder()
                 .addPreparationTask("check-type", new ResourceTypeByFileExtensionTask())
-                .addLoadingTask("load", new TestLoadingTask("Hello World!"))
                 .addProcessingTask("verify", (context, resource) -> {
                     stringValue.value = context.getValue("str", String.class);
                     numberValue.value = context.getValue("number", Integer.class);

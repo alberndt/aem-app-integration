@@ -91,7 +91,7 @@ public class TaskContext {
         return globalContext.getResourceFactory();
     }
 
-    @Nonnull
+    @Nullable
     public ExternalResourceCache getExternalResourceCache() {
         return globalContext.getExternalResourceCache();
     }

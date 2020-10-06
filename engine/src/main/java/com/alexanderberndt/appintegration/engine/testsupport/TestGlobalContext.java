@@ -15,7 +15,7 @@ import javax.annotation.Nullable;
 
 public class TestGlobalContext extends GlobalContext<TestAppInstance, TestGlobalContext> {
 
-    public TestGlobalContext(@Nonnull String applicationId, @Nonnull AppIntegrationFactory<TestAppInstance, TestGlobalContext> factory, @Nonnull ExternalResourceCache externalResourceCache, @Nullable LogAppender logAppender) {
+    public TestGlobalContext(@Nonnull String applicationId, @Nonnull AppIntegrationFactory<TestAppInstance, TestGlobalContext> factory, @Nullable ExternalResourceCache externalResourceCache, @Nullable LogAppender logAppender) {
         super(applicationId, factory, externalResourceCache, logAppender);
     }
 

@@ -1,6 +1,7 @@
 package com.alexanderberndt.appintegration.engine.logging.appender;
 
 import com.alexanderberndt.appintegration.engine.logging.AbstractLogger;
+import com.alexanderberndt.appintegration.engine.logging.DetailsLogger;
 import com.alexanderberndt.appintegration.engine.logging.LogAppender;
 import com.alexanderberndt.appintegration.engine.logging.LogStatus;
 import org.slf4j.Logger;
@@ -14,32 +15,32 @@ public class Slf4jLogAppender implements LogAppender {
     private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public Slf4jLogAppender() {
-        LOG.info("New Slf4jLogAppender created...");
+        // do not log this
     }
 
     @Override
     public void appendLogger(@Nonnull AbstractLogger logger) {
-        LOG.info("append {}", logger.getLoggerName());
+        // do not log this
     }
 
     @Override
     public void setLoggerSummary(@Nonnull AbstractLogger logger, LogStatus status, String message) {
-        getLogMethod(status).log("set summary {}: {} - {}", logger.getLoggerName(), status, message);
+        getLogMethod(logger, status).log("set summary {}: {} - {}", logger.getLoggerName(), status, message);
     }
 
     @Override
     public void setLoggerStatus(@Nonnull AbstractLogger logger, LogStatus status) {
-        getLogMethod(status).log("set status for {}: {}", logger.getLoggerName(), status);
+        getLogMethod(logger, status).log("set status for {}: {}", logger.getLoggerName(), status);
     }
 
     @Override
     public void setLoggerProperty(@Nonnull AbstractLogger logger, @Nonnull String key, String value) {
-        LOG.info("set property for {}: {} = {}", logger.getLoggerName(), key, value);
+        // do not log this
     }
 
     @Override
     public void appendLogEntry(@Nonnull AbstractLogger logger, LogStatus status, String message) {
-        getLogMethod(status).log("append entry for {}: {} - {}", logger.getLoggerName(), status, message);
+        getLogMethod(logger, status).log("append entry for {}: {} - {}", logger.getLoggerName(), status, message);
     }
 
     @Override
@@ -48,7 +49,7 @@ public class Slf4jLogAppender implements LogAppender {
     }
 
     @Nonnull
-    private LogMethod getLogMethod(LogStatus status) {
+    private LogMethod getLogMethod(AbstractLogger logger, LogStatus status) {
         switch ((status != null) ? status : LogStatus.INFO) {
             case ERROR:
             case FAILED:
@@ -56,6 +57,7 @@ public class Slf4jLogAppender implements LogAppender {
             case WARNING:
                 return LOG::warn;
             case INFO:
+                return (logger instanceof DetailsLogger) ? LOG::debug : LOG::info;
             default:
                 return LOG::info;
         }

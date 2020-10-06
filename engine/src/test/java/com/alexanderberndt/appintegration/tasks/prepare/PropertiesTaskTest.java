@@ -4,7 +4,7 @@ import com.alexanderberndt.appintegration.engine.logging.appender.Slf4jLogAppend
 import com.alexanderberndt.appintegration.engine.testsupport.TestAppIntegrationEngine;
 import com.alexanderberndt.appintegration.engine.testsupport.TestAppIntegrationFactory;
 import com.alexanderberndt.appintegration.engine.testsupport.TestApplication;
-import com.alexanderberndt.appintegration.engine.testsupport.TestLoadingTask;
+import com.alexanderberndt.appintegration.engine.testsupport.TestResourceLoader;
 import com.alexanderberndt.appintegration.pipeline.ProcessingPipeline;
 import com.alexanderberndt.appintegration.pipeline.builder.simple.SimplePipelineBuilder;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,13 +14,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collections;
 
-import static com.alexanderberndt.appintegration.engine.testsupport.TestAppIntegrationFactory.SYSTEM_RESOURCE_LOADER_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 class PropertiesTaskTest {
 
     private static final String TEST_APP = "test-app";
+
+    private TestResourceLoader testResourceLoader;
 
     private TestAppIntegrationEngine engine;
 
@@ -31,7 +32,7 @@ class PropertiesTaskTest {
 
     @BeforeEach
     void beforeEach() {
-        final TestApplication testApplication = new TestApplication(TEST_APP, "xxx", SYSTEM_RESOURCE_LOADER_NAME, "custom", Collections.emptyList(), null);
+        final TestApplication testApplication = new TestApplication(TEST_APP, "xxx", "test-loader", "custom", Collections.emptyList(), null);
 
         final ProcessingPipeline pipeline = new SimplePipelineBuilder()
                 .addPreparationTask("check-type", new ResourceTypeByFileExtensionTask())
@@ -39,7 +40,6 @@ class PropertiesTaskTest {
                 .withTaskParam("verify:hello", "Hello World!")
                 .withTaskParam("verify:hello.css", "This is a CSS value!")
                 .withTaskParam("verify:the-number", 42)
-                .addLoadingTask("load", new TestLoadingTask("Hello World!"))
                 .addProcessingTask("verify", (context, resource) -> {
                     stringValue.value = context.getValue("hello", String.class);
                     numberValue.value = context.getValue("the-number", Integer.class);
@@ -47,8 +47,11 @@ class PropertiesTaskTest {
                 .build();
 
         final TestAppIntegrationFactory factory = new TestAppIntegrationFactory();
+
         factory.registerApplication(testApplication);
         factory.registerPipeline("custom", pipeline);
+        testResourceLoader = new TestResourceLoader("Hello World!");
+        factory.registerResourceLoader("test-loader", testResourceLoader);
 
         engine = new TestAppIntegrationEngine(factory, Slf4jLogAppender::new);
 

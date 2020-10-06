@@ -4,7 +4,6 @@ import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
 import com.alexanderberndt.appintegration.pipeline.ProcessingPipeline;
 import com.alexanderberndt.appintegration.pipeline.TaskFactory;
 import com.alexanderberndt.appintegration.pipeline.TaskWrapper;
-import com.alexanderberndt.appintegration.pipeline.task.LoadingTask;
 import com.alexanderberndt.appintegration.pipeline.task.PreparationTask;
 import com.alexanderberndt.appintegration.pipeline.task.ProcessingTask;
 import com.alexanderberndt.appintegration.utils.DataMap;
@@ -28,17 +27,9 @@ public class ProcessingPipelineBuilder {
         final Set<String> taskNameSet = new HashSet<>();
 
         final List<TaskWrapper<PreparationTask>> preparationTasks = createTaskInstanceList(pipelineDef.getPreparationTasks(), taskFactory::getPreparationTask, taskNameSet);
-        final List<TaskWrapper<LoadingTask>> downloadTasks = createTaskInstanceList(pipelineDef.getLoaderTasks(), taskFactory::getLoadingTask, taskNameSet);
         final List<TaskWrapper<ProcessingTask>> processingTasks = createTaskInstanceList(pipelineDef.getProcessingTasks(), taskFactory::getProcessingTask, taskNameSet);
 
-        if (downloadTasks.isEmpty()) {
-            throw new AppIntegrationException("Cannot create pipeline, as it doesn't contain a loading task");
-        }
-        if (downloadTasks.size() > 1) {
-            throw new AppIntegrationException("Cannot create pipeline, as it contains " + downloadTasks.size() + " loading tasks. But it MUST be exactly one!");
-        }
-
-        return new ProcessingPipeline(preparationTasks, downloadTasks.get(0), processingTasks);
+        return new ProcessingPipeline(preparationTasks, processingTasks);
     }
 
     @Nonnull

@@ -10,9 +10,6 @@ public interface PipelineDefinition {
     Map<String, TaskDefinition> getPreparationTasks();
 
     @Nullable
-    Map<String, TaskDefinition> getLoaderTasks();
-
-    @Nullable
     Map<String, TaskDefinition> getProcessingTasks();
 
 }

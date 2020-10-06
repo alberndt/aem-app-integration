@@ -33,7 +33,7 @@ public abstract class GlobalContext<I extends ApplicationInstance, C extends Glo
     @Nonnull
     private final AppIntegrationFactory<I, C> factory;
 
-    @Nonnull
+    @Nullable
     private final ExternalResourceCache externalResourceCache;
 
     @Nonnull
@@ -55,7 +55,7 @@ public abstract class GlobalContext<I extends ApplicationInstance, C extends Glo
     protected GlobalContext(
             @Nonnull String applicationId,
             @Nonnull AppIntegrationFactory<I, C> factory,
-            @Nonnull ExternalResourceCache externalResourceCache,
+            @Nullable ExternalResourceCache externalResourceCache,
             @Nullable LogAppender logAppender) {
 
         this.applicationId = applicationId;
@@ -182,7 +182,7 @@ public abstract class GlobalContext<I extends ApplicationInstance, C extends Glo
         return logger;
     }
 
-    @Nonnull
+    @Nullable
     public ExternalResourceCache getExternalResourceCache() {
         return externalResourceCache;
     }

@@ -1,6 +1,8 @@
 package com.alexanderberndt.appintegration.pipeline;
 
 import com.alexanderberndt.appintegration.engine.ExternalResourceCache;
+import com.alexanderberndt.appintegration.engine.ResourceLoader;
+import com.alexanderberndt.appintegration.engine.ResourceLoaderException;
 import com.alexanderberndt.appintegration.engine.context.GlobalContext;
 import com.alexanderberndt.appintegration.engine.context.TaskContext;
 import com.alexanderberndt.appintegration.engine.logging.ResourceLogger;
@@ -8,6 +10,7 @@ import com.alexanderberndt.appintegration.engine.logging.TaskLogger;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceType;
+import com.alexanderberndt.appintegration.exceptions.AppIntegrationException;
 import com.alexanderberndt.appintegration.pipeline.configuration.Ranking;
 import com.alexanderberndt.appintegration.pipeline.task.LoadingTask;
 import com.alexanderberndt.appintegration.pipeline.task.PreparationTask;
@@ -20,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
@@ -49,7 +53,7 @@ public class ProcessingPipeline {
     // ToDo:
 
     @Nonnull
-    private final TaskWrapper<LoadingTask> loadingTask;
+    private static final TaskWrapper<LoadingTask> loadingTask = new TaskWrapper<>("download", "download", ProcessingPipeline::download, null);
 
     @Nonnull
     private final List<TaskWrapper<ProcessingTask>> processingTasks;
@@ -66,10 +70,8 @@ public class ProcessingPipeline {
 
     public ProcessingPipeline(
             @Nullable List<TaskWrapper<PreparationTask>> preparationTasks,
-            @Nonnull TaskWrapper<LoadingTask> loadingTask,
             @Nullable List<TaskWrapper<ProcessingTask>> processingTasks) {
         this.preparationTasks = Optional.ofNullable(preparationTasks).orElse(Collections.emptyList());
-        this.loadingTask = loadingTask;
         this.processingTasks = Optional.ofNullable(processingTasks).orElse(Collections.emptyList());
     }
 
@@ -182,8 +184,9 @@ public class ProcessingPipeline {
                     return null;
                 });
 
-        // store resource is cache
-        cache.storeResource(resource);
+        // ToDo: Check this!
+//        // store resource is cache
+//        cache.storeResource(resource);
 
         log.setTime(String.format("%,d ms", stopWatch.getTime(TimeUnit.MILLISECONDS)));
         return resource;
@@ -193,9 +196,13 @@ public class ProcessingPipeline {
         final boolean cachingEnabled = taskContext.getValue(CACHING_ENABLED_PROP, true);
         if (cachingEnabled) {
             final ExternalResourceCache cache = taskContext.getExternalResourceCache();
-            final ExternalResource cachedRes = cache.getCachedResource(resourceRef, taskContext.getResourceFactory());
-            if (cachedRes != null) {
-                resourceRef.setCachedExternalRes(cachedRes);
+            if (cache != null) {
+                final ExternalResource cachedRes = cache.getCachedResource(resourceRef, taskContext.getResourceFactory());
+                if (cachedRes != null) {
+                    resourceRef.setCachedExternalRes(cachedRes);
+                }
+            } else {
+                taskContext.addWarning("No cache available!");
             }
         } else {
             taskContext.addWarning("Caching disabled!");
@@ -208,14 +215,35 @@ public class ProcessingPipeline {
 
         if (cachingEnabled) {
             final ExternalResourceCache cache = taskContext.getExternalResourceCache();
-            final Supplier<InputStream> cachedDataSupplier = cache.storeResource(resource);
-            resource.setContentSupplier(cachedDataSupplier, InputStream.class);
+            if (cache != null) {
+                final Supplier<InputStream> cachedDataSupplier = cache.storeResource(resource);
+                resource.setContentSupplier(cachedDataSupplier, InputStream.class);
+            } else {
+                taskContext.addWarning("No cache available!");
+            }
         } else {
             taskContext.addWarning("Caching disabled!");
         }
     }
 
 
+
+    protected static ExternalResource download(@Nonnull TaskContext context, ExternalResourceRef resourceRef) {
+
+//        final ExternalResource cachedResource = resourceRef.getCachedExternalRes();
+//        if (cachedResource != null) {
+//            return cachedResource;
+//        }
+
+        // ToDo: Cache-Logic should be part of the resource loader
+
+        ResourceLoader resourceLoader = context.getResourceLoader();
+        try {
+            return resourceLoader.load(resourceRef, context.getResourceFactory());
+        } catch (IOException | ResourceLoaderException e) {
+            throw new AppIntegrationException("Failed to load resource " + resourceRef.getUri(), e);
+        }
+    }
 
     protected <T, R> R applyWithContext(
             @Nonnull TaskWrapper<T> taskWrapper,

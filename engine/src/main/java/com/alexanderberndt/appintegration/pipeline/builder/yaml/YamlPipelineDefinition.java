@@ -15,9 +15,6 @@ public class YamlPipelineDefinition implements PipelineDefinition {
     @JsonProperty("prepare")
     private Map<String, YamlTaskDefinition> preparationTasks;
 
-    @JsonProperty("load")
-    private Map<String, YamlTaskDefinition> loaderTasks;
-
     @JsonProperty("process")
     private Map<String, YamlTaskDefinition> processingTasks;
 
@@ -25,12 +22,6 @@ public class YamlPipelineDefinition implements PipelineDefinition {
     @Override
     public Map<String, TaskDefinition> getPreparationTasks() {
         return (preparationTasks != null) ? new HashMap<>(preparationTasks) : null;
-    }
-
-    @Nullable
-    @Override
-    public Map<String, TaskDefinition> getLoaderTasks() {
-        return (loaderTasks != null) ? new HashMap<>(loaderTasks) : null;
     }
 
     @Nullable

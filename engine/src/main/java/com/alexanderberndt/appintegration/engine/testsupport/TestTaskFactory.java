@@ -4,8 +4,6 @@ import com.alexanderberndt.appintegration.pipeline.TaskFactory;
 import com.alexanderberndt.appintegration.pipeline.task.LoadingTask;
 import com.alexanderberndt.appintegration.pipeline.task.PreparationTask;
 import com.alexanderberndt.appintegration.pipeline.task.ProcessingTask;
-import com.alexanderberndt.appintegration.tasks.cache.ReadFromCacheTask;
-import com.alexanderberndt.appintegration.tasks.cache.StoreInCacheTask;
 import com.alexanderberndt.appintegration.tasks.load.DownloadTask;
 import com.alexanderberndt.appintegration.tasks.prepare.PropertiesTask;
 import com.alexanderberndt.appintegration.tasks.process.AddReferencedResourceTask;
@@ -32,8 +30,6 @@ public class TestTaskFactory implements TaskFactory {
         registerTask(new AddReferencedResourceTask());
         registerTask(new FileSizeValidationTask());
         registerTask(new RegexValidationTask());
-        registerTask(new StoreInCacheTask());
-        registerTask(new ReadFromCacheTask());
         registerTask(new ExtractHtmlSnippetTask());
     }
 
