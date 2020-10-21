@@ -258,7 +258,12 @@ public class AemExternalResourceCache extends AbstractExternalResourceCache<AemE
             if (metadataRes == null) metadataRes = resolver.create(cacheEntry.getCacheEntryRes(), nodeName, null);
 
             final ModifiableValueMap valueMap = Objects.requireNonNull(metadataRes.adaptTo(ModifiableValueMap.class));
-            valueMap.clear();
+
+            Set<String> keySet = valueMap.keySet().stream()
+                    .filter(key -> !StringUtils.startsWithAny(key, "jcr:", "cq:"))
+                    .collect(Collectors.toSet());
+            keySet.forEach(valueMap::remove);
+
             metadataMap.entrySet().stream()
                     .filter(entry -> !entry.getKey().startsWith("jcr:"))
                     .filter(entry -> !entry.getKey().startsWith("cq:"))
