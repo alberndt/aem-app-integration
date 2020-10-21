@@ -8,7 +8,7 @@ public abstract class AbstractTextParser<T> implements TextParser {
     @Nonnull
     private final Class<T> targetType;
 
-    public AbstractTextParser(@Nonnull Class<T> targetType) {
+    protected AbstractTextParser(@Nonnull Class<T> targetType) {
         this.targetType = targetType;
     }
 

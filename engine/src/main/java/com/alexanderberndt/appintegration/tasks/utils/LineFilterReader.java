@@ -14,7 +14,7 @@ public abstract class LineFilterReader extends Reader {
 
     private boolean isBeforeLineEnd = false;
 
-    public LineFilterReader(Reader input) {
+    protected LineFilterReader(Reader input) {
         this.input = new BufferedReader(input);
     }
 
