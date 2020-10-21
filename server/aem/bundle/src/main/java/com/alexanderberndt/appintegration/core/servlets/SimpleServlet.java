@@ -23,13 +23,10 @@ import org.apache.sling.api.servlets.HttpConstants;
 import org.apache.sling.api.servlets.SlingAllMethodsServlet;
 import org.apache.sling.api.servlets.SlingSafeMethodsServlet;
 import org.apache.sling.servlets.annotations.SlingServletResourceTypes;
-import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.propertytypes.ServiceDescription;
 
 import javax.servlet.Servlet;
-import javax.servlet.ServletException;
 import java.io.IOException;
 
 /**
@@ -51,7 +48,7 @@ public class SimpleServlet extends SlingSafeMethodsServlet {
 
     @Override
     protected void doGet(final SlingHttpServletRequest req,
-            final SlingHttpServletResponse resp) throws ServletException, IOException {
+            final SlingHttpServletResponse resp) throws IOException {
         final Resource resource = req.getResource();
         resp.setContentType("text/plain");
         resp.getWriter().write("Title = " + resource.getValueMap().get(JcrConstants.JCR_TITLE));
