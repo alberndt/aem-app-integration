@@ -23,11 +23,10 @@ public class SystemResourceLoader implements ResourceLoader {
 
     @Nonnull
     @Override
-    public ExternalResource load(@Nonnull ExternalResourceRef resourceRef, @Nonnull ExternalResourceFactory factory) throws ResourceLoaderException {
+    public ExternalResource load(@Nonnull ExternalResourceRef resourceRef, @Nonnull ExternalResourceFactory factory, ExternalResource cachedResource) throws ResourceLoaderException {
 
-        final ExternalResource cachedRes = resourceRef.getCachedExternalRes();
-        if (cachedRes != null) {
-            return cachedRes;
+        if (cachedResource != null) {
+            return cachedResource;
         }
 
         final URI uri = resourceRef.getUri();

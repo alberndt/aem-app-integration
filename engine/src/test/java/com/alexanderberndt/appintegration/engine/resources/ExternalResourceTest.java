@@ -132,8 +132,8 @@ class ExternalResourceTest {
 
     @Test
     void setLoadStatus() {
-        resource.setLoadStatus(ExternalResource.LoadStatus.OK, Collections.singletonMap("size", "100kb"));
-        assertEquals(ExternalResource.LoadStatus.OK, resource.getLoadStatus());
+        resource.setLoadStatus(ExternalResource.LoadStatus.LOADED, Collections.singletonMap("size", "100kb"));
+        assertEquals(ExternalResource.LoadStatus.LOADED, resource.getLoadStatus());
         assertEquals(1, resource.getLoadStatusDetails().size());
         assertEquals("100kb", resource.getLoadStatusDetails().get("size"));
     }

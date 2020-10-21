@@ -14,7 +14,16 @@ import java.net.URISyntaxException;
 public interface ResourceLoader {
 
     @Nonnull
-    ExternalResource load(@Nonnull final ExternalResourceRef resourceRef, @Nonnull final ExternalResourceFactory factory) throws IOException, ResourceLoaderException;
+    ExternalResource load(
+            @Nonnull final ExternalResourceRef resourceRef,
+            @Nonnull final ExternalResourceFactory factory,
+            @Nullable final ExternalResource cachedResource) throws IOException, ResourceLoaderException;
+
+    @Nonnull
+    default ExternalResource load(@Nonnull final ExternalResourceRef resourceRef, @Nonnull final ExternalResourceFactory factory)
+            throws IOException, ResourceLoaderException {
+        return load(resourceRef, factory, null);
+    }
 
     @Nullable
     default URI getDefaultBaseUri() {

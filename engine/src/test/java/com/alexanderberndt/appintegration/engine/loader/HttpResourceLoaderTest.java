@@ -70,13 +70,10 @@ class HttpResourceLoaderTest {
     void loadCached() throws IOException, ResourceLoaderException, URISyntaxException {
         ExternalResource cachedRes = createExternalResource(new URI("http://localhost:8089/test-url"), ExternalResourceType.TEXT,
                 new ByteArrayInputStream("Cached data".getBytes()), null);
+        cachedRes.setMetadata("HttpHeader.ETag", "12345");
 
         ExternalResourceRef ref = ExternalResourceRef.create("http://localhost:8089/test-url", ExternalResourceType.TEXT);
-        ref.setCachedExternalRes(cachedRes);
-        ref.setMetadata("HttpHeader.ETag", "12345");
-
-
-        ExternalResource resource = resourceLoader.load(ref, this::createExternalResource);
+        ExternalResource resource = resourceLoader.load(ref, this::createExternalResource, cachedRes);
         assertEquals("Cached data", resource.getContentAsParsedObject(String.class));
     }
 

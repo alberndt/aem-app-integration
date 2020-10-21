@@ -1,6 +1,7 @@
 package com.alexanderberndt.appintegration.engine.context;
 
 import com.alexanderberndt.appintegration.engine.*;
+import com.alexanderberndt.appintegration.engine.cache.ExternalResourceCache;
 import com.alexanderberndt.appintegration.engine.logging.IntegrationLogger;
 import com.alexanderberndt.appintegration.engine.logging.LogAppender;
 import com.alexanderberndt.appintegration.engine.logging.ResourceLogger;

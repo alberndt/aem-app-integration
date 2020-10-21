@@ -21,10 +21,6 @@ public class ExternalResourceRef {
     @Nonnull
     private final DataMap metadataMap = new DataMap();
 
-    @Nullable
-    private ExternalResource cachedExternalRes;
-
-
     public ExternalResourceRef(@Nonnull URI uri, @Nullable ExternalResourceType expectedType) {
         this.uri = uri;
         this.expectedType = (expectedType != null) ? expectedType : ExternalResourceType.ANY;
@@ -72,15 +68,6 @@ public class ExternalResourceRef {
 
     public <T> T getMetadata(@Nonnull String name, @Nonnull Class<T> tClass) {
         return metadataMap.getData(name, tClass);
-    }
-
-    @Nullable
-    public ExternalResource getCachedExternalRes() {
-        return cachedExternalRes;
-    }
-
-    public void setCachedExternalRes(@Nullable ExternalResource cachedExternalRes) {
-        this.cachedExternalRes = cachedExternalRes;
     }
 
     @Override

@@ -24,7 +24,6 @@ import java.nio.charset.UnsupportedCharsetException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static java.net.HttpURLConnection.*;
 
@@ -43,7 +42,10 @@ public class HttpResourceLoader implements ResourceLoader {
 
     @Nonnull
     @Override
-    public ExternalResource load(@Nonnull ExternalResourceRef resourceRef, @Nonnull ExternalResourceFactory factory) {
+    public ExternalResource load(
+            @Nonnull final ExternalResourceRef resourceRef,
+            @Nonnull final ExternalResourceFactory factory,
+            @Nullable ExternalResource cachedResource) {
 
         try {
             final URI uri = resourceRef.getUri();
@@ -57,12 +59,12 @@ public class HttpResourceLoader implements ResourceLoader {
             connection.setConnectTimeout(CONNECTION_TIMEOUT);
             connection.setReadTimeout(READ_TIMEOUT);
 
-            if (resourceRef.getCachedExternalRes() != null) {
-                final String lastModified = resourceRef.getMetadata(HTTP_HEADER_PREFIX + "Last-Modified", String.class);
+            if (cachedResource != null) {
+                final String lastModified = cachedResource.getMetadata(HTTP_HEADER_PREFIX + "Last-Modified", String.class);
                 if (StringUtils.isNotBlank(lastModified)) {
                     connection.setRequestProperty("If-Modified-Since", lastModified);
                 }
-                final String eTag = resourceRef.getMetadata(HTTP_HEADER_PREFIX + "ETag", String.class);
+                final String eTag = cachedResource.getMetadata(HTTP_HEADER_PREFIX + "ETag", String.class);
                 if (StringUtils.isNotBlank(eTag)) {
                     connection.setRequestProperty("If-None-Match", eTag);
                 }
@@ -94,16 +96,12 @@ public class HttpResourceLoader implements ResourceLoader {
 
                     setResourceContentType(resource, connection);
                     setResourceContentEncoding(resource, connection);
-                    resource.setLoadStatus(LoadStatus.OK, loadStatusDetails);
+                    resource.setLoadStatus(LoadStatus.LOADED, loadStatusDetails);
 
                     return resource;
 
                 case HTTP_NOT_MODIFIED:
                     LOG.info("Not modified - take the cached version");
-                    final ExternalResource cachedResource = Optional.of(resourceRef)
-                            .map(ExternalResourceRef::getCachedExternalRes)
-                            .orElse(null);
-
                     if (cachedResource != null) {
                         cachedResource.setLoadStatus(LoadStatus.CACHED, loadStatusDetails);
                         return cachedResource;

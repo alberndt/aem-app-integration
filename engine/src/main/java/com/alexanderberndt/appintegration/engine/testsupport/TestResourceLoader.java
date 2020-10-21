@@ -24,7 +24,7 @@ public class TestResourceLoader implements ResourceLoader {
 
     @Nonnull
     @Override
-    public ExternalResource load(@Nonnull ExternalResourceRef resourceRef, @Nonnull ExternalResourceFactory factory) throws IOException, ResourceLoaderException {
+    public ExternalResource load(@Nonnull ExternalResourceRef resourceRef, @Nonnull ExternalResourceFactory factory, ExternalResource cachedResource) throws IOException, ResourceLoaderException {
         return factory.createExternalResource(resourceRef, new ByteArrayInputStream(testContent.getBytes()));
     }
 

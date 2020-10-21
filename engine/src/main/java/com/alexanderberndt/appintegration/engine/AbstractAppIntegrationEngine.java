@@ -1,5 +1,6 @@
 package com.alexanderberndt.appintegration.engine;
 
+import com.alexanderberndt.appintegration.engine.cache.ExternalResourceCache;
 import com.alexanderberndt.appintegration.engine.context.GlobalContext;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
@@ -86,10 +87,9 @@ public abstract class AbstractAppIntegrationEngine<I extends ApplicationInstance
         LOG.info("prefetch {} instances for application {}", applicationInstanceList.size(), context.getApplicationId());
 
         final String curJobName = "prefetch_" + DateTimeFormatter.ISO_DATE_TIME.format(LocalDateTime.now());
-        if (!context.getExternalResourceCache().startLongRunningWrite(curJobName)) {
-            context.getIntegrationLog().addWarning("Couldn't lock resource-cache. Abort prefetch-operation!");
-            return;
-        }
+        final ExternalResourceCache cache = context.getExternalResourceCache();
+
+        if (cache != null) cache.startLongRunningWrite(curJobName);
 
         // load application-properties.json
         final ApplicationInfoJson applicationInfo = getApplicationInfo(context, true);
@@ -127,7 +127,7 @@ public abstract class AbstractAppIntegrationEngine<I extends ApplicationInstance
 
         }
 
-        context.getExternalResourceCache().commitLongRunningWrite();
+        if (cache != null) cache.commitLongRunningWrite();
 
 
     }

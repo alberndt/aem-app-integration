@@ -2,7 +2,7 @@ package com.alexanderberndt.appintegration.engine.testsupport;
 
 import com.alexanderberndt.appintegration.engine.AbstractAppIntegrationEngine;
 import com.alexanderberndt.appintegration.engine.AppIntegrationEngine;
-import com.alexanderberndt.appintegration.engine.ExternalResourceCache;
+import com.alexanderberndt.appintegration.engine.cache.ExternalResourceCache;
 import com.alexanderberndt.appintegration.engine.logging.LogAppender;
 import com.alexanderberndt.appintegration.engine.logging.appender.Slf4jLogAppender;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;

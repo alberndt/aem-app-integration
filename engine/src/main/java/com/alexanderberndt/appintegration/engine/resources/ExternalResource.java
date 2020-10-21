@@ -21,7 +21,7 @@ public class ExternalResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    public enum LoadStatus {OK, CACHED}
+    public enum LoadStatus {LOADED, CACHED}
 
     @Nonnull
     private final URI uri;
@@ -38,7 +38,8 @@ public class ExternalResource {
     @Nonnull
     private final List<ExternalResourceRef> referencedResources = new ArrayList<>();
 
-    private LoadStatus loadStatus;
+    @Nonnull
+    private LoadStatus loadStatus = LoadStatus.LOADED;
 
     private Map<String, Serializable> loadStatusDetails;
 
@@ -172,11 +173,12 @@ public class ExternalResource {
         }
     }
 
-    public void setLoadStatus(LoadStatus loadStatus, Map<String, Serializable> loadStatusDetails) {
+    public void setLoadStatus(@Nonnull LoadStatus loadStatus, Map<String, Serializable> loadStatusDetails) {
         this.loadStatus = loadStatus;
         this.loadStatusDetails = loadStatusDetails;
     }
 
+    @Nonnull
     public LoadStatus getLoadStatus() {
         return loadStatus;
     }

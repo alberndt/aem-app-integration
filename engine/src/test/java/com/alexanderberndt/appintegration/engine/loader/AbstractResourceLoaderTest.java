@@ -2,6 +2,7 @@
 package com.alexanderberndt.appintegration.engine.loader;
 
 import com.alexanderberndt.appintegration.engine.ResourceLoader;
+import com.alexanderberndt.appintegration.engine.ResourceLoaderException;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceFactory;
 import com.alexanderberndt.appintegration.engine.resources.ExternalResourceRef;
@@ -28,21 +29,21 @@ class AbstractResourceLoaderTest {
     private static final ExternalResourceRef resourceRef = ExternalResourceRef.create("xxx", ExternalResourceType.PLAIN_TEXT);
 
     @Test
-    void loadAsString() throws IOException {
+    void loadAsString() throws IOException, ResourceLoaderException {
         ExternalResource resource = resourceLoader1000.load(resourceRef, this::createExternalResource);
         assertNotNull(resource);
         assertEquals(1000 * TEST_STRING.length(), resource.getContentAsParsedObject(String.class).length());
     }
 
     @Test
-    void loadAsInputStream() throws IOException {
+    void loadAsInputStream() throws IOException, ResourceLoaderException {
         ExternalResource resource = resourceLoader1000.load(resourceRef, this::createExternalResource);
         assertNotNull(resource);
         assert1000Lines(new LineNumberReader(new InputStreamReader(resource.getContentAsInputStream())));
     }
 
     @Test
-    void loadAsReader() throws IOException {
+    void loadAsReader() throws IOException, ResourceLoaderException {
         ExternalResource resource = resourceLoader1000.load(resourceRef, this::createExternalResource);
         assertNotNull(resource);
         assert1000Lines(new LineNumberReader(resource.getContentAsReader()));
@@ -90,7 +91,7 @@ class AbstractResourceLoaderTest {
 
         @Nonnull
         @Override
-        public ExternalResource load(@Nonnull ExternalResourceRef resourceRef, @Nonnull ExternalResourceFactory factory) {
+        public ExternalResource load(@Nonnull ExternalResourceRef resourceRef, @Nonnull ExternalResourceFactory factory, ExternalResource cachedResource) {
             ExternalResource externalResource = factory.createExternalResource(resourceRef, new ByteArrayInputStream(byteArray));
             if (charset != null) {
                 externalResource.setCharset(charset);

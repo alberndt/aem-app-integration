@@ -50,7 +50,7 @@ class AemExternalResourceCacheTest {
         cache.commitLongRunningWrite();
         dumpResource(rootRes);
 
-        ExternalResource cachedRes = cache.getCachedResource(resourceRef, this::createExternalResource);
+        ExternalResource cachedRes = cache.getCachedResource(resourceRef.getUri(), this::createExternalResource);
         assertNotNull(cachedRes);
     }
 

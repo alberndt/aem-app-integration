@@ -1,8 +1,8 @@
 package com.alexanderberndt.appintegration.pipeline;
 
-import com.alexanderberndt.appintegration.engine.ExternalResourceCache;
 import com.alexanderberndt.appintegration.engine.ResourceLoader;
 import com.alexanderberndt.appintegration.engine.ResourceLoaderException;
+import com.alexanderberndt.appintegration.engine.cache.ExternalResourceCache;
 import com.alexanderberndt.appintegration.engine.context.GlobalContext;
 import com.alexanderberndt.appintegration.engine.context.TaskContext;
 import com.alexanderberndt.appintegration.engine.logging.ResourceLogger;
@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.List;
@@ -31,7 +30,6 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import static com.alexanderberndt.appintegration.pipeline.configuration.Ranking.PIPELINE_EXECUTION;
 
@@ -120,27 +118,24 @@ public class ProcessingPipeline {
         }
 
         // try to get from cache
-        pipelineContext.acceptWithContext("load-from-cache", "load-from-cache",
-                taskContext -> ProcessingPipeline.readFromCache(taskContext, resourceRef));
+        final ExternalResource cachedResource =
+                pipelineContext.applyWithContext("load-from-cache", "load-from-cache",
+                        taskContext -> ProcessingPipeline.readFromCache(taskContext, resourceRef));
 
         // loading task
         final ExternalResource resource = pipelineContext.applyWithContext("download", "download",
-                taskContext -> ProcessingPipeline.download(taskContext, resourceRef));
-
+                taskContext -> ProcessingPipeline.download(taskContext, resourceRef, cachedResource));
 
         // directly return a cached resource
-        final ExternalResourceCache cache = context.getExternalResourceCache();
-        if (resource.getLoadStatus() == ExternalResource.LoadStatus.CACHED) {
-            cache.markResourceRefreshed(resource);
-            return resource;
+        if (resource.getLoadStatus() == ExternalResource.LoadStatus.LOADED) {
+            // processing tasks
+            for (TaskWrapper<ProcessingTask> taskWrapper : processingTasks) {
+                pipelineContext.acceptWithContext(taskWrapper.getId(), taskWrapper.getName(),
+                        taskContext -> taskWrapper.getTask().process(taskContext, resource));
+            }
         }
 
-        // processing tasks
-        for (TaskWrapper<ProcessingTask> taskWrapper : processingTasks) {
-            pipelineContext.acceptWithContext(taskWrapper.getId(), taskWrapper.getName(),
-                    taskContext -> taskWrapper.getTask().process(taskContext, resource));
-        }
-
+        // ToDo: Rethink about mark-as-refreshed
         pipelineContext.acceptWithContext("store-in-cache", "store-in-cache",
                 taskContext -> ProcessingPipeline.storeInCache(taskContext, resource));
 
@@ -148,21 +143,22 @@ public class ProcessingPipeline {
         return resource;
     }
 
-    protected static void readFromCache(@Nonnull TaskContext taskContext, @Nonnull ExternalResourceRef resourceRef) {
+    protected static ExternalResource readFromCache(@Nonnull TaskContext taskContext, @Nonnull ExternalResourceRef resourceRef) {
+
         final boolean cachingEnabled = taskContext.getValue(CACHING_ENABLED_PROP, true);
-        if (cachingEnabled) {
-            final ExternalResourceCache cache = taskContext.getExternalResourceCache();
-            if (cache != null) {
-                final ExternalResource cachedRes = cache.getCachedResource(resourceRef, taskContext.getResourceFactory());
-                if (cachedRes != null) {
-                    resourceRef.setCachedExternalRes(cachedRes);
-                }
-            } else {
-                taskContext.addWarning("No cache available!");
-            }
-        } else {
+        if (!cachingEnabled) {
             taskContext.addWarning("Caching disabled!");
+            return null;
         }
+
+        final ExternalResourceCache cache = taskContext.getExternalResourceCache();
+        if (cache == null) {
+            taskContext.addWarning("No cache available!");
+            return null;
+        }
+
+        return cache.getCachedResource(resourceRef.getUri(), taskContext.getResourceFactory());
+
     }
 
     protected static void storeInCache(@Nonnull TaskContext taskContext, @Nonnull ExternalResource resource) {
@@ -172,8 +168,7 @@ public class ProcessingPipeline {
         if (cachingEnabled) {
             final ExternalResourceCache cache = taskContext.getExternalResourceCache();
             if (cache != null) {
-                final Supplier<InputStream> cachedDataSupplier = cache.storeResource(resource);
-                resource.setContentSupplier(cachedDataSupplier, InputStream.class);
+                cache.storeResource(resource);
             } else {
                 taskContext.addWarning("No cache available!");
             }
@@ -183,7 +178,7 @@ public class ProcessingPipeline {
     }
 
 
-    protected static ExternalResource download(@Nonnull TaskContext context, ExternalResourceRef resourceRef) {
+    protected static ExternalResource download(@Nonnull TaskContext context, ExternalResourceRef resourceRef, @Nullable ExternalResource cachedResource) {
 
 //        final ExternalResource cachedResource = resourceRef.getCachedExternalRes();
 //        if (cachedResource != null) {
@@ -194,7 +189,7 @@ public class ProcessingPipeline {
 
         ResourceLoader resourceLoader = context.getResourceLoader();
         try {
-            return resourceLoader.load(resourceRef, context.getResourceFactory());
+            return resourceLoader.load(resourceRef, context.getResourceFactory(), cachedResource);
         } catch (IOException | ResourceLoaderException e) {
             throw new AppIntegrationException("Failed to load resource " + resourceRef.getUri(), e);
         }

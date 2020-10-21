@@ -76,11 +76,11 @@ class AbstractAppIntegrationEngineTest {
 
     @Test
     void prefetch() throws URISyntaxException {
+
         engine.prefetch(Arrays.asList(instance1, instance2));
 
         final TestExternalResourceCache cache = engine.getExternalResourceCache(APPLICATION_ID);
         final List<URI> keyList = cache.getCacheKeys();
-
         assertEquals(5, keyList.size());
         assertEquals(new URI("classpath://system/simple-app1/server/application-info.json"), keyList.get(0));
         assertEquals(new URI("classpath://system/simple-app1/server/subscribe.product-news.de.html"), keyList.get(1));

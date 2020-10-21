@@ -1,6 +1,7 @@
 package com.alexanderberndt.appintegration.tasks.prepare;
 
 import com.alexanderberndt.appintegration.engine.logging.appender.Slf4jLogAppender;
+import com.alexanderberndt.appintegration.engine.resources.ExternalResource;
 import com.alexanderberndt.appintegration.engine.testsupport.TestAppIntegrationEngine;
 import com.alexanderberndt.appintegration.engine.testsupport.TestAppIntegrationFactory;
 import com.alexanderberndt.appintegration.engine.testsupport.TestApplication;
@@ -15,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ExtendWith(MockitoExtension.class)
 class PropertiesTaskTest {
@@ -63,7 +65,8 @@ class PropertiesTaskTest {
 
     @Test
     void prepareTextRes() {
-        engine.getStaticResource("test-app", "/test.txt");
+        ExternalResource res = engine.getStaticResource("test-app", "/test.txt");
+        assertNotNull(res);
         assertEquals("Hello World!", stringValue.value);
         assertEquals(new Integer(42), numberValue.value);
     }
